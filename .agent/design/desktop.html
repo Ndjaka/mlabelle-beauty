@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mlabelle Beauty - Coiffure &amp; Esthétique</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&amp;family=Noto+Serif:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#5a4300",
+                        "on-tertiary-container": "#6e6d6d",
+                        "tertiary-container": "#f3f0ef",
+                        "surface-variant": "#e9e2d7",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#e0d9ce",
+                        "on-secondary-container": "#785d14",
+                        "tertiary-fixed": "#e5e2e1",
+                        "background": "#fff8f0",
+                        "surface": "#fff8f0",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#6f6d67",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "on-surface-variant": "#49473f",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#eee7dc",
+                        "surface-container-low": "#faf3e7",
+                        "inverse-surface": "#333029",
+                        "on-secondary-fixed": "#251a00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1e1b15",
+                        "surface-container": "#f4ede2",
+                        "secondary": "#765a12",
+                        "inverse-primary": "#cac6be",
+                        "inverse-on-surface": "#f7f0e5",
+                        "secondary-fixed": "#ffdf9b",
+                        "tertiary": "#5f5e5e",
+                        "outline": "#7a776f",
+                        "outline-variant": "#cbc6bc",
+                        "surface-tint": "#615e58",
+                        "on-primary-fixed-variant": "#494741",
+                        "on-surface": "#1e1b15",
+                        "secondary-fixed-dim": "#e6c270",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "surface-bright": "#fff8f0",
+                        "primary-fixed": "#e7e2da",
+                        "secondary-container": "#fed884",
+                        "primary-container": "#f5f0e8",
+                        "surface-container-highest": "#e9e2d7",
+                        "primary": "#615e58",
+                        "primary-fixed-dim": "#cac6be",
+                        "on-primary-fixed": "#1d1c17"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "xxl": "80px",
+                        "sm": "8px",
+                        "unit": "4px",
+                        "xl": "48px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Manrope"],
+                        "label-caps": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "h2": ["Noto Serif"],
+                        "h3": ["Noto Serif"],
+                        "h1": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "h2": ["36px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                        "h3": ["24px", {"lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "h1": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .text-rose-gold { color: #B8974A; }
+        .bg-rose-gold { background-color: #B8974A; }
+        .border-rose-gold { border-color: #B8974A; }
+        .border-stone { border-color: #E5DED3; }
+        .bg-stone-light { background-color: #E5DED3; }
+    </style>
+</head>
+<body class="bg-primary-container text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="w-full bg-[#F5F0E8] border-b border-[#E5DED3] sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-20 py-6 max-w-[1440px] mx-auto">
+<div class="font-['Noto_Serif'] text-2xl font-light tracking-tighter text-stone-900">
+                Mlabelle Beauty
+            </div>
+<button class="hidden md:block bg-on-surface text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-none hover:bg-opacity-90 transition-all border border-on-surface">
+                Réserver
+            </button>
+<button class="md:hidden text-stone-900">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-lg md:px-xxl py-xl md:py-xxl">
+<!-- Header Section -->
+<header class="text-center mb-xl md:mb-xxl max-w-2xl mx-auto">
+<h1 class="font-h1 text-h1 text-on-surface mb-sm">Nos Prestations</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">L'art de la beauté à la française. Découvrez nos rituels de soins sur mesure.</p>
+</header>
+<!-- Services Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Service Card 1 -->
+<article class="bg-[#F5F0E8] border border-[#B8974A]/30 flex flex-col group hover:border-[#B8974A] transition-colors duration-500 p-xl">
+<div class="mb-lg">
+<span class="font-label-caps text-label-caps text-[#B8974A] tracking-[0.15em]">COIFFURE</span>
+</div>
+<div class="flex flex-col flex-grow">
+<h3 class="font-h3 text-h3 text-on-surface mb-md">Coupe &amp; Brushing Signature</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl flex-grow">Un diagnostic personnalisé suivi d'une coupe sur mesure et d'un coiffage élégant pour sublimer votre visage.</p>
+<div class="flex items-center justify-between mb-lg pt-lg border-t border-[#B8974A]/20">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+<span class="font-label-caps text-label-caps">60 MIN</span>
+</div>
+<span class="font-body-lg text-body-lg font-medium text-stone-900">85 €</span>
+</div>
+<button class="w-full bg-on-surface text-on-primary font-label-caps text-label-caps py-4 hover:bg-opacity-90 transition-colors">
+                        Réserver
+                    </button>
+</div>
+</article>
+<!-- Service Card 2 -->
+<article class="bg-[#F5F0E8] border border-[#B8974A]/30 flex flex-col group hover:border-[#B8974A] transition-colors duration-500 p-xl">
+<div class="mb-lg">
+<span class="font-label-caps text-label-caps text-[#B8974A] tracking-[0.15em]">ESTHÉTIQUE</span>
+</div>
+<div class="flex flex-col flex-grow">
+<h3 class="font-h3 text-h3 text-on-surface mb-md">Soin Visage Éclat</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl flex-grow">Un rituel purifiant et hydratant aux extraits de rose pour raviver la luminosité naturelle de votre peau.</p>
+<div class="flex items-center justify-between mb-lg pt-lg border-t border-[#B8974A]/20">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+<span class="font-label-caps text-label-caps">45 MIN</span>
+</div>
+<span class="font-body-lg text-body-lg font-medium text-stone-900">65 €</span>
+</div>
+<button class="w-full bg-on-surface text-on-primary font-label-caps text-label-caps py-4 hover:bg-opacity-90 transition-colors">
+                        Réserver
+                    </button>
+</div>
+</article>
+<!-- Service Card 3 -->
+<article class="bg-[#F5F0E8] border border-[#B8974A]/30 flex flex-col group hover:border-[#B8974A] transition-colors duration-500 p-xl">
+<div class="mb-lg">
+<span class="font-label-caps text-label-caps text-[#B8974A] tracking-[0.15em]">LE SALON</span>
+</div>
+<div class="flex flex-col flex-grow">
+<h3 class="font-h3 text-h3 text-on-surface mb-md">Massage Relaxant</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl flex-grow">Détente absolue du corps et de l'esprit avec nos huiles essentielles délicatement parfumées.</p>
+<div class="flex items-center justify-between mb-lg pt-lg border-t border-[#B8974A]/20">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+<span class="font-label-caps text-label-caps">90 MIN</span>
+</div>
+<span class="font-body-lg text-body-lg font-medium text-stone-900">120 €</span>
+</div>
+<button class="w-full bg-on-surface text-on-primary font-label-caps text-label-caps py-4 hover:bg-opacity-90 transition-colors">
+                        Réserver
+                    </button>
+</div>
+</article>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t mt-20 border-[#E5DED3] bg-[#F5F0E8]">
+<div class="flex flex-col items-center gap-8 w-full px-20 py-12 text-center max-w-[1440px] mx-auto">
+<div class="font-['Noto_Serif'] text-lg font-medium text-stone-900">
+                Mlabelle Beauty
+            </div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-['Noto_Serif'] text-xs tracking-widest uppercase text-stone-500 hover:text-[#B8974A] transition-colors duration-200 ease-in-out" href="#">Mentions Légales</a>
+<a class="font-['Noto_Serif'] text-xs tracking-widest uppercase text-stone-500 hover:text-[#B8974A] transition-colors duration-200 ease-in-out" href="#">Confidentialité</a>
+<a class="font-['Noto_Serif'] text-xs tracking-widest uppercase text-stone-500 hover:text-[#B8974A] transition-colors duration-200 ease-in-out" href="#">Instagram</a>
+<a class="font-['Noto_Serif'] text-xs tracking-widest uppercase text-stone-500 hover:text-[#B8974A] transition-colors duration-200 ease-in-out" href="#">Prendre Rendez-vous</a>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">
+                © 2024 Mlabelle Beauty - Coiffure &amp; Esthétique. L'art de la beauté à la française.
+            </p>
+</div>
+</footer>
+</body></html>

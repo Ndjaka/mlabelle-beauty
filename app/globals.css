@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Foundation */
+  --background: #FFF8F0;
+  --foreground: #1A1A1A;
+  --primary: #F5F0E8; /* Cream */
+  --on-primary: #1A1A1A;
+  --secondary: #B8974A; /* Rose Gold */
+  --on-secondary: #FFFFFF;
+  --tertiary: #1A1A1A; /* Ink Black */
+  --neutral: #E5DED3; /* Stone */
+  
+  /* Surfaces */
+  --surface: #F5F0E8;
+  --surface-dim: #E5DED3;
+  --surface-container: #FAF3E7;
+  --surface-container-low: #FFF8F0;
+  --surface-container-high: #EEE7DC;
+  
+  /* Outlines */
+  --outline: #7A776F;
+  --outline-variant: #CBC6BC;
 }
 
 @theme inline {
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-noto-serif);
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-neutral: var(--neutral);
+  
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-high: var(--surface-container-high);
+  
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif), serif;
+  font-weight: 400;
+}
+
+/* Custom Utilities for Design System */
+@layer utilities {
+  .label-caps {
+    font-family: var(--font-manrope);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+  }
+
+  .animate-fade-in-up {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
