@@ -1,312 +1,428 @@
-"use client";
+'use client'
 
-import { useState, useMemo } from "react";
-import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, startOfToday, isValid } from "date-fns";
-import { fr } from "date-fns/locale";
-import { useRouter } from "next/navigation";
-import { groupSlotsByPeriod, formatPrice, formatDuration } from "@/features/booking/utils";
-import type { Service } from "@/types/service";
+import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addDays, isBefore, startOfDay, isSameDay, isSameMonth } from 'date-fns'
+import { fr } from 'date-fns/locale'
+import type { Service } from '@/types/service'
+import { formatPrice, formatDuration } from '@/features/booking/utils'
+import { getSlotsForDate } from '@/features/booking/actions'
 
 interface BookingClientProps {
-  service: Service;
-  selectedDateStr: string;
-  availableSlots: string[];
+  service: Service
+  initialDate: Date
+  initialSlots: { morning: string[], afternoon: string[] }
 }
 
-export function BookingClient({ service, selectedDateStr, availableSlots }: BookingClientProps) {
-  const router = useRouter();
-  
-  const selectedDate = useMemo(() => {
-    const d = parseISO(selectedDateStr);
-    return isValid(d) ? d : new Date();
-  }, [selectedDateStr]);
+export function BookingClient({ service, initialDate, initialSlots }: BookingClientProps) {
+  const router = useRouter()
+  const today = startOfDay(new Date())
 
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(initialDate))
+  const [selectedDate, setSelectedDate] = useState(initialDate)
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
+  const [slots, setSlots] = useState(initialSlots)
+  const [loadingSlots, setLoadingSlots] = useState(false)
 
-  const today = startOfToday();
-  const mobileDays = useMemo(() => 
-    Array.from({ length: 14 }).map((_, i) => addDays(today, i)),
-  [today]);
+  // Desktop month days
+  const monthDays = eachDayOfInterval({
+    start: startOfMonth(currentMonth),
+    end: endOfMonth(currentMonth),
+  })
 
-  const monthStart = startOfMonth(selectedDate);
-  const monthEnd = endOfMonth(monthStart);
-  const desktopDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-  
-  const startDayOfWeek = monthStart.getDay(); 
-  const emptyDaysCount = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
-  const emptyDays = Array.from({ length: emptyDaysCount });
+  // Mobile upcoming 14 days
 
-  const { morning, afternoon } = useMemo(() => 
-    groupSlotsByPeriod(availableSlots),
-  [availableSlots]);
+  const loadSlotsForDate = useCallback(async (date: Date) => {
+    setLoadingSlots(true)
+    setSelectedSlot(null)
+    try {
+      const dateStr = format(date, 'yyyy-MM-dd')
+      const result = await getSlotsForDate(dateStr, service.duration_minutes)
+      setSlots(result)
+    } catch {
+      setSlots({ morning: [], afternoon: [] })
+    } finally {
+      setLoadingSlots(false)
+    }
+  }, [service.duration_minutes])
 
-  const handleDateClick = (date: Date) => {
-    setSelectedSlot(null);
-    router.push(`/booking/${format(date, "yyyy-MM-dd")}?service_id=${service.id}`);
-  };
+  const handleDateSelect = (date: Date) => {
+    if (isBefore(date, today)) return
+    setSelectedDate(date)
+    loadSlotsForDate(date)
+  }
 
   const handleConfirm = () => {
-    if (!selectedSlot) return;
-    alert(`Rendez-vous confirmé pour le ${format(selectedDate, 'd MMMM', { locale: fr })} à ${selectedSlot}`);
-  };
+    if (!selectedSlot) return
+    const dateStr = format(selectedDate, 'yyyy-MM-dd')
+    router.push(`/booking/${dateStr}/confirm?service_id=${service.id}&slot=${selectedSlot}`)
+  }
+
+  const allSlotsCount = slots.morning.length + slots.afternoon.length
 
   return (
-    <div className="flex flex-col lg:flex-row gap-xxl items-start">
-      {/* COLONNE GAUCHE - 60% */}
-      <div className="w-full lg:w-[60%] flex flex-col">
-        
-        {/* Titre & Étape */}
-        <div className="mb-xl">
-          <span className="label-caps text-secondary text-[12px] tracking-[0.2em] block mb-sm">
-            ÉTAPES 1 SUR 3
-          </span>
-          <h1 className="text-h1 font-serif text-foreground leading-[1.1]">
-            Votre parenthèse beauté
-          </h1>
-          <p className="text-body-md text-outline mt-md font-sans lg:max-w-md">
-            Sélectionnez le moment parfait pour vous parmi nos disponibilités.
-          </p>
-        </div>
-
-        {/* Carte Service Style "Mockup" */}
-        <div className="bg-surface border border-outline-variant/30 p-lg mb-xxl relative group">
-          <div className="absolute top-0 left-0 -translate-y-1/2 ml-lg">
-            <span className="bg-surface-container-high px-3 py-1 text-[10px] font-bold tracking-[0.15em] text-foreground border border-outline-variant/30 uppercase">
-              COIFFURE
-            </span>
+    <>
+      {/* ======== MOBILE (md:hidden) ======== */}
+      <div className="md:hidden flex flex-col bg-background pb-[120px]">
+        <main className="flex-grow px-gutter pt-lg">
+          {/* Page Title */}
+          <div className="mb-xl text-center mt-4">
+            <h1 className="font-h2 text-h2 text-on-background mb-sm">Votre parenthèse beauté</h1>
+            <p className="font-normal text-[16px] text-on-surface-variant">Sélectionnez le moment parfait pour vous.</p>
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <div>
-              <h2 className="text-h3 font-serif text-foreground mb-sm">{service.name}</h2>
-              <div className="flex items-center gap-md text-body-md">
-                <div className="flex items-center gap-xs text-outline">
-                  <span className="material-symbols-outlined text-[20px]">schedule</span>
-                  <span>{formatDuration(service.duration_minutes)}</span>
-                </div>
-                <span className="text-outline-variant">|</span>
-                <span className="font-bold text-foreground">{formatPrice(service.price_cents)}</span>
+
+          {/* Service Recap Card */}
+          <div className="bg-surface border border-outline-variant rounded-none p-4 mb-xl">
+            <div className="flex justify-between items-start mb-sm">
+              <div>
+                <h3 className="font-h3 text-h3 text-on-background">{service.name}</h3>
               </div>
             </div>
-            <button className="text-[11px] font-bold tracking-widest text-secondary hover:text-foreground transition-colors underline decoration-secondary/30 underline-offset-4">
-              MODIFIER
-            </button>
+            <div className="flex items-center text-on-surface-variant font-body-md text-body-md mt-4 gap-1.5">
+              <span className="material-symbols-outlined text-sm text-outline" style={{ fontSize: '12px' }}>schedule</span>
+              <span>{formatDuration(service.duration_minutes)}</span>
+              <span className="mx-3 text-outline">|</span>
+              <span className="font-bold text-on-background ">{formatPrice(service.price_cents)}</span>
+            </div>
           </div>
-        </div>
 
-        {/* Section Sélection Date/Heure */}
-        <div className="flex flex-col gap-xl">
-          <h3 className="text-h3 font-serif text-foreground">Sélectionnez une date</h3>
-          
-          <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-xl items-start">
-            
-            {/* Calendrier Desktop */}
-            <div className="hidden lg:block bg-white border border-outline-variant/30 p-lg rounded-sm shadow-sm">
-              <div className="flex justify-between items-center mb-lg">
-                <button className="p-2 hover:bg-surface rounded-full transition-colors text-outline">
-                  <span className="material-symbols-outlined">chevron_left</span>
+          {/* Date Picker */}
+          <div className="mb-xl">
+            <div className="flex justify-between items-end mb-4">
+              <h2 className="font-label-caps text-label-caps text-on-surface uppercase">
+                {format(currentMonth, 'MMMM', { locale: fr })}
+              </h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                  className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm">chevron_left</span>
                 </button>
-                <span className="text-body-lg text-foreground font-serif capitalize">
-                  {format(selectedDate, 'MMMM yyyy', { locale: fr })}
-                </span>
-                <button className="p-2 hover:bg-surface rounded-full transition-colors text-outline">
-                  <span className="material-symbols-outlined">chevron_right</span>
+                <button
+                  onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                  className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm">chevron_right</span>
                 </button>
               </div>
-              
-              <div className="grid grid-cols-7 gap-y-sm text-center mb-sm text-[11px] font-bold text-outline-variant uppercase tracking-tighter">
-                <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
-              </div>
-              
-              <div className="grid grid-cols-7 gap-1 text-center">
-                {emptyDays.map((_, i) => <div key={`empty-${i}`} />)}
-                {desktopDays.map((day) => {
-                  const isSelected = isSameDay(day, selectedDate);
-                  return (
-                    <button
-                      key={day.toISOString()}
-                      onClick={() => handleDateClick(day)}
-                      className={`w-9 h-9 mx-auto flex items-center justify-center text-sm transition-all rounded-full ${
-                        isSelected 
-                          ? 'bg-secondary text-white font-bold shadow-md scale-110' 
-                          : 'text-foreground hover:bg-surface'
-                      }`}
-                    >
+            </div>
+            <div className="flex overflow-x-auto gap-4 no-scrollbar pb-2 snap-x">
+              {monthDays.map((day) => {
+                const isSelected = isSameDay(day, selectedDate)
+                const isPast = isBefore(day, today)
+                return (
+                  <button
+                    key={day.toISOString()}
+                    onClick={() => !isPast && handleDateSelect(day)}
+                    disabled={isPast}
+                    className={`snap-start flex-shrink-0 w-[64px] h-[80px] border flex flex-col items-center justify-center transition-colors relative
+                      ${isPast ? 'opacity-50 cursor-not-allowed border-outline-variant bg-surface' : ''}
+                      ${isSelected ? 'border-secondary bg-surface shadow-[0_0_15px_rgba(184,151,74,0.15)]' : !isPast ? 'border-outline-variant bg-surface hover:border-secondary/50' : ''}
+                    `}
+                  >
+                    {isSelected && <div className="absolute top-0 w-full h-[2px] bg-secondary" />}
+                    <span className={`font-label-caps text-label-caps uppercase mb-1 ${isSelected ? 'text-secondary' : 'text-on-surface-variant'}`}>
+                      {format(day, 'EEE', { locale: fr })}
+                    </span>
+                    <span className="font-h3 text-h3 text-on-background">
                       {format(day, 'd')}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Date Picker Mobile (Scroll) */}
-            <div className="lg:hidden">
-               <div className="flex justify-between items-end mb-md">
-                <h2 className="label-caps text-foreground uppercase tracking-widest text-[11px]">{format(selectedDate, 'MMMM', { locale: fr })}</h2>
-                <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-outline">
-                    <span className="material-symbols-outlined text-sm">chevron_left</span>
+                    </span>
                   </button>
-                  <button className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-outline">
-                    <span className="material-symbols-outlined text-sm">chevron_right</span>
-                  </button>
-                </div>
-              </div>
-              <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2 snap-x">
-                {mobileDays.map((day) => {
-                  const isSelected = isSameDay(day, selectedDate);
-                  return (
-                    <button
-                      key={day.toISOString()}
-                      onClick={() => handleDateClick(day)}
-                      className={`snap-start flex-shrink-0 w-[68px] h-[84px] border flex flex-col items-center justify-center transition-all relative ${
-                        isSelected
-                          ? 'border-secondary bg-surface shadow-[0_0_20px_rgba(184,151,74,0.1)]'
-                          : 'border-outline-variant bg-white'
-                      }`}
-                    >
-                      {isSelected && <div className="absolute top-0 w-full h-[3px] bg-secondary"></div>}
-                      <span className={`text-[10px] font-bold uppercase mb-1 tracking-widest ${isSelected ? 'text-secondary' : 'text-outline'}`}>
-                        {format(day, 'EEE', { locale: fr }).replace('.', '')}
-                      </span>
-                      <span className="text-[22px] font-serif text-foreground leading-none">
-                        {format(day, 'd')}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Créneaux Horaires */}
-            <div className="flex flex-col gap-lg">
-              <div className="flex items-center justify-between border-b border-outline-variant/20 pb-md">
-                <h4 className="text-body-md font-serif text-foreground capitalize">
-                  {format(selectedDate, 'EEEE d MMMM', { locale: fr })}
-                </h4>
-              </div>
-
-              {/* Matin */}
-              <div className="space-y-sm">
-                <div className="flex items-center gap-xs text-[11px] font-bold text-outline uppercase tracking-widest">
-                  <span className="material-symbols-outlined text-secondary text-[18px]">wb_sunny</span>
-                  <span>Matin</span>
-                </div>
-                <div className="grid grid-cols-3 xl:grid-cols-2 gap-3">
-                  {morning.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`py-3 border transition-all text-sm rounded-sm ${
-                        slot === selectedSlot
-                          ? 'border-secondary bg-secondary/5 text-foreground ring-1 ring-secondary shadow-inner font-bold'
-                          : 'border-outline-variant bg-white text-outline hover:border-secondary hover:text-foreground'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                  {morning.length === 0 && (
-                    <div className="col-span-full py-md px-lg border border-dashed border-outline-variant/30 text-center rounded-sm">
-                      <span className="text-[11px] text-outline-variant font-sans uppercase tracking-widest italic">
-                        Aucun créneau disponible
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Après-midi */}
-              <div className="space-y-sm">
-                <div className="flex items-center gap-xs text-[11px] font-bold text-outline uppercase tracking-widest">
-                  <span className="material-symbols-outlined text-secondary text-[18px]">partly_cloudy_day</span>
-                  <span>Après-midi</span>
-                </div>
-                <div className="grid grid-cols-3 xl:grid-cols-2 gap-3">
-                  {afternoon.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`py-3 border transition-all text-sm rounded-sm ${
-                        slot === selectedSlot
-                          ? 'border-secondary bg-secondary/5 text-foreground ring-1 ring-secondary shadow-inner font-bold'
-                          : 'border-outline-variant bg-white text-outline hover:border-secondary hover:text-foreground'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                  {afternoon.length === 0 && (
-                    <div className="col-span-full py-md px-lg border border-dashed border-outline-variant/30 text-center rounded-sm">
-                      <span className="text-[11px] text-outline-variant font-sans uppercase tracking-widest italic">
-                        Aucun créneau disponible
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* COLONNE DROITE - RÉSUMÉ STICKY */}
-      <div className="hidden lg:block w-[40%] sticky top-32">
-        <div className="bg-white border border-outline-variant/30 p-xl shadow-[0_10px_40px_rgba(0,0,0,0.02)]">
-          <h3 className="text-h3 font-serif text-foreground mb-lg">Résumé</h3>
-          
-          <div className="space-y-md mb-xl">
-            <div className="flex justify-between items-baseline">
-              <span className="text-body-md text-foreground">{service.name}</span>
-              <span className="text-body-md font-bold">{formatPrice(service.price_cents)}</span>
-            </div>
-            
-            <div className="flex items-start gap-sm text-outline text-body-sm italic">
-              <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-              <div className="flex flex-col">
-                <span className="capitalize">{format(selectedDate, 'EEEE d MMMM', { locale: fr })}</span>
-                {selectedSlot && <span className="text-secondary font-bold not-italic">{selectedSlot}</span>}
-                {!selectedSlot && <span>Sélectionnez un créneau</span>}
-              </div>
+                )
+              })}
             </div>
           </div>
 
-          <div className="pt-lg border-t border-outline-variant/20 flex justify-between items-center mb-xl">
-            <span className="text-body-lg font-serif">Total</span>
-            <span className="text-h3 font-bold text-foreground">{formatPrice(service.price_cents)}</span>
-          </div>
+          {/* Time Slots */}
+          {loadingSlots ? (
+            <div className="text-center py-8 font-body-md text-on-surface-variant">Chargement...</div>
+          ) : (
+            <div>
+              {slots.morning.length > 0 && (
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="material-symbols-outlined text-secondary">wb_sunny</span>
+                    <h3 className="font-label-caps text-label-caps text-on-surface uppercase">Matin</h3>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mb-lg">
+                    {slots.morning.map(slot => (
+                      <button
+                        key={slot}
+                        onClick={() => setSelectedSlot(slot)}
+                        className={`py-3 border text-center font-body-md text-body-md transition-colors
+                          ${selectedSlot === slot
+                            ? 'border-secondary bg-surface text-on-background shadow-[0_0_10px_rgba(184,151,74,0.1)]'
+                            : 'border-outline-variant bg-surface text-on-background hover:border-secondary'
+                          }
+                        `}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
 
+              {slots.afternoon.length > 0 && (
+                <>
+                  <div className="flex items-center gap-3 mb-4 mt-xl">
+                    <span className="material-symbols-outlined text-secondary">partly_cloudy_day</span>
+                    <h3 className="font-label-caps text-label-caps text-on-surface uppercase">Après-midi</h3>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {slots.afternoon.map(slot => (
+                      <button
+                        key={slot}
+                        onClick={() => setSelectedSlot(slot)}
+                        className={`py-3 border text-center font-body-md text-body-md transition-colors
+                          ${selectedSlot === slot
+                            ? 'border-secondary bg-surface text-on-background shadow-[0_0_10px_rgba(184,151,74,0.1)]'
+                            : 'border-outline-variant bg-surface text-on-background hover:border-secondary'
+                          }
+                        `}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {allSlotsCount === 0 && (
+                <div className="text-center py-8 font-body-md text-on-surface-variant">Aucun créneau disponible.</div>
+              )}
+            </div>
+          )}
+        </main>
+
+        {/* Sticky Bottom Recap & Action */}
+        <div className="fixed bottom-0 w-full bg-surface/95 backdrop-blur-md border-t border-outline-variant px-6 py-4 flex items-center justify-between z-40">
+          <div>
+            <p className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">
+              {format(selectedDate, 'EEE d MMM', { locale: fr })}
+            </p>
+            <p className="font-h3 text-h3 text-on-background">
+              {selectedSlot ?? '—'}
+            </p>
+          </div>
           <button
             onClick={handleConfirm}
             disabled={!selectedSlot}
-            className="w-full py-5 bg-foreground text-white text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-neutral transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg"
+            className="bg-[#2C2924] text-white font-semibold text-[12px] uppercase tracking-[0.2em] px-[28.73px] py-[16px] hover:bg-black transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
           >
-            CONFIRMER MON RENDEZ-VOUS
+            CONFIRMER
           </button>
-          
-          <p className="mt-md text-[11px] text-outline text-center font-sans">
-            Paiement sur place. Annulation flexible.
-          </p>
         </div>
       </div>
 
-      {/* STICKY BOTTOM MOBILE */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-outline-variant px-6 py-4 pb-safe flex items-center justify-between z-50">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-outline uppercase tracking-widest">
-            {format(selectedDate, 'EEE d MMM', { locale: fr }).replace('.', '')}
-          </span>
-          <span className="text-h3 font-serif text-foreground">
-            {selectedSlot || "--:--"}
-          </span>
+      {/* ======== DESKTOP (hidden md:flex) ======== */}
+      <div className="hidden md:flex flex-col flex-grow w-full max-w-container-max mx-auto px-lg md:px-xxl py-xl md:py-xxl">
+        <div className="flex flex-col lg:flex-row gap-xxl">
+
+          {/* Left Column (60%) */}
+          <div className="w-full lg:w-[60%] flex flex-col gap-xl">
+            <div className="mb-lg">
+              <span className="font-label-caps text-label-caps uppercase text-secondary tracking-widest block mb-sm">
+                Étape 1 sur 3
+              </span>
+              <h1 className="font-h1 text-h1 text-on-surface">Votre parenthèse beauté</h1>
+            </div>
+
+            {/* Service Recap Card */}
+            <div className="p-4 bg-surface border border-surface-dim rounded flex items-start gap-6">
+              <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center shrink-0 border border-secondary/20">
+                <span className="material-symbols-outlined text-secondary text-2xl" style={{ fontVariationSettings: "'FILL' 0" }}>cut</span>
+              </div>
+              <div className="flex-grow">
+                <h3 className="font-h3 text-h3 text-on-surface mb-xs">{service.name}</h3>
+                <div className="flex items-center gap-2 font-body-md text-body-md text-on-surface-variant">
+                  <span className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">schedule</span> {formatDuration(service.duration_minutes)}
+                  </span>
+                  <span className="text-outline-variant">|</span>
+                  <span>{formatPrice(service.price_cents)}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => router.back()}
+                className="text-secondary hover:text-foreground transition-colors underline font-label-caps text-label-caps"
+              >
+                MODIFIER
+              </button>
+            </div>
+
+            {/* Date & Time Selection */}
+            <div className="mt-md">
+              <h2 className="font-h3 text-h3 text-on-surface mb-lg">Sélectionnez une date</h2>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-xl">
+
+                {/* Minimalist Calendar */}
+                <div className="border border-outline-variant/50 p-gutter rounded h-fit bg-white shadow-[0_4px_24px_rgba(30,27,21,0.02)]">
+                  <div className="flex justify-between items-center mb-4">
+                    <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-surface-container rounded-full transition-colors w-8 h-8 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-on-surface-variant">chevron_left</span>
+                    </button>
+                    <span className="font-body-lg text-body-lg text-on-surface capitalize">
+                      {format(currentMonth, 'MMMM yyyy', { locale: fr })}
+                    </span>
+                    <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-surface-container rounded-full transition-colors  w-8 h-8 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-y-sm text-center mb-4 font-label-caps text-label-caps text-on-surface-variant">
+                    <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-2 text-center font-body-md text-body-md">
+                    {/* Empty cells for alignment */}
+                    {Array.from({ length: (getDay(startOfMonth(currentMonth)) + 6) % 7 }).map((_, i) => (
+                      <div key={`empty-${i}`} />
+                    ))}
+                    {/* Days */}
+                    {monthDays.map((day) => {
+                      const isPast = isBefore(day, today)
+                      const isSelected = isSameDay(day, selectedDate)
+                      const isCurrentMonth = isSameMonth(day, currentMonth)
+                      return (
+                        <button
+                          key={day.toISOString()}
+                          onClick={() => !isPast && handleDateSelect(day)}
+                          disabled={isPast || !isCurrentMonth}
+                          className={`w-8 h-8 mx-auto flex items-center justify-center rounded-full transition-colors
+                            ${isPast ? 'text-outline hover:border hover:border-outline-variant cursor-not-allowed' : ''}
+                            ${isSelected ? 'bg-secondary text-background' : ''}
+                            ${!isPast && !isSelected ? 'text-on-surface hover:bg-surface' : ''}
+                          `}
+                        >
+                          {format(day, 'd')}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Time Slots List */}
+                <div className="flex flex-col gap-3">
+                  <span className="font-body-md text-body-md text-on-surface block capitalize">
+                    {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
+                  </span>
+
+                  {loadingSlots ? (
+                    <div className="font-body-md text-on-surface-variant">Chargement...</div>
+                  ) : (
+                    <>
+                      {/* Matin */}
+                      {slots.morning.length > 0 && (
+                        <div className="flex flex-col gap-sm">
+                          <div className="flex items-center gap-3 mb-gutter">
+                            <span className="material-symbols-outlined text-secondary">light_mode</span>
+                            <h3 className="font-label-caps text-label-caps text-on-surface uppercase">Matin</h3>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {slots.morning.map(slot => (
+                              <button
+                                key={slot}
+                                onClick={() => setSelectedSlot(slot)}
+                                className={`py-sm border font-body-lg text-body-lg rounded text-center transition-all
+                                  ${selectedSlot === slot
+                                    ? 'border-secondary bg-surface text-on-surface'
+                                    : 'border-surface-dim text-secondary hover:border-secondary hover:bg-surface'
+                                  }
+                                `}
+                              >
+                                {slot}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Après-midi */}
+                      {slots.afternoon.length > 0 && (
+                        <div className="flex flex-col gap-sm mt-gutter">
+                          <div className="flex items-center gap-3 mb-gutter">
+                            <span className="material-symbols-outlined text-secondary">sunny</span>
+                            <h3 className="font-label-caps text-label-caps text-on-surface uppercase">Après-midi</h3>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {slots.afternoon.map(slot => (
+                              <button
+                                key={slot}
+                                onClick={() => setSelectedSlot(slot)}
+                                className={`py-sm border font-body-lg text-body-lg rounded text-center transition-all
+                                  ${selectedSlot === slot
+                                    ? 'border-secondary bg-surface text-on-surface'
+                                    : 'border-surface-dim text-secondary hover:border-secondary hover:bg-surface'
+                                  }
+                                `}
+                              >
+                                {slot}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {allSlotsCount === 0 && (
+                        <div className="font-body-md text-on-surface-variant py-4">
+                          Aucun créneau disponible.
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column (40%) */}
+          <div className="w-full lg:w-[40%]">
+            <div className="sticky top-32 bg-white border border-outline-variant/20 rounded p-[49px] shadow-[0_4px_24px_rgba(30,27,21,0.02)]">
+              <h3 className="font-h3 font-normal text-[24px] text-on-surface mb-8 pb-4 border-b border-outline-variant/10">Résumé</h3>
+
+              <div className="flex flex-col gap-6 mb-12">
+                <div className="flex justify-between items-baseline">
+                  <span className="font-body-lg text-[18px] text-on-surface">{service.name}</span>
+                  <span className="font-body-lg text-[18px] text-on-surface">{formatPrice(service.price_cents)}</span>
+                </div>
+
+                <div className="flex items-start gap-3 text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[20px] mt-1">calendar_today</span>
+                  <div className="font-normal text-[16px]">
+                    <span className="capitalize block">{format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}</span>
+                    {selectedSlot ? (
+                      <span className="block mt-1">{selectedSlot} ({formatDuration(service.duration_minutes)})</span>
+                    ) : (
+                      <span className="italic text-outline block mt-1">Sélectionnez un créneau</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-outline-variant/10 pt-8 mb-12 flex justify-between items-center">
+                <span className="font-h3 font-normal text-[24px] text-on-surface">Total</span>
+                <span className="font-h3 font-normal text-[24px] text-on-surface">{formatPrice(service.price_cents)}</span>
+              </div>
+
+              <button
+                onClick={handleConfirm}
+                disabled={!selectedSlot}
+                className="w-full py-5 bg-[#2C2924] text-white font-semibold text-[12px] uppercase tracking-[0.2em] hover:bg-black transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                CONFIRMER MON RENDEZ-VOUS
+              </button>
+
+              <p className="text-center mt-6 font-normal text-[12px] text-outline leading-relaxed px-4">
+                Paiement sécurisé sur place. Annulation gratuite jusqu'à 24h avant.
+              </p>
+            </div>
+          </div>
+
         </div>
-        <button
-          onClick={handleConfirm}
-          disabled={!selectedSlot}
-          className="bg-foreground text-white text-[12px] font-bold tracking-[0.15em] uppercase px-xl py-4 shadow-lg active:scale-95 transition-transform"
-        >
-          CONFIRMER
-        </button>
       </div>
-    </div>
-  );
+    </>
+  )
 }

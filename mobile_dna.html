@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking - Select Slot Mobile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#615e58",
+                        "on-tertiary-container": "#6e6d6d",
+                        "on-secondary-fixed-variant": "#5a4300",
+                        "surface-variant": "#e9e2d7",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#e7e2da",
+                        "inverse-on-surface": "#f7f0e5",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "tertiary-fixed": "#e5e2e1",
+                        "surface-container-high": "#eee7dc",
+                        "primary-fixed-dim": "#cac6be",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "surface-container-low": "#faf3e7",
+                        "on-primary-fixed": "#1d1c17",
+                        "error": "#ba1a1a",
+                        "on-surface": "#1e1b15",
+                        "on-secondary-fixed": "#251a00",
+                        "on-background": "#1e1b15",
+                        "surface": "#fff8f0",
+                        "on-secondary-container": "#785d14",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#5f5e5e",
+                        "surface-bright": "#fff8f0",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#fed884",
+                        "on-primary-container": "#6f6d67",
+                        "primary": "#615e58",
+                        "outline-variant": "#cbc6bc",
+                        "on-surface-variant": "#49473f",
+                        "inverse-surface": "#333029",
+                        "surface-dim": "#e0d9ce",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fff8f0",
+                        "surface-container-highest": "#e9e2d7",
+                        "surface-container": "#f4ede2",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#765a12",
+                        "secondary-fixed": "#ffdf9b",
+                        "outline": "#7a776f",
+                        "primary-container": "#f5f0e8",
+                        "inverse-primary": "#cac6be",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#e6c270",
+                        "tertiary-container": "#f3f0ef",
+                        "on-primary-fixed-variant": "#494741"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "xxl": "80px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "container-max": "1200px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "xl": "48px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "h2": ["Noto Serif"],
+                        "h1": ["Noto Serif"],
+                        "body-md": ["Manrope"],
+                        "h3": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "h2": ["36px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "h1": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "h3": ["24px", { "lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-[#F5F0E8] dark:bg-stone-950 border-b-[1px] border-[#E5DED3] dark:border-stone-800 flex justify-between items-center w-full px-6 py-4 sticky top-0 z-50">
+<button aria-label="Back" class="text-[#B8974A] hover:opacity-80 transition-opacity duration-300">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back_ios</span>
+</button>
+<div class="text-lg font-['Noto_Serif'] tracking-[0.2em] text-stone-900 dark:text-stone-100 uppercase">
+            Mlabelle Beauty
+        </div>
+<div class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-on-surface-variant">person</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow px-gutter pt-lg pb-[120px]">
+<!-- Page Title -->
+<div class="mb-xl text-center mt-md">
+<h1 class="font-h2 text-h2 text-on-background mb-sm">Votre parenthèse beauté</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Sélectionnez le moment parfait pour vous.</p>
+</div>
+<!-- Service Recap Card -->
+<div class="bg-surface border border-outline-variant rounded-none p-md mb-xl">
+<div class="flex justify-between items-start mb-sm">
+<div>
+<span class="inline-block px-2 py-1 bg-surface-variant text-on-surface font-label-caps text-label-caps mb-2 uppercase">Coiffure</span>
+<h3 class="font-h3 text-h3 text-on-background">Coupe &amp; Brushing Signature</h3>
+</div>
+</div>
+<div class="flex items-center text-on-surface-variant font-body-md text-body-md mt-4">
+<span class="material-symbols-outlined mr-2 text-primary" style="font-size: 20px;">schedule</span>
+<span>60 min</span>
+<span class="mx-3 text-outline-variant">|</span>
+<span class="font-bold text-on-background">85 €</span>
+</div>
+</div>
+<!-- Date Picker -->
+<div class="mb-xl">
+<div class="flex justify-between items-end mb-md">
+<h2 class="font-label-caps text-label-caps text-on-surface uppercase">Novembre</h2>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+<div class="flex overflow-x-auto gap-4 no-scrollbar pb-2 snap-x">
+<!-- Day Item -->
+<button class="snap-start flex-shrink-0 w-[64px] h-[80px] border border-outline-variant bg-surface flex flex-col items-center justify-center transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Jeu</span>
+<span class="font-h3 text-h3 text-on-background">21</span>
+</button>
+<button class="snap-start flex-shrink-0 w-[64px] h-[80px] border border-outline-variant bg-surface flex flex-col items-center justify-center transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Ven</span>
+<span class="font-h3 text-h3 text-on-background">22</span>
+</button>
+<button class="snap-start flex-shrink-0 w-[64px] h-[80px] border border-outline-variant bg-surface flex flex-col items-center justify-center transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Sam</span>
+<span class="font-h3 text-h3 text-on-background">23</span>
+</button>
+<!-- Active Day -->
+<button class="snap-start flex-shrink-0 w-[64px] h-[80px] border border-[#B8974A] bg-[#F5F0E8] flex flex-col items-center justify-center transition-colors shadow-[0_0_15px_rgba(184,151,74,0.15)] relative">
+<div class="absolute top-0 w-full h-[2px] bg-[#B8974A]"></div>
+<span class="font-label-caps text-label-caps text-[#B8974A] uppercase mb-1">Lun</span>
+<span class="font-h3 text-h3 text-on-background">25</span>
+</button>
+<button class="snap-start flex-shrink-0 w-[64px] h-[80px] border border-outline-variant bg-surface flex flex-col items-center justify-center transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Mar</span>
+<span class="font-h3 text-h3 text-on-background">26</span>
+</button>
+<button class="snap-start flex-shrink-0 w-[64px] h-[80px] border border-outline-variant bg-surface flex flex-col items-center justify-center transition-colors opacity-50 cursor-not-allowed">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Mer</span>
+<span class="font-h3 text-h3 text-on-background">27</span>
+</button>
+<button class="snap-start flex-shrink-0 w-[64px] h-[80px] border border-outline-variant bg-surface flex flex-col items-center justify-center transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Jeu</span>
+<span class="font-h3 text-h3 text-on-background">28</span>
+</button>
+</div>
+</div>
+<!-- Time Slots -->
+<div>
+<div class="flex items-center gap-3 mb-md">
+<span class="material-symbols-outlined text-[#B8974A]">wb_sunny</span>
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase">Matin</h3>
+</div>
+<div class="grid grid-cols-3 gap-3 mb-lg">
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">09:00</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">09:30</button>
+<button class="py-3 border border-[#B8974A] bg-[#F5F0E8] text-center font-body-md text-body-md text-on-background shadow-[0_0_10px_rgba(184,151,74,0.1)] transition-colors">10:00</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-surface-variant opacity-50 cursor-not-allowed">10:30</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">11:00</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">11:30</button>
+</div>
+<div class="flex items-center gap-3 mb-md mt-xl">
+<span class="material-symbols-outlined text-[#B8974A]">partly_cloudy_day</span>
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase">Après-midi</h3>
+</div>
+<div class="grid grid-cols-3 gap-3">
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">14:00</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">14:30</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">15:00</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-surface-variant opacity-50 cursor-not-allowed">15:30</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-surface-variant opacity-50 cursor-not-allowed">16:00</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">16:30</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">17:00</button>
+<button class="py-3 border border-outline-variant bg-surface text-center font-body-md text-body-md text-on-background hover:border-[#B8974A] transition-colors">17:30</button>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Recap & Action -->
+<div class="fixed bottom-0 w-full bg-surface/95 backdrop-blur-md border-t border-outline-variant px-6 py-4 pb-safe flex items-center justify-between z-40">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Lun 25 Nov</p>
+<p class="font-h3 text-h3 text-on-background">10:00</p>
+</div>
+<button class="bg-on-background text-on-primary font-label-caps text-label-caps uppercase px-xl py-4 hover:opacity-90 transition-opacity">
+            Confirmer
+        </button>
+</div>
+</body></html>

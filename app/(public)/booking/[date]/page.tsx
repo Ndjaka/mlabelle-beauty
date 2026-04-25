@@ -1,7 +1,7 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { BookingClient } from "@/components/ui/booking-client";
 import { getBookingsForDate, getScheduleRule, getDaysOff } from "@/features/booking/queries";
-import { getAvailableSlots } from "@/features/booking/utils";
+import { getAvailableSlots, groupSlotsByPeriod } from "@/features/booking/utils";
 import { notFound } from "next/navigation";
 
 export default async function BookingPage({
@@ -47,13 +47,13 @@ export default async function BookingPage({
     daysOff
   );
 
+  const initialSlots = groupSlotsByPeriod(availableSlots);
+
   return (
-    <main className="flex-grow w-full max-w-[1440px] mx-auto px-6 md:px-[80px] py-[48px] md:py-[80px]">
-      <BookingClient 
-        service={service} 
-        selectedDateStr={dateStr} 
-        availableSlots={availableSlots} 
-      />
-    </main>
+    <BookingClient 
+      service={service} 
+      initialDate={date} 
+      initialSlots={initialSlots} 
+    />
   );
 }

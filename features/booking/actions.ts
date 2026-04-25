@@ -6,7 +6,7 @@ import type { ActionResult } from '@/types/action';
 import { getActiveServices } from '@/features/booking/queries';
 import { getScheduleRule, getBookingsForDate, getDaysOff } from '@/features/booking/queries';
 import { createBooking, updateBookingStatus } from '@/features/booking/mutations';
-import { getAvailableSlots } from '@/features/booking/utils';
+import { getAvailableSlots, groupSlotsByPeriod } from '@/features/booking/utils';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -102,4 +102,30 @@ export async function cancelBookingByAdmin(bookingId: string): Promise<ActionRes
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
     return { success: false, error: `Impossible d'annuler : ${message}` };
   }
+}
+
+/**
+ * Recovers available slots for a given date, structured into morning and afternoon.
+ */
+export async function getSlotsForDate(
+  dateStr: string,
+  serviceDurationMinutes: number
+): Promise<{ morning: string[], afternoon: string[] }> {
+  const date = new Date(dateStr);
+  const dayOfWeek = date.getDay();
+  const [scheduleRule, existingBookings, daysOff] = await Promise.all([
+    getScheduleRule(dayOfWeek),
+    getBookingsForDate(date),
+    getDaysOff(),
+  ]);
+
+  const available = getAvailableSlots(
+    date,
+    scheduleRule,
+    existingBookings,
+    serviceDurationMinutes,
+    daysOff
+  );
+
+  return groupSlotsByPeriod(available);
 }
