@@ -11,6 +11,7 @@ import {
   groupBookingsByDay,
   getWeekDays,
   formatMonthlyRevenue,
+  groupSlotsByPeriod,
 } from './utils';
 import type { TimeRange } from '@/types/booking';
 import type { BookingWithService } from '@/types/booking';
@@ -308,5 +309,29 @@ describe('formatMonthlyRevenue', () => {
 
   it('99 -> "0,99 €"', () => {
     expect(formatMonthlyRevenue(99)).toBe('0,99 €');
+  });
+});
+
+// --- groupSlotsByPeriod ---
+
+describe('groupSlotsByPeriod', () => {
+  it('sépare correctement matin et après-midi', () => {
+    const slots = ['09:00', '10:30', '12:45', '13:00', '14:15', '17:30'];
+    const result = groupSlotsByPeriod(slots);
+    expect(result.morning).toEqual(['09:00', '10:30', '12:45']);
+    expect(result.afternoon).toEqual(['13:00', '14:15', '17:30']);
+  });
+
+  it('gère les tableaux vides', () => {
+    const result = groupSlotsByPeriod([]);
+    expect(result.morning).toEqual([]);
+    expect(result.afternoon).toEqual([]);
+  });
+
+  it('gère uniquement le matin', () => {
+    const slots = ['09:00', '10:00'];
+    const result = groupSlotsByPeriod(slots);
+    expect(result.morning).toEqual(['09:00', '10:00']);
+    expect(result.afternoon).toEqual([]);
   });
 });

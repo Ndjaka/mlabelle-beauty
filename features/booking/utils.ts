@@ -176,6 +176,25 @@ export function formatMonthlyRevenue(cents: number): string {
   return `${parts.join(',')} €`;
 }
 
+/**
+ * Groups a list of time slots ("HH:MM") into morning (09:00 → 12:45) and afternoon (13:00 → 18:00).
+ */
+export function groupSlotsByPeriod(slots: string[]): { morning: string[]; afternoon: string[] } {
+  const morning: string[] = [];
+  const afternoon: string[] = [];
+
+  for (const slot of slots) {
+    const [h] = slot.split(':').map(Number);
+    if (h < 13) {
+      morning.push(slot);
+    } else {
+      afternoon.push(slot);
+    }
+  }
+
+  return { morning, afternoon };
+}
+
 // --- Internal helpers ---
 
 function addMinutes(date: Date, minutes: number): Date {
