@@ -42,7 +42,7 @@ description: Use this skill when creating new files, new folders, new features, 
 │   │   ├── queries.ts
 │   │   └── mutations.ts
 │   └── notifications/
-│       └── email.ts            # Resend email sending functions
+│       └── email.ts            # Resend email functions (Confirmations, Reminders, Cancellations)
 │
 ├── hooks/                      # Custom React hooks
 │   ├── use-available-slots.ts

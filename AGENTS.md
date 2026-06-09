@@ -21,3 +21,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Anti-Regression
 **CRITICAL RULE**: Before modifying an existing feature, identify if it has unit tests. If it does, run them first to understand the baseline. You must ensure all existing tests pass before delivering your work.
+
+# Skills Maintenance
+**CRITICAL RULE**: If you introduce a new architectural pattern, a new core library, or a significant change to the project's structure, you MUST update the relevant skill files in `.agent/skills/` (such as `project-context/SKILL.md` or `architecture/SKILL.md`) so that future agents are aware of the new rules and patterns.

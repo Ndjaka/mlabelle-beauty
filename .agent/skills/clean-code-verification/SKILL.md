@@ -27,6 +27,7 @@ Check components:
 - Use `type` imports for types.
 - Avoid inline React styles except inside email HTML strings.
 - Use the shared `Button` component for CTA-style buttons.
+- For backward navigation (like 'Back' buttons), use `useRouter().back()` from `next/navigation` instead of hardcoded `<Link href="/">` to preserve user flow context.
 - Avoid `useEffect` for derived state when the URL, props, or memoized values can be the source of truth.
 
 Check server/features:
