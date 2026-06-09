@@ -34,22 +34,34 @@ export async function sendBookingReminder(data: BookingEmailData): Promise<void>
   });
 }
 
+export async function sendBookingCancellation(data: BookingEmailData): Promise<void> {
+  await sendBookingEmail({
+    data,
+    subject: 'Annulation confirmée — Mlabelle Beauty',
+    intro: 'Votre rendez-vous est annulé.',
+    body: 'Nous vous confirmons l\'annulation de votre rendez-vous chez Mlabelle Beauty. Nous espérons vous revoir bientôt.',
+    isCancellation: true,
+  });
+}
+
 async function sendBookingEmail({
   data,
   subject,
   intro,
   body,
+  isCancellation = false,
 }: {
   data: BookingEmailData;
   subject: string;
   intro: string;
   body: string;
+  isCancellation?: boolean;
 }): Promise<void> {
   const { error } = await resend.emails.send({
     from: EMAIL_FROM,
     to: data.clientEmail,
     subject,
-    html: buildBookingEmailHtml(data, intro, body),
+    html: buildBookingEmailHtml(data, intro, body, isCancellation),
   });
 
   if (error) {
@@ -60,7 +72,8 @@ async function sendBookingEmail({
 function buildBookingEmailHtml(
   data: BookingEmailData,
   intro: string,
-  body: string
+  body: string,
+  isCancellation: boolean
 ): string {
   const cancelUrl = buildCancelUrl(data.cancelToken);
   const clientName = escapeHtml(data.clientName);
@@ -116,7 +129,9 @@ function buildBookingEmailHtml(
                 </table>
               </td>
             </tr>
-            <tr>
+            ${
+              !isCancellation
+                ? `<tr>
               <td style="padding:0 32px 28px;">
                 <div style="background:#F5F0E8; border-left:4px solid #B8974A; padding:18px 20px;">
                   <p style="margin:0; font-family:Arial, sans-serif; font-size:15px; line-height:1.6; color:#1A1A1A;">
@@ -131,7 +146,9 @@ function buildBookingEmailHtml(
                   Annuler ma réservation
                 </a>
               </td>
-            </tr>
+            </tr>`
+                : ''
+            }
             <tr>
               <td style="padding:28px 32px 40px; text-align:center; background:#1A1A1A;">
                 <p style="margin:0 0 8px; font-family:'Noto Serif', Georgia, serif; font-size:22px; line-height:1.4; color:#FFF8F0;">

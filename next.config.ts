@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["@supabase/ssr", "@supabase/supabase-js", "resend"],
   turbopack: {
-    root: process.cwd(),
+    root: path.resolve(__dirname),
   },
 };
 

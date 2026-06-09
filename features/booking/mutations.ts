@@ -1,6 +1,6 @@
 // Write operations for booking data (create, update, cancel)
 import { createServerClient } from '@/lib/supabase/server';
-import type { CreateBookingInput } from '@/types/booking';
+import type { CreateBookingInput, BookingWithService } from '@/types/booking';
 
 /**
  * Creates a new booking with status 'pending'.
@@ -57,4 +57,63 @@ export async function updateBookingStatus(
     .eq('id', bookingId);
 
   if (error) throw new Error(error.message);
+}
+
+/**
+ * Cancels a booking by its cancel_token (public client action).
+ * Returns the cancelled booking with service data on success.
+ * Throws a descriptive error if the token is invalid, already cancelled,
+ * or the appointment is in the past.
+ */
+export async function cancelBookingByToken(
+  token: string
+): Promise<BookingWithService> {
+  const supabase = await createServerClient();
+
+  // 1. Find the booking by token
+  const { data: booking, error: fetchError } = await supabase
+    .from('bookings')
+    .select(
+      'id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)'
+    )
+    .eq('cancel_token', token)
+    .single();
+
+  if (fetchError || !booking) {
+    throw new Error('Ce lien d\'annulation est invalide ou expiré.');
+  }
+
+  // 2. Already cancelled
+  if (booking.status === 'cancelled') {
+    throw new Error('Cette réservation a déjà été annulée.');
+  }
+
+  // 3. Appointment must be in the future
+  if (new Date(booking.starts_at) <= new Date()) {
+    throw new Error('Impossible d\'annuler un rendez-vous passé.');
+  }
+
+  // 4. Cancel it
+  const { error: updateError } = await supabase
+    .from('bookings')
+    .update({ status: 'cancelled' })
+    .eq('id', booking.id);
+
+  if (updateError) throw new Error(updateError.message);
+
+  const service = Array.isArray(booking.service)
+    ? booking.service[0]
+    : booking.service;
+
+  return {
+    id: booking.id,
+    client_name: booking.client_name,
+    client_email: booking.client_email,
+    client_phone: booking.client_phone ?? undefined,
+    starts_at: booking.starts_at,
+    ends_at: booking.ends_at,
+    status: 'cancelled',
+    cancel_token: booking.cancel_token,
+    service: service as BookingWithService['service'],
+  };
 }

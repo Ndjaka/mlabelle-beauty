@@ -1,12 +1,12 @@
 // Server Actions for booking — orchestrate queries, mutations, and notifications
 'use server';
 
-import type { CreateBookingInput, BookingResult } from '@/types/booking';
+import type { CreateBookingInput, BookingResult, BookingWithService } from '@/types/booking';
 import type { ActionResult } from '@/types/action';
 import { getActiveServices, getActiveServiceById } from '@/features/booking/queries';
 import { getScheduleRule, getBookingsForDate, getDaysOff } from '@/features/booking/queries';
-import { createBooking, updateBookingStatus } from '@/features/booking/mutations';
-import { sendBookingConfirmation } from '@/features/notifications/email';
+import { createBooking, updateBookingStatus, cancelBookingByToken as cancelBookingByTokenMutation } from '@/features/booking/mutations';
+import { sendBookingConfirmation, sendBookingCancellation } from '@/features/notifications/email';
 import { getAvailableSlots, groupSlotsByPeriod, formatDuration, formatPrice } from '@/features/booking/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -159,4 +159,41 @@ export async function getSlotsForDate(
   );
 
   return groupSlotsByPeriod(available);
+}
+
+/**
+ * Cancels a booking via its public cancel_token (client-facing action).
+ * Delegates all validation and DB mutation to the mutations layer.
+ */
+export async function cancelBookingByToken(
+  token: string
+): Promise<ActionResult & { booking?: BookingWithService }> {
+  if (!token || typeof token !== 'string' || token.trim() === '') {
+    return { success: false, error: 'Token d\'annulation manquant.' };
+  }
+
+  try {
+    const booking = await cancelBookingByTokenMutation(token.trim());
+
+    try {
+      const startsAt = new Date(booking.starts_at);
+      await sendBookingCancellation({
+        clientName: booking.client_name,
+        clientEmail: booking.client_email,
+        serviceName: booking.service.name,
+        date: format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }),
+        slot: `${String(startsAt.getHours()).padStart(2, '0')}:${String(startsAt.getMinutes()).padStart(2, '0')}`,
+        duration: formatDuration(booking.service.duration_minutes),
+        price: formatPrice(booking.service.price_cents),
+        cancelToken: booking.cancel_token,
+      });
+    } catch (emailError) {
+      console.error('Failed to send booking cancellation email', emailError);
+    }
+
+    return { success: true, booking };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erreur inconnue';
+    return { success: false, error: message };
+  }
 }
