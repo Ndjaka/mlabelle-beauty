@@ -1,7 +1,7 @@
 // components/ui/cancellation-error.tsx
 // DNA: Booking - Error (Desktop + Mobile) — Stitch ID 169cb77d17914cf08791224ef7614937 / 0203dc659ae847469390f17fc7e7616a
 
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 interface CancellationErrorProps {
   message: string;
@@ -43,12 +43,9 @@ export function CancellationError({ message }: CancellationErrorProps) {
 
         {/* CTA */}
         <div className="w-full pt-2">
-          <Link
-            href="/"
-            className="block w-full bg-[var(--foreground)] text-white py-6 label-caps tracking-[0.2em] text-center transition-all hover:opacity-90 active:scale-[0.98]"
-          >
+          <Button href="/" className="w-full">
             RETOUR À L&apos;ACCUEIL
-          </Link>
+          </Button>
         </div>
 
       </div>

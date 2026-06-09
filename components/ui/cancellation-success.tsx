@@ -1,7 +1,7 @@
 // components/ui/cancellation-success.tsx
 // DNA: Booking - Cancellation (Desktop + Mobile) — Stitch ID 5165bd983f9f440cab1f8d1c11f4c592 / c6e8cc4ca08d4673bb91a932ffc0ce3c
 
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import type { BookingWithService } from '@/types/booking';
@@ -73,12 +73,9 @@ export function CancellationSuccess({ booking }: CancellationSuccessProps) {
         </div>
 
         {/* CTA */}
-        <Link
-          href="/"
-          className="block w-full bg-[var(--foreground)] text-white py-6 label-caps tracking-[0.2em] text-center transition-all hover:opacity-90 active:scale-[0.98]"
-        >
+        <Button href="/" className="w-full">
           RETOUR À L&apos;ACCUEIL
-        </Link>
+        </Button>
 
         {/* Decorative separator */}
         <div className="mt-[80px] opacity-20">
