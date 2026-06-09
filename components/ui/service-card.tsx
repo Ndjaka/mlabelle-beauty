@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { formatPrice, formatDuration } from "@/features/booking/utils";
 import type { Service } from "@/types/service";
+import { Button } from "@/components/ui/button";
 
 interface ServiceCardProps {
   service: Service;
@@ -43,12 +43,12 @@ export function ServiceCard({ service, today }: ServiceCardProps) {
           </span>
         </div>
 
-        <Link
+        <Button
           href={`/booking/${today}?service_id=${service.id}`}
-          className="block w-full bg-tertiary text-white font-sans text-[12px] font-semibold tracking-[0.15em] uppercase py-4 text-center hover:bg-tertiary/90 transition-colors duration-300"
+          className="w-full"
         >
           Réserver
-        </Link>
+        </Button>
       </div>
     </article>
   );

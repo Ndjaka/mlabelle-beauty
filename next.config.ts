@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ["@supabase/ssr", "@supabase/supabase-js", "resend"],
+  turbopack: {
+    root: process.cwd(),
+  },
 };
 
 export default nextConfig;

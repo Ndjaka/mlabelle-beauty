@@ -16,7 +16,7 @@ export default async function HomePage() {
           Nos Prestations
         </h2>
         <p className="font-sans text-[16px] md:text-[18px] text-foreground/80 leading-[1.6]">
-          L'art de la beauté à la française. Découvrez nos rituels de soins sur mesure.
+          L&apos;art de la beauté à la française. Découvrez nos rituels de soins sur mesure.
         </p>
       </header>
 

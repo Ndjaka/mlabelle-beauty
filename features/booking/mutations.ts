@@ -29,7 +29,13 @@ export async function createBooking(
     .select('id, cancel_token')
     .single();
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.code === '23P01') {
+      throw new Error('Ce créneau n\'est plus disponible.');
+    }
+
+    throw new Error(error.message);
+  }
   if (!booking) throw new Error('Booking creation failed: no data returned');
 
   return { id: booking.id, cancel_token: booking.cancel_token };

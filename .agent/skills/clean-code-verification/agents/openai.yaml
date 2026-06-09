@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clean Code Verification"
+  short_description: "Audit qualité, lint, tests et build"
+  default_prompt: "Use $clean-code-verification to review project code quality, run lint, TypeScript, tests, and build."

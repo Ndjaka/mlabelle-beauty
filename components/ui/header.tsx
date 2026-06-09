@@ -1,5 +1,6 @@
 import { Logo } from "@/components/ui/logo";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
   variant?: "home" | "booking";
@@ -14,9 +15,9 @@ export function Header({ variant = "home" }: HeaderProps) {
 
         {variant !== "booking" && (
           <div className="flex items-center gap-xl">
-            <button className="bg-foreground text-white label-caps px-xl py-3 hover:bg-neutral transition-all duration-300 shadow-md">
+            <Button href="/" size="sm" className="shadow-md">
               RÉSERVER
-            </button>
+            </Button>
           </div>
         )}
       </div>

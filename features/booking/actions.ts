@@ -3,10 +3,13 @@
 
 import type { CreateBookingInput, BookingResult } from '@/types/booking';
 import type { ActionResult } from '@/types/action';
-import { getActiveServices } from '@/features/booking/queries';
+import { getActiveServices, getActiveServiceById } from '@/features/booking/queries';
 import { getScheduleRule, getBookingsForDate, getDaysOff } from '@/features/booking/queries';
 import { createBooking, updateBookingStatus } from '@/features/booking/mutations';
-import { getAvailableSlots, groupSlotsByPeriod } from '@/features/booking/utils';
+import { sendBookingConfirmation } from '@/features/notifications/email';
+import { getAvailableSlots, groupSlotsByPeriod, formatDuration, formatPrice } from '@/features/booking/utils';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -67,6 +70,21 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
   try {
     const result = await createBooking(data, service.duration_minutes);
 
+    try {
+      await sendBookingConfirmation({
+        clientName: data.client_name,
+        clientEmail: data.client_email,
+        serviceName: service.name,
+        date: format(data.starts_at, 'EEEE d MMMM yyyy', { locale: fr }),
+        slot: requestedTime,
+        duration: formatDuration(service.duration_minutes),
+        price: formatPrice(service.price_cents),
+        cancelToken: result.cancel_token,
+      });
+    } catch (emailError) {
+      console.error('Failed to send booking confirmation email', emailError);
+    }
+
     return {
       success: true,
       bookingId: result.id,
@@ -74,6 +92,10 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
+    if (message === 'Ce créneau n\'est plus disponible.') {
+      return { success: false, error: message };
+    }
+
     return { success: false, error: `Erreur lors de la réservation : ${message}` };
   }
 }
@@ -109,9 +131,18 @@ export async function cancelBookingByAdmin(bookingId: string): Promise<ActionRes
  */
 export async function getSlotsForDate(
   dateStr: string,
-  serviceDurationMinutes: number
+  serviceId: string
 ): Promise<{ morning: string[], afternoon: string[] }> {
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) {
+    return { morning: [], afternoon: [] };
+  }
+
+  const service = await getActiveServiceById(serviceId);
+  if (!service) {
+    return { morning: [], afternoon: [] };
+  }
+
   const dayOfWeek = date.getDay();
   const [scheduleRule, existingBookings, daysOff] = await Promise.all([
     getScheduleRule(dayOfWeek),
@@ -123,7 +154,7 @@ export async function getSlotsForDate(
     date,
     scheduleRule,
     existingBookings,
-    serviceDurationMinutes,
+    service.duration_minutes,
     daysOff
   );
 

@@ -17,6 +17,27 @@ export async function getActiveServices(): Promise<Service[]> {
     .order('name');
 
   if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+/**
+ * Fetches a single active service by id.
+ */
+export async function getActiveServiceById(id: string): Promise<Service | null> {
+  const supabase = await createServerClient();
+
+  const { data, error } = await supabase
+    .from('services')
+    .select('id, name, duration_minutes, price_cents, is_active, description')
+    .eq('id', id)
+    .eq('is_active', true)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw new Error(error.message);
+  }
+
   return data;
 }
 
@@ -208,4 +229,36 @@ function getStartOfWeek(date: Date): Date {
   d.setDate(diff);
   d.setHours(0, 0, 0, 0);
   return d;
+}
+
+/**
+ * Fetches a single booking with its joined service data.
+ */
+export async function getBookingById(
+  id: string
+): Promise<BookingWithService | null> {
+  const supabase = await createServerClient();
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    client_name: data.client_name,
+    client_email: data.client_email,
+    client_phone: data.client_phone ?? undefined,
+    starts_at: data.starts_at,
+    ends_at: data.ends_at,
+    status: data.status as BookingWithService['status'],
+    cancel_token: data.cancel_token,
+    service: Array.isArray(data.service) ? data.service[0] : data.service as BookingWithService['service'],
+  };
 }
