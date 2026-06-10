@@ -5,7 +5,7 @@ import type { CreateBookingInput, BookingWithService } from '@/types/booking';
 import { CLIENT_CREATED_BOOKING_STATUS } from '@/features/booking/status';
 
 /**
- * Creates a new client booking with an automatically confirmed status.
+ * Creates a new client booking waiting for admin confirmation after deposit.
  * Computes ends_at from starts_at + serviceDurationMinutes.
  * Returns the booking id and cancel_token.
  */

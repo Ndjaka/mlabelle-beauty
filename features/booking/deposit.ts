@@ -1,0 +1,2 @@
+export const BOOKING_DEPOSIT_AMOUNT_CENTS = 2000
+export const BOOKING_DEPOSIT_LABEL = '20,00 €'

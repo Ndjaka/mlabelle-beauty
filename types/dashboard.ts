@@ -1,6 +1,6 @@
 import type { BookingWithService } from '@/types/booking'
 
-export type DashboardBookingStatus = 'Confirmé' | 'Annulé'
+export type DashboardBookingStatus = 'À confirmer' | 'Confirmé' | 'Annulé'
 
 export type DashboardNavItem = {
   label: string

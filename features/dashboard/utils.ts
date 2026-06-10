@@ -132,6 +132,7 @@ export function formatDashboardDuration(durationMinutes: number): string {
 }
 
 export function mapDashboardStatus(status: BookingWithService['status']): DashboardBookingStatus {
+  if (status === 'pending') return 'À confirmer'
   return status === 'cancelled' ? 'Annulé' : 'Confirmé'
 }
 

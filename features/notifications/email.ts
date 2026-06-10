@@ -1,8 +1,10 @@
 // Email notification functions using Resend
 import { resend } from '@/lib/resend/client';
+import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit';
 
 const EMAIL_FROM = 'Mlabelle Beauty <onboarding@resend.dev>';
 const CONFIRMATION_SUBJECT = 'Votre réservation est confirmée — Mlabelle Beauty';
+const REQUEST_RECEIVED_SUBJECT = 'Votre demande de réservation est reçue — Mlabelle Beauty';
 const REMINDER_SUBJECT = 'Rappel — Votre rendez-vous demain chez Mlabelle Beauty';
 
 export interface BookingEmailData {
@@ -21,7 +23,18 @@ export async function sendBookingConfirmation(data: BookingEmailData): Promise<v
     data,
     subject: CONFIRMATION_SUBJECT,
     intro: 'Votre réservation est confirmée.',
-    body: 'Nous avons bien enregistré votre rendez-vous chez Mlabelle Beauty.',
+    body: 'Votre acompte a bien été validé. Votre rendez-vous chez Mlabelle Beauty est confirmé.',
+    paymentNotice: 'Acompte validé. Le solde pourra être réglé sur place.',
+  });
+}
+
+export async function sendBookingRequestReceived(data: BookingEmailData): Promise<void> {
+  await sendBookingEmail({
+    data,
+    subject: REQUEST_RECEIVED_SUBJECT,
+    intro: 'Votre demande de réservation est reçue.',
+    body: `Nous avons bien reçu votre demande. Pour confirmer définitivement votre rendez-vous, un acompte de ${BOOKING_DEPOSIT_LABEL} est nécessaire. Le salon vous indiquera comment régler cet acompte.`,
+    paymentNotice: `Acompte à régler pour confirmation : ${BOOKING_DEPOSIT_LABEL}.`,
   });
 }
 
@@ -49,19 +62,21 @@ async function sendBookingEmail({
   subject,
   intro,
   body,
+  paymentNotice = 'Paiement sur place.',
   isCancellation = false,
 }: {
   data: BookingEmailData;
   subject: string;
   intro: string;
   body: string;
+  paymentNotice?: string;
   isCancellation?: boolean;
 }): Promise<void> {
   const { error } = await resend.emails.send({
     from: EMAIL_FROM,
     to: data.clientEmail,
     subject,
-    html: buildBookingEmailHtml(data, intro, body, isCancellation),
+    html: buildBookingEmailHtml(data, intro, body, paymentNotice, isCancellation),
   });
 
   if (error) {
@@ -73,6 +88,7 @@ function buildBookingEmailHtml(
   data: BookingEmailData,
   intro: string,
   body: string,
+  paymentNotice: string,
   isCancellation: boolean
 ): string {
   const cancelUrl = buildCancelUrl(data.cancelToken);
@@ -84,6 +100,7 @@ function buildBookingEmailHtml(
   const price = escapeHtml(data.price);
   const escapedIntro = escapeHtml(intro);
   const escapedBody = escapeHtml(body);
+  const escapedPaymentNotice = escapeHtml(paymentNotice);
 
   return `<!doctype html>
 <html lang="fr">
@@ -135,7 +152,7 @@ function buildBookingEmailHtml(
               <td style="padding:0 32px 28px;">
                 <div style="background:#F5F0E8; border-left:4px solid #B8974A; padding:18px 20px;">
                   <p style="margin:0; font-family:Arial, sans-serif; font-size:15px; line-height:1.6; color:#1A1A1A;">
-                    Paiement sur place.
+                    ${escapedPaymentNotice}
                   </p>
                 </div>
               </td>

@@ -7,3 +7,4 @@ interface AuthUserWithMetadata {
 export function isAdminUser(user: AuthUserWithMetadata | null | undefined): boolean {
   return user?.app_metadata?.role === ADMIN_ROLE;
 }
+

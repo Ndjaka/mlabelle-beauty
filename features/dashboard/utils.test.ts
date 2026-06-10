@@ -82,6 +82,27 @@ describe('dashboard utils', () => {
     ])
   })
 
+  it('maps pending bookings as bookings to confirm', () => {
+    const booking: BookingWithService = {
+      id: 'booking-id',
+      client_name: 'Camille Laurent',
+      client_email: 'camille@example.com',
+      starts_at: '2026-06-10T07:00:00.000Z',
+      ends_at: '2026-06-10T07:45:00.000Z',
+      status: 'pending',
+      cancel_token: 'cancel-token',
+      service: {
+        name: 'Brushing',
+        duration_minutes: 45,
+        price_cents: 3500,
+      },
+    }
+
+    expect(mapBookingsToAgendaItems([booking])[0]).toMatchObject({
+      status: 'À confirmer',
+    })
+  })
+
   it('maps recent bookings with relative labels', () => {
     const booking: DashboardBookingWithCreatedAt = {
       id: 'booking-id',

@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { BookingConfirmationCard } from '@/components/ui/booking/BookingConfirmationCard'
+import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 
 interface BookingConfirmationClientProps {
   booking: BookingWithService
@@ -20,6 +21,14 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
   const timeStr = format(new Date(booking.starts_at), 'HH:mm')
   const durationStr = formatDuration(booking.service.duration_minutes)
   const priceStr = formatPrice(booking.service.price_cents)
+  const isPending = booking.status === 'pending'
+  const title = isPending ? 'Demande de réservation reçue' : 'Réservation confirmée'
+  const description = isPending
+    ? `Pour confirmer définitivement ce rendez-vous, un acompte de ${BOOKING_DEPOSIT_LABEL} est nécessaire. Le salon vous indiquera comment le régler.`
+    : 'Votre moment d’exception est désormais réservé chez Mlabelle Beauty.'
+  const emailNote = isPending
+    ? `Un e-mail récapitulatif a été envoyé à ${booking.client_email}.`
+    : `Un e-mail de confirmation a été envoyé à ${booking.client_email}.`
 
   return (
     <>
@@ -33,9 +42,9 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
           </div>
 
           {/* Titles */}
-          <h1 className="font-serif text-h1 text-on-surface mb-md">Réservation Confirmée</h1>
+          <h1 className="font-serif text-h1 text-on-surface mb-md">{title}</h1>
           <p className="font-sans text-body-lg text-on-surface-variant mb-xl max-w-md mx-auto">
-            Votre moment d&apos;exception est désormais réservé chez Mlabelle Beauty.
+            {description}
           </p>
 
           <BookingConfirmationCard
@@ -59,7 +68,7 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
           {/* Email Note */}
           <div className="mt-8 flex items-center justify-center gap-2 text-on-surface-variant">
             <span className="material-symbols-outlined text-sm">mail</span>
-            <p className="font-sans text-body-md text-[14px]">Un e-mail de confirmation a été envoyé à {booking.client_email}.</p>
+            <p className="font-sans text-body-md text-[14px]">{emailNote}</p>
           </div>
         </div>
       </div>
@@ -75,9 +84,9 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
         </div>
 
         {/* Success Message */}
-        <h2 className="font-serif text-h2 text-on-surface mb-md">Réservation Confirmée</h2>
+        <h2 className="font-serif text-h2 text-on-surface mb-md">{title}</h2>
         <p className="font-sans text-body-lg text-on-surface-variant mb-xl italic">
-          Votre moment d&apos;exception est désormais réservé
+          {description}
         </p>
 
         <BookingConfirmationCard
@@ -92,7 +101,7 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
         <div className="mt-xl px-md">
           <p className="font-sans text-body-md text-on-surface-variant flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-[20px]">mail</span>
-            Un e-mail de confirmation vient de vous être envoyé.
+            {isPending ? 'Un e-mail récapitulatif vient de vous être envoyé.' : 'Un e-mail de confirmation vient de vous être envoyé.'}
           </p>
         </div>
 

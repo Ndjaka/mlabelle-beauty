@@ -58,11 +58,13 @@ export function DashboardRecentBookings({ bookings }: DashboardRecentBookingsPro
         )}
       </section>
 
-      <BookingDetailPanel
-        booking={selectedBooking!}
-        isOpen={selectedBooking !== null}
-        onClose={() => setSelectedBooking(null)}
-      />
+      {selectedBooking && (
+        <BookingDetailPanel
+          booking={selectedBooking}
+          isOpen
+          onClose={() => setSelectedBooking(null)}
+        />
+      )}
     </>
   )
 }

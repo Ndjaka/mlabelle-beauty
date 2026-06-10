@@ -7,8 +7,8 @@ import {
 } from '@/features/booking/status';
 
 describe('booking status rules', () => {
-  it('creates client bookings as confirmed', () => {
-    expect(CLIENT_CREATED_BOOKING_STATUS).toBe('confirmed');
+  it('creates client bookings as pending until the deposit is validated', () => {
+    expect(CLIENT_CREATED_BOOKING_STATUS).toBe('pending');
   });
 
   it('keeps pending bookings blocking availability for existing data', () => {

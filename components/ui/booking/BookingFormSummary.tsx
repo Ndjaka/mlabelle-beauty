@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
+import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 import { formatDuration, formatPrice } from '@/features/booking/utils'
 
 interface BookingFormSummaryProps {
@@ -36,6 +37,9 @@ export function BookingFormSummary({
             </div>
           </div>
         </div>
+        <p className="border-t border-outline-variant/30 pt-3 text-sm leading-6 text-on-surface-variant">
+          Acompte de {BOOKING_DEPOSIT_LABEL} à régler pour confirmer le rendez-vous.
+        </p>
       </div>
     )
   }
@@ -69,7 +73,7 @@ export function BookingFormSummary({
           <span className="font-h3 text-h3 text-on-background">{formatPrice(service.price_cents)}</span>
         </div>
         <p className="font-body-md text-body-md text-on-surface-variant text-sm">
-          Paiement sur place
+          Acompte de {BOOKING_DEPOSIT_LABEL} à régler pour confirmer le rendez-vous.
         </p>
       </div>
     </div>

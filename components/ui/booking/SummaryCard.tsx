@@ -3,6 +3,7 @@
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
+import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 import { formatPrice, formatDuration } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 
@@ -57,7 +58,7 @@ export function SummaryCard({
       </Button>
 
       <p className="text-center mt-6 font-normal text-[12px] text-outline leading-relaxed px-4">
-        Paiement sécurisé sur place. Annulation gratuite jusqu&apos;à 24h avant.
+        Acompte de {BOOKING_DEPOSIT_LABEL} nécessaire pour confirmer. Solde à régler sur place.
       </p>
     </div>
   )

@@ -7,7 +7,11 @@ import { getActiveServices, getActiveServiceById, getBookingById } from '@/featu
 import { getScheduleRule, getBookingsForDate, getDaysOff } from '@/features/booking/queries';
 import { revalidatePath } from 'next/cache';
 import { createBooking, updateBookingStatus, cancelBookingByToken as cancelBookingByTokenMutation } from '@/features/booking/mutations';
-import { sendBookingConfirmation, sendBookingCancellation } from '@/features/notifications/email';
+import {
+  sendBookingCancellation,
+  sendBookingConfirmation,
+  sendBookingRequestReceived,
+} from '@/features/notifications/email';
 import { getAvailableSlots, groupSlotsByPeriod, formatDuration, formatPrice } from '@/features/booking/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -72,7 +76,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
     const result = await createBooking(data, service.duration_minutes);
 
     try {
-      await sendBookingConfirmation({
+      await sendBookingRequestReceived({
         clientName: data.client_name,
         clientEmail: data.client_email,
         serviceName: service.name,
@@ -83,7 +87,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
         cancelToken: result.cancel_token,
       });
     } catch (emailError) {
-      console.error('Failed to send booking confirmation email', emailError);
+      console.error('Failed to send booking request email', emailError);
     }
 
     return {
@@ -98,6 +102,52 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
     }
 
     return { success: false, error: `Erreur lors de la réservation : ${message}` };
+  }
+}
+
+/**
+ * Confirms a booking after the deposit has been validated by the admin.
+ * Sends the final confirmation email to the client.
+ */
+export async function confirmBookingByAdmin(bookingId: string): Promise<ActionResult> {
+  try {
+    const booking = await getBookingById(bookingId);
+
+    if (!booking) {
+      return { success: false, error: 'Réservation introuvable.' };
+    }
+
+    if (booking.status === 'cancelled') {
+      return { success: false, error: 'Impossible de confirmer une réservation annulée.' };
+    }
+
+    if (booking.status === 'confirmed') {
+      return { success: false, error: 'Cette réservation est déjà confirmée.' };
+    }
+
+    await updateBookingStatus(bookingId, 'confirmed');
+
+    try {
+      const startsAt = new Date(booking.starts_at);
+      await sendBookingConfirmation({
+        clientName: booking.client_name,
+        clientEmail: booking.client_email,
+        serviceName: booking.service.name,
+        date: format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }),
+        slot: `${String(startsAt.getHours()).padStart(2, '0')}:${String(startsAt.getMinutes()).padStart(2, '0')}`,
+        duration: formatDuration(booking.service.duration_minutes),
+        price: formatPrice(booking.service.price_cents),
+        cancelToken: booking.cancel_token,
+      });
+    } catch (emailError) {
+      console.error('Failed to send admin confirmation email', emailError);
+    }
+
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erreur inconnue';
+    return { success: false, error: `Impossible de confirmer : ${message}` };
   }
 }
 

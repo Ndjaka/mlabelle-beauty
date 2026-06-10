@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { StatusBadge } from '@/components/ui/dashboard/status-badge'
 import { CancelBookingModal } from '@/components/ui/dashboard/cancel-booking-modal'
+import { ConfirmBookingButton } from '@/components/ui/dashboard/confirm-booking-button'
+import { ConfirmBookingModal } from '@/components/ui/dashboard/confirm-booking-modal'
 import type { DashboardRecentBooking } from '@/types/dashboard'
 import { cn } from '@/lib/utils'
 
@@ -14,6 +16,7 @@ interface BookingDetailPanelProps {
 
 export function BookingDetailPanel({ booking, isOpen, onClose }: BookingDetailPanelProps) {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   
   // Prevent body scroll when panel is open
   useEffect(() => {
@@ -98,7 +101,11 @@ export function BookingDetailPanel({ booking, isOpen, onClose }: BookingDetailPa
         </div>
 
         {/* Footer Actions */}
-        <div className="border-t border-outline-variant p-6">
+        <div className="space-y-3 border-t border-outline-variant p-6">
+          <ConfirmBookingButton
+            onClick={() => setIsConfirmModalOpen(true)}
+            status={booking.status}
+          />
           <button
             onClick={() => setIsCancelModalOpen(true)}
             className="w-full border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm font-semibold uppercase transition-colors hover:bg-red-100"
@@ -115,6 +122,16 @@ export function BookingDetailPanel({ booking, isOpen, onClose }: BookingDetailPa
           clientName={booking.client}
           serviceName={booking.service}
           onClose={() => setIsCancelModalOpen(false)}
+        />
+      )}
+
+      {isConfirmModalOpen && (
+        <ConfirmBookingModal
+          bookingId={booking.id}
+          clientName={booking.client}
+          serviceName={booking.service}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirmed={onClose}
         />
       )}
     </>
