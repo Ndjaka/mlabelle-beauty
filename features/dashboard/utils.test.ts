@@ -81,6 +81,7 @@ describe('dashboard utils', () => {
     expect(mapBookingsToAgendaItems([booking])).toEqual([
       {
         kind: 'booking',
+        id: 'booking-id',
         time: '09:00',
         endTime: '09:45',
         service: 'Brushing',
@@ -88,6 +89,9 @@ describe('dashboard utils', () => {
         duration: '45 min',
         status: 'Confirmé',
         price: '35,00 €',
+        email: 'camille@example.com',
+        phone: null,
+        date: 'Mercredi 10 juin 2026',
       },
     ])
   })
@@ -194,6 +198,7 @@ describe('dashboard utils', () => {
     const rows = buildDashboardAgendaHourRows([
       {
         kind: 'booking',
+        id: 'booking-1',
         time: '09:30',
         endTime: '10:15',
         service: 'Coupe',
@@ -201,6 +206,9 @@ describe('dashboard utils', () => {
         duration: '45 min',
         status: 'Confirmé',
         price: '45,00 €',
+        email: 'nora@example.com',
+        phone: null,
+        date: 'Aujourd\'hui',
       },
       {
         kind: 'free',
@@ -219,6 +227,7 @@ describe('dashboard utils', () => {
     const rows = buildDashboardAgendaHourRows([
       {
         kind: 'booking',
+        id: 'booking-2',
         time: '06:30',
         endTime: '07:15',
         service: 'Brushing',
@@ -226,6 +235,9 @@ describe('dashboard utils', () => {
         duration: '45 min',
         status: 'Confirmé',
         price: '35,00 €',
+        email: 'nadia@example.com',
+        phone: null,
+        date: 'Aujourd\'hui',
       },
     ])
 

@@ -12,7 +12,7 @@ export function DashboardBottomNav({ items }: DashboardBottomNavProps) {
       <div className="grid grid-cols-4 gap-1">
         {items.map((item) => (
           <Link
-            key={item.href}
+            key={item.label}
             href={item.href}
             className={cn(
               'flex min-h-14 flex-col items-center justify-center gap-1 px-2 text-[11px] font-semibold text-foreground/55',

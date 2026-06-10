@@ -1,11 +1,12 @@
 import { AgendaBookingBlock } from '@/components/ui/dashboard/agenda/agenda-booking-block'
 import { cn } from '@/lib/utils'
-import type { DashboardAgendaWeekColumn } from '@/types/dashboard'
+import type { DashboardAgendaWeekColumn, DashboardAgendaItem } from '@/types/dashboard'
 
 type AgendaWeekGridProps = {
   columns: DashboardAgendaWeekColumn[]
   selectedDateKey: string
   onDayClick: (dateKey: string) => void
+  onBookingClick?: (booking: DashboardAgendaItem) => void
 }
 
 const WEEK_HOURS = [
@@ -14,7 +15,7 @@ const WEEK_HOURS = [
   '18:00', '19:00',
 ]
 
-export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick }: AgendaWeekGridProps) {
+export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBookingClick }: AgendaWeekGridProps) {
   return (
     <div className="hidden overflow-x-auto border border-outline-variant bg-background md:block">
       {/* Header row — days of the week */}
@@ -68,6 +69,7 @@ export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick }: AgendaW
                           key={`${item.kind}-${item.time}-${item.endTime}`}
                           item={item}
                           compact
+                          onClick={item.kind === 'booking' && onBookingClick ? () => onBookingClick(item) : undefined}
                         />
                       ))}
                     </div>

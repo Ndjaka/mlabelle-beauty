@@ -69,6 +69,7 @@ export function mapBookingsToAgendaItems(
 ): DashboardAgendaItem[] {
   return bookings.map((booking) => ({
     kind: 'booking',
+    id: booking.id,
     time: formatDashboardTime(new Date(booking.starts_at)),
     endTime: formatDashboardTime(new Date(booking.ends_at)),
     service: booking.service.name,
@@ -76,6 +77,9 @@ export function mapBookingsToAgendaItems(
     duration: formatDashboardDuration(booking.service.duration_minutes),
     status: mapDashboardStatus(booking.status),
     price: formatDashboardPrice(booking.service.price_cents),
+    email: booking.client_email,
+    phone: booking.client_phone ?? null,
+    date: formatDashboardDateLabel(new Date(booking.starts_at)),
   }))
 }
 

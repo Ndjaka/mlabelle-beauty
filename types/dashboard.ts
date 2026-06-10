@@ -19,6 +19,7 @@ export type DashboardMetric = {
 export type DashboardAgendaItem =
   | {
       kind: 'booking'
+      id: string
       time: string
       endTime: string
       service: string
@@ -26,6 +27,9 @@ export type DashboardAgendaItem =
       duration: string
       status: DashboardBookingStatus
       price: string
+      email: string
+      phone: string | null
+      date: string
     }
   | {
       kind: 'free'

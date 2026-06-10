@@ -1,11 +1,12 @@
 import { AgendaBookingBlock } from '@/components/ui/dashboard/agenda/agenda-booking-block'
-import type { DashboardAgendaHourRow } from '@/types/dashboard'
+import type { DashboardAgendaHourRow, DashboardAgendaItem } from '@/types/dashboard'
 
 type AgendaDesktopGridProps = {
   rows: DashboardAgendaHourRow[]
+  onBookingClick?: (booking: DashboardAgendaItem) => void
 }
 
-export function AgendaDesktopGrid({ rows }: AgendaDesktopGridProps) {
+export function AgendaDesktopGrid({ rows, onBookingClick }: AgendaDesktopGridProps) {
   return (
     <div className="hidden overflow-hidden border border-outline-variant bg-background md:block">
       <div className="grid grid-cols-[80px_1fr] border-b border-outline-variant bg-surface-container-low">
@@ -19,15 +20,19 @@ export function AgendaDesktopGrid({ rows }: AgendaDesktopGridProps) {
 
       <div>
         {rows.map((row) => (
-          <div key={row.hour} className="grid min-h-24 grid-cols-[80px_1fr]">
-            <div className="border-r border-t border-outline-variant px-3 pt-4 text-xs font-semibold text-foreground/50">
+          <div key={row.hour} className="grid min-h-20 grid-cols-[80px_1fr]">
+            <div className="border-r border-t border-outline-variant px-3 pt-3 text-xs font-semibold text-foreground/50">
               {row.hour}
             </div>
-            <div className="border-t border-outline-variant p-3">
+            <div className="border-t border-outline-variant p-2">
               {row.items.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {row.items.map((item) => (
-                    <AgendaBookingBlock key={`${item.kind}-${item.time}-${item.endTime}`} item={item} />
+                    <AgendaBookingBlock 
+                      key={`${item.kind}-${item.time}-${item.endTime}`} 
+                      item={item} 
+                      onClick={item.kind === 'booking' && onBookingClick ? () => onBookingClick(item) : undefined}
+                    />
                   ))}
                 </div>
               ) : (

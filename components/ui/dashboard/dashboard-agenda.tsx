@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { AgendaControls } from '@/components/ui/dashboard/agenda/agenda-controls'
 import { AgendaDaySummary } from '@/components/ui/dashboard/agenda/agenda-day-summary'
 import { AgendaDesktopGrid } from '@/components/ui/dashboard/agenda/agenda-desktop-grid'
@@ -9,6 +9,7 @@ import { AgendaMiniMonth } from '@/components/ui/dashboard/agenda/agenda-mini-mo
 import { AgendaMobileList } from '@/components/ui/dashboard/agenda/agenda-mobile-list'
 import { AgendaWeekGrid } from '@/components/ui/dashboard/agenda/agenda-week-grid'
 import { AgendaWeekStrip } from '@/components/ui/dashboard/agenda/agenda-week-strip'
+import { BookingDetailPanel } from '@/components/ui/dashboard/booking-detail-panel'
 import { buildDashboardAgendaHourRows } from '@/features/dashboard/utils'
 import type {
   AgendaViewMode,
@@ -17,6 +18,7 @@ import type {
   DashboardAgendaMonth,
   DashboardAgendaSummary,
   DashboardAgendaWeekColumn,
+  DashboardRecentBooking,
 } from '@/types/dashboard'
 
 type DashboardAgendaProps = {
@@ -63,6 +65,7 @@ export function DashboardAgenda({
 }: DashboardAgendaProps) {
   const router = useRouter()
   const rows = buildDashboardAgendaHourRows(items)
+  const [selectedBooking, setSelectedBooking] = useState<DashboardRecentBooking | null>(null)
 
   const navigateToDate = useCallback(
     (dateKey: string, targetView: AgendaViewMode = view) => {
@@ -99,6 +102,24 @@ export function DashboardAgenda({
     [navigateToDate]
   )
 
+  const handleBookingClick = useCallback((item: DashboardAgendaItem) => {
+    if (item.kind === 'booking') {
+      setSelectedBooking({
+        id: item.id,
+        client: item.client,
+        service: item.service,
+        date: item.date,
+        time: item.time,
+        duration: item.duration,
+        price: item.price,
+        status: item.status,
+        email: item.email,
+        phone: item.phone,
+        note: '',
+      })
+    }
+  }, [])
+
   return (
     <section className="space-y-5 border border-outline-variant bg-surface-container-low p-5 md:p-6">
       <AgendaControls
@@ -112,23 +133,42 @@ export function DashboardAgenda({
       />
       <div className="grid gap-5 xl:grid-cols-[220px_minmax(0,1fr)_260px]">
         <AgendaMiniMonth month={month} onDayClick={handleDayClick} />
+        
         <div className="space-y-5">
-          {view === 'day' ? (
-            <>
-              <AgendaWeekStrip days={days} onDayClick={handleDayClick} />
-              <AgendaDesktopGrid rows={rows} />
-              <AgendaMobileList rows={rows} />
-            </>
-          ) : (
-            <AgendaWeekGrid
-              columns={weekColumns}
-              selectedDateKey={selectedDateKey}
-              onDayClick={handleDayClick}
-            />
-          )}
+          {/* Always show day view on mobile */}
+          <div className="md:hidden space-y-5">
+            <AgendaWeekStrip days={days} onDayClick={handleDayClick} />
+            <AgendaMobileList rows={rows} onBookingClick={handleBookingClick} />
+          </div>
+
+          {/* Desktop views */}
+          <div className="hidden md:block space-y-5">
+            {view === 'day' ? (
+              <>
+                <AgendaWeekStrip days={days} onDayClick={handleDayClick} />
+                <AgendaDesktopGrid rows={rows} onBookingClick={handleBookingClick} />
+              </>
+            ) : (
+              <AgendaWeekGrid
+                columns={weekColumns}
+                selectedDateKey={selectedDateKey}
+                onDayClick={handleDayClick}
+                onBookingClick={handleBookingClick}
+              />
+            )}
+          </div>
         </div>
+
         <AgendaDaySummary summary={summary} />
       </div>
+
+      {selectedBooking && (
+        <BookingDetailPanel
+          booking={selectedBooking}
+          isOpen
+          onClose={() => setSelectedBooking(null)}
+        />
+      )}
     </section>
   )
 }

@@ -20,7 +20,7 @@ export function DashboardSidebar({ items }: DashboardSidebarProps) {
       <nav className="flex flex-1 flex-col gap-1" aria-label="Navigation dashboard">
         {items.map((item) => (
           <Link
-            key={item.href}
+            key={item.label}
             href={item.href}
             className={cn(
               'flex items-center gap-3 border border-transparent px-4 py-3 text-sm font-medium text-foreground/70 transition-colors hover:border-secondary/30 hover:text-foreground',

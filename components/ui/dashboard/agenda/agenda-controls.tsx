@@ -59,7 +59,7 @@ export function AgendaControls({
           </span>
         </button>
 
-        <div className="ml-0 flex border border-outline-variant bg-background p-1 md:ml-2">
+        <div className="hidden border border-outline-variant bg-background p-1 md:ml-2 md:flex">
           <button
             type="button"
             onClick={() => onViewChange('day')}

@@ -16,7 +16,7 @@ export function DashboardQuickActions({ actions }: DashboardQuickActionsProps) {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {actions.map((action) => (
           <Link
-            key={action.href}
+            key={action.label}
             href={action.href}
             className="group border border-outline-variant bg-background p-4 transition-colors hover:border-secondary"
           >
