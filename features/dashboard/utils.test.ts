@@ -101,6 +101,7 @@ describe('dashboard utils', () => {
 
     expect(mapBookingsToRecentBookings([booking], REFERENCE_DATE)).toEqual([
       {
+        id: 'booking-id',
         client: 'Nadia Benali',
         service: 'Soin profond',
         date: 'Demain',

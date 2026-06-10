@@ -35,6 +35,7 @@ export type DashboardAgendaItem =
     }
 
 export type DashboardRecentBooking = {
+  id: string
   client: string
   service: string
   date: string

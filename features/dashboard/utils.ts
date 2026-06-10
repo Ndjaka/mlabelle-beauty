@@ -65,6 +65,7 @@ export function mapBookingsToRecentBookings(
   referenceDate: Date
 ): DashboardRecentBooking[] {
   return bookings.map((booking) => ({
+    id: booking.id,
     client: booking.client_name,
     service: booking.service.name,
     date: formatRelativeBookingDate(new Date(booking.starts_at), referenceDate),

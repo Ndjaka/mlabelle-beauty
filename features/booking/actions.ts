@@ -3,8 +3,9 @@
 
 import type { CreateBookingInput, BookingResult, BookingWithService } from '@/types/booking';
 import type { ActionResult } from '@/types/action';
-import { getActiveServices, getActiveServiceById } from '@/features/booking/queries';
+import { getActiveServices, getActiveServiceById, getBookingById } from '@/features/booking/queries';
 import { getScheduleRule, getBookingsForDate, getDaysOff } from '@/features/booking/queries';
+import { revalidatePath } from 'next/cache';
 import { createBooking, updateBookingStatus, cancelBookingByToken as cancelBookingByTokenMutation } from '@/features/booking/mutations';
 import { sendBookingConfirmation, sendBookingCancellation } from '@/features/notifications/email';
 import { getAvailableSlots, groupSlotsByPeriod, formatDuration, formatPrice } from '@/features/booking/utils';
@@ -102,10 +103,40 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
 
 /**
  * Cancels a booking (admin action).
+ * Fetches the booking first to validate its state, then cancels it
+ * and notifies the client by email (non-blocking).
  */
 export async function cancelBookingByAdmin(bookingId: string): Promise<ActionResult> {
   try {
+    const booking = await getBookingById(bookingId);
+
+    if (!booking) {
+      return { success: false, error: 'Réservation introuvable.' };
+    }
+
+    if (booking.status === 'cancelled') {
+      return { success: false, error: 'Cette réservation est déjà annulée.' };
+    }
+
     await updateBookingStatus(bookingId, 'cancelled');
+
+    try {
+      const startsAt = new Date(booking.starts_at);
+      await sendBookingCancellation({
+        clientName: booking.client_name,
+        clientEmail: booking.client_email,
+        serviceName: booking.service.name,
+        date: format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }),
+        slot: `${String(startsAt.getHours()).padStart(2, '0')}:${String(startsAt.getMinutes()).padStart(2, '0')}`,
+        duration: formatDuration(booking.service.duration_minutes),
+        price: formatPrice(booking.service.price_cents),
+        cancelToken: booking.cancel_token,
+      });
+    } catch (emailError) {
+      console.error('Failed to send admin cancellation email', emailError);
+    }
+
+    revalidatePath('/dashboard');
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
