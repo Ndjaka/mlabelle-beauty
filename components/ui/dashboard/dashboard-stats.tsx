@@ -1,4 +1,4 @@
-import type { DashboardMetric } from '@/components/ui/dashboard/types'
+import type { DashboardMetric } from '@/types/dashboard'
 import { cn } from '@/lib/utils'
 
 type DashboardStatsProps = {

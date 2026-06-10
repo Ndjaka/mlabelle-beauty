@@ -33,6 +33,9 @@ description: Use this skill when creating new files, new folders, new features, 
 │   │   ├── queries.ts          # Supabase read queries
 │   │   ├── mutations.ts        # Supabase write mutations
 │   │   └── utils.ts            # Pure functions (slot calculation etc.)
+│   ├── dashboard/
+│   │   ├── queries.ts          # Aggregated dashboard read model
+│   │   └── utils.ts            # Dashboard formatting and mapping helpers
 │   ├── services/
 │   │   ├── actions.ts
 │   │   ├── queries.ts

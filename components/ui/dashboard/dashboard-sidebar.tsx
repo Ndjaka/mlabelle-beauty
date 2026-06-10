@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Logo } from '@/components/ui/logo'
-import type { DashboardNavItem } from '@/components/ui/dashboard/types'
+import type { DashboardNavItem } from '@/types/dashboard'
 import { cn } from '@/lib/utils'
 
 type DashboardSidebarProps = {

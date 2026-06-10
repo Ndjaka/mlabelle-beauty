@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { DashboardQuickAction } from '@/components/ui/dashboard/types'
+import type { DashboardQuickAction } from '@/types/dashboard'
 
 type DashboardQuickActionsProps = {
   actions: DashboardQuickAction[]

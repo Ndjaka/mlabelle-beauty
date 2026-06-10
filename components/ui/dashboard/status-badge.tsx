@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import type { DashboardBookingStatus } from '@/components/ui/dashboard/types'
+import type { DashboardBookingStatus } from '@/types/dashboard'
 
 type StatusBadgeProps = {
   status: DashboardBookingStatus

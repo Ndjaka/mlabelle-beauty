@@ -1,3 +1,5 @@
+import type { BookingWithService } from '@/types/booking'
+
 export type DashboardBookingStatus = 'Confirmé' | 'Annulé'
 
 export type DashboardNavItem = {
@@ -46,4 +48,15 @@ export type DashboardQuickAction = {
   description: string
   href: string
   icon: string
+}
+
+export type DashboardBookingWithCreatedAt = BookingWithService & {
+  created_at: string
+}
+
+export type DashboardData = {
+  dateLabel: string
+  metrics: DashboardMetric[]
+  agendaItems: DashboardAgendaItem[]
+  recentBookings: DashboardRecentBooking[]
 }

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { DashboardNavItem } from '@/components/ui/dashboard/types'
+import type { DashboardNavItem } from '@/types/dashboard'
 import { cn } from '@/lib/utils'
 
 type DashboardBottomNavProps = {
