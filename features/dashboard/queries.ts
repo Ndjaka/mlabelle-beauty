@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import type { BookingWithService } from '@/types/booking'
 import type { DashboardBookingWithCreatedAt, DashboardData } from '@/types/dashboard'
 import {
+  buildDashboardAgendaDays,
   buildDashboardMetrics,
   formatDashboardDateLabel,
   getCurrentWeekSalonStart,
@@ -28,6 +29,7 @@ export async function getDashboardData(
   return {
     dateLabel: formatDashboardDateLabel(referenceDate),
     metrics: buildDashboardMetrics(stats, todayBookings.length),
+    agendaDays: buildDashboardAgendaDays(referenceDate),
     agendaItems: mapBookingsToAgendaItems(todayBookings),
     recentBookings: mapBookingsToRecentBookings(recentBookings, referenceDate),
   }

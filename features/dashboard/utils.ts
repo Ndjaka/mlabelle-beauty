@@ -1,5 +1,7 @@
 import type { BookingStats, BookingWithService } from '@/types/booking'
 import type {
+  DashboardAgendaDay,
+  DashboardAgendaHourRow,
   DashboardAgendaItem,
   DashboardBookingStatus,
   DashboardBookingWithCreatedAt,
@@ -12,6 +14,20 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
   currency: 'EUR',
 })
+const DASHBOARD_AGENDA_HOURS = [
+  '08:00',
+  '09:00',
+  '10:00',
+  '11:00',
+  '12:00',
+  '13:00',
+  '14:00',
+  '15:00',
+  '16:00',
+  '17:00',
+  '18:00',
+  '19:00',
+]
 
 export function buildDashboardMetrics(
   stats: BookingStats,
@@ -57,6 +73,41 @@ export function mapBookingsToAgendaItems(
     duration: formatDashboardDuration(booking.service.duration_minutes),
     status: mapDashboardStatus(booking.status),
     price: formatDashboardPrice(booking.service.price_cents),
+  }))
+}
+
+export function buildDashboardAgendaDays(referenceDate: Date): DashboardAgendaDay[] {
+  const parts = getSalonDateParts(referenceDate)
+  const activeDayIndex = (parts.weekday + 6) % 7
+  const mondayDay = parts.day - activeDayIndex
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index, 12, 0, 0)
+
+    return {
+      weekdayLabel: formatAgendaWeekday(date),
+      dayNumber: new Intl.DateTimeFormat('fr-FR', {
+        timeZone: SALON_TIME_ZONE,
+        day: '2-digit',
+      }).format(date),
+      active: index === activeDayIndex,
+    }
+  })
+}
+
+export function buildDashboardAgendaHourRows(
+  items: DashboardAgendaItem[]
+): DashboardAgendaHourRow[] {
+  const visibleHours = new Set(DASHBOARD_AGENDA_HOURS)
+
+  items.forEach((item) => {
+    const itemHour = getAgendaItemHour(item)
+    if (itemHour) visibleHours.add(itemHour)
+  })
+
+  return Array.from(visibleHours).sort().map((hour) => ({
+    hour,
+    items: items.filter((item) => getAgendaItemHour(item) === hour),
   }))
 }
 
@@ -134,6 +185,24 @@ export function formatDashboardDuration(durationMinutes: number): string {
 export function mapDashboardStatus(status: BookingWithService['status']): DashboardBookingStatus {
   if (status === 'pending') return 'À confirmer'
   return status === 'cancelled' ? 'Annulé' : 'Confirmé'
+}
+
+function formatAgendaWeekday(date: Date): string {
+  const label = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: SALON_TIME_ZONE,
+    weekday: 'short',
+  })
+    .format(date)
+    .replace('.', '')
+
+  return label.charAt(0).toUpperCase() + label.slice(1)
+}
+
+function getAgendaItemHour(item: DashboardAgendaItem): string | null {
+  const [hour] = item.time.split(':')
+  if (!hour) return null
+
+  return `${hour.padStart(2, '0')}:00`
 }
 
 function formatRelativeBookingDate(date: Date, referenceDate: Date): string {

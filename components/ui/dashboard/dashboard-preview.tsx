@@ -62,7 +62,11 @@ export function DashboardPreview({ data }: DashboardPreviewProps) {
             <DashboardStats metrics={data.metrics} />
 
             <div id="agenda" className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-              <DashboardAgenda items={data.agendaItems} />
+              <DashboardAgenda
+                items={data.agendaItems}
+                days={data.agendaDays}
+                dateLabel={data.dateLabel}
+              />
               <div id="recent-bookings">
                 <DashboardRecentBookings bookings={data.recentBookings} />
               </div>

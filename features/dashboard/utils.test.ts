@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildDashboardAgendaDays,
+  buildDashboardAgendaHourRows,
   buildDashboardMetrics,
   formatDashboardDateLabel,
   formatDashboardPrice,
@@ -12,6 +14,10 @@ import type { BookingStats, BookingWithService } from '@/types/booking'
 import type { DashboardBookingWithCreatedAt } from '@/types/dashboard'
 
 const REFERENCE_DATE = new Date('2026-06-10T10:00:00.000Z')
+const EARLY_BOOKING_HOUR = '06:00'
+const MIDDAY_EMPTY_HOUR = '12:00'
+const MORNING_BOOKING_HOUR = '09:00'
+const AFTERNOON_FREE_HOUR = '14:00'
 
 describe('dashboard utils', () => {
   it('builds dashboard metrics from booking stats', () => {
@@ -101,6 +107,61 @@ describe('dashboard utils', () => {
     expect(mapBookingsToAgendaItems([booking])[0]).toMatchObject({
       status: 'À confirmer',
     })
+  })
+
+  it('builds the visible agenda week around the reference day', () => {
+    expect(buildDashboardAgendaDays(REFERENCE_DATE)).toEqual([
+      { weekdayLabel: 'Lun', dayNumber: '08', active: false },
+      { weekdayLabel: 'Mar', dayNumber: '09', active: false },
+      { weekdayLabel: 'Mer', dayNumber: '10', active: true },
+      { weekdayLabel: 'Jeu', dayNumber: '11', active: false },
+      { weekdayLabel: 'Ven', dayNumber: '12', active: false },
+      { weekdayLabel: 'Sam', dayNumber: '13', active: false },
+      { weekdayLabel: 'Dim', dayNumber: '14', active: false },
+    ])
+  })
+
+  it('groups agenda items by visible hour rows', () => {
+    const rows = buildDashboardAgendaHourRows([
+      {
+        kind: 'booking',
+        time: '09:30',
+        endTime: '10:15',
+        service: 'Coupe',
+        client: 'Nora',
+        duration: '45 min',
+        status: 'Confirmé',
+        price: '45,00 €',
+      },
+      {
+        kind: 'free',
+        time: '14:00',
+        endTime: '15:00',
+        label: 'Disponible',
+      },
+    ])
+
+    expect(rows.find((row) => row.hour === MORNING_BOOKING_HOUR)?.items).toHaveLength(1)
+    expect(rows.find((row) => row.hour === AFTERNOON_FREE_HOUR)?.items).toHaveLength(1)
+    expect(rows.find((row) => row.hour === MIDDAY_EMPTY_HOUR)?.items).toHaveLength(0)
+  })
+
+  it('keeps agenda bookings visible when they start before default opening hours', () => {
+    const rows = buildDashboardAgendaHourRows([
+      {
+        kind: 'booking',
+        time: '06:30',
+        endTime: '07:15',
+        service: 'Brushing',
+        client: 'Nadia',
+        duration: '45 min',
+        status: 'Confirmé',
+        price: '35,00 €',
+      },
+    ])
+
+    expect(rows.find((row) => row.hour === EARLY_BOOKING_HOUR)?.items).toHaveLength(1)
+    expect(rows[0]?.hour).toBe(EARLY_BOOKING_HOUR)
   })
 
   it('maps recent bookings with relative labels', () => {

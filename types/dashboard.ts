@@ -34,6 +34,17 @@ export type DashboardAgendaItem =
       label: string
     }
 
+export type DashboardAgendaDay = {
+  weekdayLabel: string
+  dayNumber: string
+  active: boolean
+}
+
+export type DashboardAgendaHourRow = {
+  hour: string
+  items: DashboardAgendaItem[]
+}
+
 export type DashboardRecentBooking = {
   id: string
   client: string
@@ -62,6 +73,7 @@ export type DashboardBookingWithCreatedAt = BookingWithService & {
 export type DashboardData = {
   dateLabel: string
   metrics: DashboardMetric[]
+  agendaDays: DashboardAgendaDay[]
   agendaItems: DashboardAgendaItem[]
   recentBookings: DashboardRecentBooking[]
 }
