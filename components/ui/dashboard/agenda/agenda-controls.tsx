@@ -1,9 +1,18 @@
 type AgendaControlsProps = {
   dateLabel: string
   bookingCount: number
+  onPrev: () => void
+  onNext: () => void
+  onToday: () => void
 }
 
-export function AgendaControls({ dateLabel, bookingCount }: AgendaControlsProps) {
+export function AgendaControls({
+  dateLabel,
+  bookingCount,
+  onPrev,
+  onNext,
+  onToday,
+}: AgendaControlsProps) {
   return (
     <div className="flex flex-col gap-5 border-b border-outline-variant pb-5 lg:flex-row lg:items-end lg:justify-between">
       <div>
@@ -17,6 +26,7 @@ export function AgendaControls({ dateLabel, bookingCount }: AgendaControlsProps)
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
+          onClick={onPrev}
           className="inline-flex size-10 items-center justify-center border border-outline-variant bg-background text-foreground transition-colors hover:border-secondary"
           aria-label="Jour précédent"
         >
@@ -26,12 +36,14 @@ export function AgendaControls({ dateLabel, bookingCount }: AgendaControlsProps)
         </button>
         <button
           type="button"
+          onClick={onToday}
           className="border border-outline-variant bg-background px-4 py-3 text-xs font-semibold uppercase text-foreground transition-colors hover:border-secondary"
         >
-          Aujourd’hui
+          Aujourd&apos;hui
         </button>
         <button
           type="button"
+          onClick={onNext}
           className="inline-flex size-10 items-center justify-center border border-outline-variant bg-background text-foreground transition-colors hover:border-secondary"
           aria-label="Jour suivant"
         >
@@ -39,15 +51,6 @@ export function AgendaControls({ dateLabel, bookingCount }: AgendaControlsProps)
             chevron_right
           </span>
         </button>
-
-        <div className="ml-0 flex border border-outline-variant bg-background p-1 md:ml-2">
-          <button type="button" className="bg-tertiary px-4 py-2 text-xs font-semibold uppercase text-white">
-            Jour
-          </button>
-          <button type="button" className="px-4 py-2 text-xs font-semibold uppercase text-foreground/55">
-            Semaine
-          </button>
-        </div>
       </div>
     </div>
   )

@@ -36,7 +36,10 @@ export function AgendaPage({ data }: AgendaPageProps) {
         <DashboardAgenda
           items={data.agendaItems}
           days={data.agendaDays}
+          month={data.agendaMonth}
+          summary={data.agendaSummary}
           dateLabel={data.dateLabel}
+          selectedDateKey={data.selectedDateKey}
         />
       </div>
     </DashboardShell>

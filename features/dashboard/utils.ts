@@ -3,6 +3,8 @@ import type {
   DashboardAgendaDay,
   DashboardAgendaHourRow,
   DashboardAgendaItem,
+  DashboardAgendaMonth,
+  DashboardAgendaSummary,
   DashboardBookingStatus,
   DashboardBookingWithCreatedAt,
   DashboardMetric,
@@ -85,6 +87,7 @@ export function buildDashboardAgendaDays(referenceDate: Date): DashboardAgendaDa
     const date = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index, 12, 0, 0)
 
     return {
+      dateKey: formatSalonDateKey(date),
       weekdayLabel: formatAgendaWeekday(date),
       dayNumber: new Intl.DateTimeFormat('fr-FR', {
         timeZone: SALON_TIME_ZONE,
@@ -93,6 +96,53 @@ export function buildDashboardAgendaDays(referenceDate: Date): DashboardAgendaDa
       active: index === activeDayIndex,
     }
   })
+}
+
+export function buildDashboardAgendaMonth(referenceDate: Date): DashboardAgendaMonth {
+  const parts = getSalonDateParts(referenceDate)
+  const firstMonthDay = zonedDateTimeToUtc(parts.year, parts.month, 1, 12, 0, 0)
+  const firstMonthDayParts = getSalonDateParts(firstMonthDay)
+  const gridStartDay = 1 - ((firstMonthDayParts.weekday + 6) % 7)
+  const activeDateKey = formatSalonDateKey(referenceDate)
+
+  return {
+    label: formatDashboardMonthLabel(referenceDate),
+    days: Array.from({ length: 42 }, (_, index) => {
+      const date = zonedDateTimeToUtc(parts.year, parts.month, gridStartDay + index, 12, 0, 0)
+      const dateParts = getSalonDateParts(date)
+      const dateKey = formatSalonDateKey(date)
+
+      return {
+        dateKey,
+        dayNumber: String(dateParts.day),
+        isCurrentMonth: dateParts.year === parts.year && dateParts.month === parts.month,
+        active: dateKey === activeDateKey,
+      }
+    }),
+  }
+}
+
+export function buildDashboardAgendaSummary(
+  bookings: BookingWithService[]
+): DashboardAgendaSummary {
+  const sortedBookings = [...bookings].sort(
+    (bookingA, bookingB) =>
+      new Date(bookingA.starts_at).getTime() - new Date(bookingB.starts_at).getTime()
+  )
+  const nextBooking = sortedBookings.find((booking) => booking.status !== 'cancelled')
+  const totalEstimateCents = sortedBookings
+    .filter((booking) => booking.status !== 'cancelled')
+    .reduce((total, booking) => total + booking.service.price_cents, 0)
+
+  return {
+    bookingCount: sortedBookings.filter((booking) => booking.status !== 'cancelled').length,
+    nextBookingLabel: nextBooking
+      ? `${nextBooking.service.name} · ${nextBooking.client_name}`
+      : 'Aucun rendez-vous',
+    nextBookingTime: nextBooking ? formatDashboardTime(new Date(nextBooking.starts_at)) : null,
+    pendingCount: sortedBookings.filter((booking) => booking.status === 'pending').length,
+    totalEstimate: formatDashboardPrice(totalEstimateCents),
+  }
 }
 
 export function buildDashboardAgendaHourRows(
@@ -160,6 +210,16 @@ export function formatDashboardDateLabel(date: Date): string {
   return label.charAt(0).toUpperCase() + label.slice(1)
 }
 
+function formatDashboardMonthLabel(date: Date): string {
+  const label = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: SALON_TIME_ZONE,
+    month: 'long',
+    year: 'numeric',
+  }).format(date)
+
+  return label.charAt(0).toUpperCase() + label.slice(1)
+}
+
 export function formatDashboardPrice(priceCents: number): string {
   return CURRENCY_FORMATTER.format(priceCents / 100).replace(/[\u00A0\u202F]/g, ' ')
 }
@@ -203,6 +263,15 @@ function getAgendaItemHour(item: DashboardAgendaItem): string | null {
   if (!hour) return null
 
   return `${hour.padStart(2, '0')}:00`
+}
+
+export function formatSalonDateKey(date: Date): string {
+  const parts = getSalonDateParts(date)
+  return [
+    parts.year,
+    String(parts.month).padStart(2, '0'),
+    String(parts.day).padStart(2, '0'),
+  ].join('-')
 }
 
 function formatRelativeBookingDate(date: Date, referenceDate: Date): string {

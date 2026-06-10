@@ -3,16 +3,18 @@ import type { DashboardAgendaDay } from '@/types/dashboard'
 
 type AgendaWeekStripProps = {
   days: DashboardAgendaDay[]
+  onDayClick: (dateKey: string) => void
 }
 
-export function AgendaWeekStrip({ days }: AgendaWeekStripProps) {
+export function AgendaWeekStrip({ days, onDayClick }: AgendaWeekStripProps) {
   return (
     <div className="grid grid-cols-7 border border-outline-variant bg-background" aria-label="Semaine affichée">
       {days.map((day) => (
         <button
-          key={`${day.weekdayLabel}-${day.dayNumber}`}
+          key={day.dateKey}
           type="button"
           aria-pressed={day.active}
+          onClick={() => onDayClick(day.dateKey)}
           className={cn(
             'flex min-h-20 flex-col items-center justify-center gap-1 border-r border-outline-variant px-1 text-center last:border-r-0',
             'transition-colors hover:bg-primary',

@@ -4,8 +4,11 @@ import type { BookingWithService } from '@/types/booking'
 import type { DashboardBookingWithCreatedAt, DashboardData } from '@/types/dashboard'
 import {
   buildDashboardAgendaDays,
+  buildDashboardAgendaMonth,
+  buildDashboardAgendaSummary,
   buildDashboardMetrics,
   formatDashboardDateLabel,
+  formatSalonDateKey,
   getCurrentWeekSalonStart,
   getTodaySalonRange,
   mapBookingsToAgendaItems,
@@ -14,9 +17,14 @@ import {
 
 const RECENT_BOOKINGS_LIMIT = 3
 
+/**
+ * Builds the full dashboard data payload.
+ * @param dateKey — optional YYYY-MM-DD string to select a specific date (from URL search params).
+ */
 export async function getDashboardData(
-  referenceDate = new Date()
+  dateKey?: string
 ): Promise<DashboardData> {
+  const referenceDate = dateKey ? parseDateKey(dateKey) : new Date()
   const todayRange = getTodaySalonRange(referenceDate)
   const weekStart = getCurrentWeekSalonStart(referenceDate)
 
@@ -28,11 +36,21 @@ export async function getDashboardData(
 
   return {
     dateLabel: formatDashboardDateLabel(referenceDate),
+    selectedDateKey: formatSalonDateKey(referenceDate),
+    agendaMonth: buildDashboardAgendaMonth(referenceDate),
+    agendaSummary: buildDashboardAgendaSummary(todayBookings),
     metrics: buildDashboardMetrics(stats, todayBookings.length),
     agendaDays: buildDashboardAgendaDays(referenceDate),
     agendaItems: mapBookingsToAgendaItems(todayBookings),
     recentBookings: mapBookingsToRecentBookings(recentBookings, referenceDate),
   }
+}
+
+function parseDateKey(dateKey: string): Date {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateKey)
+  if (!match) return new Date()
+
+  return new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12, 0, 0))
 }
 
 async function getRecentDashboardBookings(

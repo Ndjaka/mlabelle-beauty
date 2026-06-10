@@ -35,14 +35,35 @@ export type DashboardAgendaItem =
     }
 
 export type DashboardAgendaDay = {
+  dateKey: string
   weekdayLabel: string
   dayNumber: string
   active: boolean
 }
 
+export type DashboardAgendaMonthDay = {
+  dateKey: string
+  dayNumber: string
+  isCurrentMonth: boolean
+  active: boolean
+}
+
+export type DashboardAgendaMonth = {
+  label: string
+  days: DashboardAgendaMonthDay[]
+}
+
 export type DashboardAgendaHourRow = {
   hour: string
   items: DashboardAgendaItem[]
+}
+
+export type DashboardAgendaSummary = {
+  bookingCount: number
+  nextBookingLabel: string
+  nextBookingTime: string | null
+  pendingCount: number
+  totalEstimate: string
 }
 
 export type DashboardRecentBooking = {
@@ -72,6 +93,9 @@ export type DashboardBookingWithCreatedAt = BookingWithService & {
 
 export type DashboardData = {
   dateLabel: string
+  selectedDateKey: string
+  agendaMonth: DashboardAgendaMonth
+  agendaSummary: DashboardAgendaSummary
   metrics: DashboardMetric[]
   agendaDays: DashboardAgendaDay[]
   agendaItems: DashboardAgendaItem[]

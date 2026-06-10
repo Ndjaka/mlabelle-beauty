@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   buildDashboardAgendaDays,
   buildDashboardAgendaHourRows,
+  buildDashboardAgendaMonth,
+  buildDashboardAgendaSummary,
   buildDashboardMetrics,
   formatDashboardDateLabel,
   formatDashboardPrice,
@@ -18,6 +20,8 @@ const EARLY_BOOKING_HOUR = '06:00'
 const MIDDAY_EMPTY_HOUR = '12:00'
 const MORNING_BOOKING_HOUR = '09:00'
 const AFTERNOON_FREE_HOUR = '14:00'
+const MORNING_BOOKING_START = '2026-06-10T07:00:00.000Z'
+const AFTERNOON_BOOKING_START = '2026-06-10T12:30:00.000Z'
 
 describe('dashboard utils', () => {
   it('builds dashboard metrics from booking stats', () => {
@@ -111,14 +115,79 @@ describe('dashboard utils', () => {
 
   it('builds the visible agenda week around the reference day', () => {
     expect(buildDashboardAgendaDays(REFERENCE_DATE)).toEqual([
-      { weekdayLabel: 'Lun', dayNumber: '08', active: false },
-      { weekdayLabel: 'Mar', dayNumber: '09', active: false },
-      { weekdayLabel: 'Mer', dayNumber: '10', active: true },
-      { weekdayLabel: 'Jeu', dayNumber: '11', active: false },
-      { weekdayLabel: 'Ven', dayNumber: '12', active: false },
-      { weekdayLabel: 'Sam', dayNumber: '13', active: false },
-      { weekdayLabel: 'Dim', dayNumber: '14', active: false },
+      { dateKey: '2026-06-08', weekdayLabel: 'Lun', dayNumber: '08', active: false },
+      { dateKey: '2026-06-09', weekdayLabel: 'Mar', dayNumber: '09', active: false },
+      { dateKey: '2026-06-10', weekdayLabel: 'Mer', dayNumber: '10', active: true },
+      { dateKey: '2026-06-11', weekdayLabel: 'Jeu', dayNumber: '11', active: false },
+      { dateKey: '2026-06-12', weekdayLabel: 'Ven', dayNumber: '12', active: false },
+      { dateKey: '2026-06-13', weekdayLabel: 'Sam', dayNumber: '13', active: false },
+      { dateKey: '2026-06-14', weekdayLabel: 'Dim', dayNumber: '14', active: false },
     ])
+  })
+
+  it('builds a month calendar grid around the active day', () => {
+    const month = buildDashboardAgendaMonth(REFERENCE_DATE)
+
+    expect(month.label).toBe('Juin 2026')
+    expect(month.days).toHaveLength(42)
+    expect(month.days[0]).toMatchObject({
+      dateKey: '2026-06-01',
+      dayNumber: '1',
+      isCurrentMonth: true,
+      active: false,
+    })
+    expect(month.days.find((day) => day.dateKey === '2026-06-10')).toMatchObject({
+      dayNumber: '10',
+      isCurrentMonth: true,
+      active: true,
+    })
+    expect(month.days[35]).toMatchObject({
+      dateKey: '2026-07-06',
+      dayNumber: '6',
+      isCurrentMonth: false,
+      active: false,
+    })
+  })
+
+  it('builds the agenda day summary from bookings', () => {
+    const bookings: BookingWithService[] = [
+      {
+        id: 'later-booking',
+        client_name: 'Nadia Benali',
+        client_email: 'nadia@example.com',
+        starts_at: AFTERNOON_BOOKING_START,
+        ends_at: '2026-06-10T13:15:00.000Z',
+        status: 'pending',
+        cancel_token: 'later-token',
+        service: {
+          name: 'Brushing',
+          duration_minutes: 45,
+          price_cents: 3500,
+        },
+      },
+      {
+        id: 'first-booking',
+        client_name: 'Camille Laurent',
+        client_email: 'camille@example.com',
+        starts_at: MORNING_BOOKING_START,
+        ends_at: '2026-06-10T08:00:00.000Z',
+        status: 'confirmed',
+        cancel_token: 'first-token',
+        service: {
+          name: 'Coupe femme',
+          duration_minutes: 60,
+          price_cents: 4500,
+        },
+      },
+    ]
+
+    expect(buildDashboardAgendaSummary(bookings)).toEqual({
+      bookingCount: 2,
+      nextBookingLabel: 'Coupe femme · Camille Laurent',
+      nextBookingTime: '09:00',
+      pendingCount: 1,
+      totalEstimate: '80,00 €',
+    })
   })
 
   it('groups agenda items by visible hour rows', () => {
