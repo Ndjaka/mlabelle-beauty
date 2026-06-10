@@ -101,19 +101,6 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
 }
 
 /**
- * Confirms a pending booking (admin action).
- */
-export async function confirmBooking(bookingId: string): Promise<ActionResult> {
-  try {
-    await updateBookingStatus(bookingId, 'confirmed');
-    return { success: true };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erreur inconnue';
-    return { success: false, error: `Impossible de confirmer : ${message}` };
-  }
-}
-
-/**
  * Cancels a booking (admin action).
  */
 export async function cancelBookingByAdmin(bookingId: string): Promise<ActionResult> {

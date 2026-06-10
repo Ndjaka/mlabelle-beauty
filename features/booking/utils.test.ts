@@ -12,6 +12,7 @@ import {
   getWeekDays,
   formatMonthlyRevenue,
   groupSlotsByPeriod,
+  buildBookingConfirmationPath,
 } from './utils';
 import type { TimeRange } from '@/types/booking';
 import type { BookingWithService } from '@/types/booking';
@@ -333,5 +334,27 @@ describe('groupSlotsByPeriod', () => {
     const result = groupSlotsByPeriod(slots);
     expect(result.morning).toEqual(['09:00', '10:00']);
     expect(result.afternoon).toEqual([]);
+  });
+});
+
+// --- buildBookingConfirmationPath ---
+
+describe('buildBookingConfirmationPath', () => {
+  it('inclut le booking id et le token d annulation', () => {
+    const bookingId = 'booking-123';
+    const cancelToken = 'cancel-token-456';
+
+    const result = buildBookingConfirmationPath(bookingId, cancelToken);
+
+    expect(result).toBe('/booking/confirmation?booking_id=booking-123&token=cancel-token-456');
+  });
+
+  it('encode les paramètres d URL', () => {
+    const bookingId = 'booking 123';
+    const cancelToken = 'token/456';
+
+    const result = buildBookingConfirmationPath(bookingId, cancelToken);
+
+    expect(result).toBe('/booking/confirmation?booking_id=booking+123&token=token%2F456');
   });
 });

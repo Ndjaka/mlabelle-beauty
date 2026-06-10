@@ -52,6 +52,7 @@ description: Use this skill when creating new files, new folders, new features, 
 │   ├── supabase/
 │   │   ├── client.ts           # Browser Supabase client
 │   │   ├── server.ts           # Server Supabase client
+│   │   ├── service-role.ts     # Server-only trusted client for internal token flows
 │   │   └── types.ts            # Generated Supabase types (auto-generated)
 │   └── resend/
 │       └── client.ts           # Resend client instance
@@ -89,3 +90,4 @@ description: Use this skill when creating new files, new folders, new features, 
 - Supabase client initialization
 - Resend client initialization
 - No business logic
+- `supabase/service-role.ts` must stay server-only and must only be used by feature-layer code for trusted internal operations that cannot rely on public RLS, such as booking availability checks or token-verified booking confirmation/cancellation.

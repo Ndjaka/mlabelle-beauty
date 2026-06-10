@@ -1,21 +1,22 @@
 import { notFound } from 'next/navigation'
-import { getBookingById } from '@/features/booking/queries'
+import { getBookingByIdAndCancelToken } from '@/features/booking/queries'
 import { BookingConfirmationClient } from '@/components/ui/booking-confirmation-client'
 
 interface ConfirmationPageProps {
   searchParams: Promise<{
     booking_id?: string
+    token?: string
   }>
 }
 
 export default async function ConfirmationPage({ searchParams }: ConfirmationPageProps) {
-  const { booking_id } = await searchParams
+  const { booking_id, token } = await searchParams
 
-  if (!booking_id) {
+  if (!booking_id || !token) {
     notFound()
   }
 
-  const booking = await getBookingById(booking_id)
+  const booking = await getBookingByIdAndCancelToken(booking_id, token)
 
   if (!booking) {
     notFound()

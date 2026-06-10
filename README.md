@@ -20,6 +20,32 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Gestion du rôle admin Supabase
+
+Le dashboard est réservé aux utilisateurs Supabase Auth dont le champ `app_metadata.role` vaut `admin`.
+
+Pour donner le rôle admin à un compte, ouvrir le SQL Editor dans Supabase et exécuter :
+
+```sql
+update auth.users
+set raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}'::jsonb
+where email = 'email-du-compte@example.com';
+
+select email, raw_app_meta_data
+from auth.users
+where email = 'email-du-compte@example.com';
+```
+
+Pour retirer le rôle admin :
+
+```sql
+update auth.users
+set raw_app_meta_data = raw_app_meta_data - 'role'
+where email = 'email-du-compte@example.com';
+```
+
+Après un changement de rôle, l'utilisateur doit se déconnecter puis se reconnecter pour rafraîchir sa session.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

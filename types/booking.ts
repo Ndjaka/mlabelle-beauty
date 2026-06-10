@@ -13,6 +13,8 @@ export interface CreateBookingInput {
   starts_at: Date;
 }
 
+export type BookingStatus = 'pending' | 'confirmed' | 'cancelled';
+
 export interface BookingResult {
   success: boolean;
   bookingId?: string;
@@ -27,7 +29,7 @@ export interface BookingWithService {
   client_phone?: string;
   starts_at: string;
   ends_at: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: BookingStatus;
   cancel_token: string;
   service: {
     name: string;
@@ -39,6 +41,6 @@ export interface BookingWithService {
 export interface BookingStats {
   monthly_revenue_cents: number;
   monthly_bookings_count: number;
-  pending_bookings_count: number;
+  recent_bookings_count: number;
   weekly_fill_rate: number;
 }

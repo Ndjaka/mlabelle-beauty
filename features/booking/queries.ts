@@ -1,8 +1,13 @@
 // Read-only Supabase queries for booking data
 import { createServerClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import type { Service } from '@/types/service';
 import type { ScheduleRule, DayOff } from '@/types/schedule';
 import type { TimeRange, BookingWithService, BookingStats } from '@/types/booking';
+import {
+  BOOKING_STATUS_COUNTED_AS_REVENUE,
+  BOOKING_STATUSES_BLOCKING_AVAILABILITY,
+} from '@/features/booking/status';
 
 /**
  * Fetches all active services, ordered by name.
@@ -61,11 +66,11 @@ export async function getScheduleRule(dayOfWeek: number): Promise<ScheduleRule |
 }
 
 /**
- * Fetches all pending/confirmed bookings for a given date.
+ * Fetches all bookings that block availability for a given date.
  * Returns an array of TimeRange for overlap checking.
  */
 export async function getBookingsForDate(date: Date): Promise<TimeRange[]> {
-  const supabase = await createServerClient();
+  const supabase = createServiceRoleClient();
 
   // Format date as ISO string for Supabase filtering
   const dateStr = formatDateISO(date);
@@ -76,7 +81,7 @@ export async function getBookingsForDate(date: Date): Promise<TimeRange[]> {
     .select('starts_at, ends_at')
     .gte('starts_at', `${dateStr}T00:00:00`)
     .lt('starts_at', `${nextDateStr}T00:00:00`)
-    .in('status', ['pending', 'confirmed']);
+    .in('status', BOOKING_STATUSES_BLOCKING_AVAILABILITY);
 
   if (error) throw new Error(error.message);
 
@@ -151,7 +156,7 @@ export async function getBookingsByDateRange(
 }
 
 /**
- * Fetches dashboard stats: monthly revenue, booking count, pending count, weekly fill rate.
+ * Fetches dashboard stats: monthly revenue, booking count, recent booking count, weekly fill rate.
  */
 export async function getBookingStats(): Promise<BookingStats> {
   const supabase = await createServerClient();
@@ -164,7 +169,7 @@ export async function getBookingStats(): Promise<BookingStats> {
   const { data: confirmedBookings, error: confirmedError } = await supabase
     .from('bookings')
     .select('id, service:services(price_cents)')
-    .eq('status', 'confirmed')
+    .eq('status', BOOKING_STATUS_COUNTED_AS_REVENUE)
     .gte('starts_at', monthStart.toISOString())
     .lte('starts_at', monthEnd.toISOString());
 
@@ -185,16 +190,17 @@ export async function getBookingStats(): Promise<BookingStats> {
 
   if (countError) throw new Error(countError.message);
 
-  // Pending bookings count
-  const { count: pendingCount, error: pendingError } = await supabase
+  // Recent bookings created this week
+  const weekStart = getStartOfWeek(now);
+  const { count: recentCount, error: recentError } = await supabase
     .from('bookings')
     .select('id', { count: 'exact', head: true })
-    .eq('status', 'pending');
+    .neq('status', 'cancelled')
+    .gte('created_at', weekStart.toISOString());
 
-  if (pendingError) throw new Error(pendingError.message);
+  if (recentError) throw new Error(recentError.message);
 
   // Weekly fill rate: bookings this week / available slots this week
-  const weekStart = getStartOfWeek(now);
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
   weekEnd.setHours(23, 59, 59);
@@ -217,7 +223,7 @@ export async function getBookingStats(): Promise<BookingStats> {
   return {
     monthly_revenue_cents: monthlyRevenue,
     monthly_bookings_count: monthlyCount ?? 0,
-    pending_bookings_count: pendingCount ?? 0,
+    recent_bookings_count: recentCount ?? 0,
     weekly_fill_rate: fillRate,
   };
 }
@@ -243,6 +249,37 @@ export async function getBookingById(
     .from('bookings')
     .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)')
     .eq('id', id)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    client_name: data.client_name,
+    client_email: data.client_email,
+    client_phone: data.client_phone ?? undefined,
+    starts_at: data.starts_at,
+    ends_at: data.ends_at,
+    status: data.status as BookingWithService['status'],
+    cancel_token: data.cancel_token,
+    service: Array.isArray(data.service) ? data.service[0] : data.service as BookingWithService['service'],
+  };
+}
+
+export async function getBookingByIdAndCancelToken(
+  id: string,
+  cancelToken: string
+): Promise<BookingWithService | null> {
+  const supabase = createServiceRoleClient();
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)')
+    .eq('id', id)
+    .eq('cancel_token', cancelToken)
     .single();
 
   if (error) {

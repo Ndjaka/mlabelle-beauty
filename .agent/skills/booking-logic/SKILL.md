@@ -82,13 +82,15 @@ export function isOverlapping(a: TimeRange, b: TimeRange): boolean {
 Client submits form
   → Validate input (server-side)
   → Re-check slot availability (race condition protection)
-  → Insert booking with status: 'pending'
+  → Insert booking with status: 'confirmed'
   → Send confirmation email via Resend
   → Return booking id + cancel_token to client
 ```
 
 > Always re-check availability server-side before inserting.
 > A slot valid at form render may be taken by the time the form is submitted.
+> For the MVP, client-created bookings are automatically confirmed because clients only see available slots.
+> The `pending` status may remain in the database for existing test data or post-MVP manual validation, but it is not the normal client booking flow.
 
 ---
 

@@ -85,6 +85,16 @@ import { createServerClient } from '@/lib/supabase/server'
 import { createBrowserClient } from '@/lib/supabase/client'
 ```
 
+### Service role client
+
+`createServiceRoleClient` from `@/lib/supabase/service-role` is server-only and bypasses RLS.
+Use it sparingly, only inside `/features`, for trusted internal operations that must not be publicly readable:
+- computing slot availability from private booking times
+- reading a booking after verifying `booking_id + cancel_token`
+- cancelling a booking after verifying `cancel_token`
+
+Never import the service role client into Client Components, public UI components, or broad admin queries that should be protected by RLS.
+
 ---
 
 ## Security Rules (Row Level Security)

@@ -1,9 +1,11 @@
 // Write operations for booking data (create, update, cancel)
 import { createServerClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import type { CreateBookingInput, BookingWithService } from '@/types/booking';
+import { CLIENT_CREATED_BOOKING_STATUS } from '@/features/booking/status';
 
 /**
- * Creates a new booking with status 'pending'.
+ * Creates a new client booking with an automatically confirmed status.
  * Computes ends_at from starts_at + serviceDurationMinutes.
  * Returns the booking id and cancel_token.
  */
@@ -11,7 +13,7 @@ export async function createBooking(
   data: CreateBookingInput,
   serviceDurationMinutes: number
 ): Promise<{ id: string; cancel_token: string }> {
-  const supabase = await createServerClient();
+  const supabase = createServiceRoleClient();
 
   const endsAt = new Date(data.starts_at.getTime() + serviceDurationMinutes * 60 * 1000);
 
@@ -24,7 +26,7 @@ export async function createBooking(
       client_phone: data.client_phone ?? null,
       starts_at: data.starts_at.toISOString(),
       ends_at: endsAt.toISOString(),
-      status: 'pending',
+      status: CLIENT_CREATED_BOOKING_STATUS,
     })
     .select('id, cancel_token')
     .single();
@@ -42,7 +44,7 @@ export async function createBooking(
 }
 
 /**
- * Updates booking status (confirm or cancel).
+ * Updates booking status for trusted admin flows.
  * Requires authenticated user (uses server client).
  */
 export async function updateBookingStatus(
@@ -68,7 +70,7 @@ export async function updateBookingStatus(
 export async function cancelBookingByToken(
   token: string
 ): Promise<BookingWithService> {
-  const supabase = await createServerClient();
+  const supabase = createServiceRoleClient();
 
   // 1. Find the booking by token
   const { data: booking, error: fetchError } = await supabase

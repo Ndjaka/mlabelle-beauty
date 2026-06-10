@@ -195,6 +195,15 @@ export function groupSlotsByPeriod(slots: string[]): { morning: string[]; aftern
   return { morning, afternoon };
 }
 
+export function buildBookingConfirmationPath(bookingId: string, cancelToken: string): string {
+  const params = new URLSearchParams({
+    booking_id: bookingId,
+    token: cancelToken,
+  });
+
+  return `/booking/confirmation?${params.toString()}`;
+}
+
 // --- Internal helpers ---
 
 function addMinutes(date: Date, minutes: number): Date {

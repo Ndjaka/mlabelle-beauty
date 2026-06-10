@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Service } from '@/types/service'
 import { bookAppointment } from '@/features/booking/actions'
+import { buildBookingConfirmationPath } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 import { BookingFormSummary } from '@/components/ui/booking/BookingFormSummary'
 import { ClientDetailsFields } from '@/components/ui/booking/ClientDetailsFields'
@@ -52,8 +53,13 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
         starts_at: startsAt,
       })
 
+      if (result.success && result.bookingId && result.cancelToken) {
+        router.push(buildBookingConfirmationPath(result.bookingId, result.cancelToken))
+        return
+      }
+
       if (result.success) {
-        router.push(`/booking/confirmation?booking_id=${result.bookingId}`)
+        setError('La réservation a été créée, mais le lien de confirmation est incomplet.')
         return
       }
 
