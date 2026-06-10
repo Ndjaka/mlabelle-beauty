@@ -106,7 +106,11 @@ describe('dashboard utils', () => {
         service: 'Soin profond',
         date: 'Demain',
         time: '13:00',
+        duration: '1h',
         price: '45,00 €',
+        status: 'Confirmé',
+        email: 'nadia@example.com',
+        phone: null,
         note: 'créée il y a 2h',
       },
     ])

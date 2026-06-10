@@ -2,21 +2,15 @@
 
 import { useState } from 'react'
 import { StatusBadge } from '@/components/ui/dashboard/status-badge'
-import { CancelBookingModal } from '@/components/ui/dashboard/cancel-booking-modal'
+import { BookingDetailPanel } from '@/components/ui/dashboard/booking-detail-panel'
 import type { DashboardRecentBooking } from '@/types/dashboard'
-
-type PendingCancellation = {
-  id: string
-  client: string
-  service: string
-}
 
 type DashboardRecentBookingsProps = {
   bookings: DashboardRecentBooking[]
 }
 
 export function DashboardRecentBookings({ bookings }: DashboardRecentBookingsProps) {
-  const [pendingCancellation, setPendingCancellation] = useState<PendingCancellation | null>(null)
+  const [selectedBooking, setSelectedBooking] = useState<DashboardRecentBooking | null>(null)
 
   return (
     <>
@@ -39,7 +33,7 @@ export function DashboardRecentBookings({ bookings }: DashboardRecentBookingsPro
                     <h3 className="font-semibold text-foreground">{booking.client}</h3>
                     <p className="mt-1 text-sm text-foreground/65">{booking.service}</p>
                   </div>
-                  <StatusBadge status="Confirmé" />
+                  <StatusBadge status={booking.status} />
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-foreground/65">
@@ -49,25 +43,13 @@ export function DashboardRecentBookings({ bookings }: DashboardRecentBookingsPro
                   <p className="text-right text-xs">{booking.note}</p>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="mt-4">
                   <button
                     type="button"
-                    className="bg-tertiary px-3 py-3 text-xs font-semibold uppercase text-white"
+                    onClick={() => setSelectedBooking(booking)}
+                    className="w-full bg-tertiary px-3 py-3 text-xs font-semibold uppercase text-white hover:bg-tertiary/90 transition-colors"
                   >
                     Voir détail
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setPendingCancellation({
-                        id: booking.id,
-                        client: booking.client,
-                        service: booking.service,
-                      })
-                    }
-                    className="border border-outline-variant px-3 py-3 text-xs font-semibold uppercase text-foreground transition-colors hover:border-red-400 hover:text-red-600"
-                  >
-                    Annuler
                   </button>
                 </div>
               </article>
@@ -76,14 +58,11 @@ export function DashboardRecentBookings({ bookings }: DashboardRecentBookingsPro
         )}
       </section>
 
-      {pendingCancellation && (
-        <CancelBookingModal
-          bookingId={pendingCancellation.id}
-          clientName={pendingCancellation.client}
-          serviceName={pendingCancellation.service}
-          onClose={() => setPendingCancellation(null)}
-        />
-      )}
+      <BookingDetailPanel
+        booking={selectedBooking!}
+        isOpen={selectedBooking !== null}
+        onClose={() => setSelectedBooking(null)}
+      />
     </>
   )
 }

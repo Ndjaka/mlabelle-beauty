@@ -40,7 +40,11 @@ export type DashboardRecentBooking = {
   service: string
   date: string
   time: string
+  duration: string
   price: string
+  status: DashboardBookingStatus
+  email: string
+  phone: string | null
   note: string
 }
 

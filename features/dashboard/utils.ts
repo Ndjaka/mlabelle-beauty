@@ -70,7 +70,11 @@ export function mapBookingsToRecentBookings(
     service: booking.service.name,
     date: formatRelativeBookingDate(new Date(booking.starts_at), referenceDate),
     time: formatDashboardTime(new Date(booking.starts_at)),
+    duration: formatDashboardDuration(booking.service.duration_minutes),
     price: formatDashboardPrice(booking.service.price_cents),
+    status: mapDashboardStatus(booking.status),
+    email: booking.client_email,
+    phone: booking.client_phone ?? null,
     note: formatCreatedAtNote(new Date(booking.created_at), referenceDate),
   }))
 }
@@ -118,7 +122,7 @@ function formatDashboardTime(date: Date): string {
   }).format(date)
 }
 
-function formatDashboardDuration(durationMinutes: number): string {
+export function formatDashboardDuration(durationMinutes: number): string {
   if (durationMinutes < 60) return `${durationMinutes} min`
 
   const hours = Math.floor(durationMinutes / 60)
@@ -127,7 +131,7 @@ function formatDashboardDuration(durationMinutes: number): string {
   return minutes === 0 ? `${hours}h` : `${hours}h${minutes}`
 }
 
-function mapDashboardStatus(status: BookingWithService['status']): DashboardBookingStatus {
+export function mapDashboardStatus(status: BookingWithService['status']): DashboardBookingStatus {
   return status === 'cancelled' ? 'Annulé' : 'Confirmé'
 }
 
