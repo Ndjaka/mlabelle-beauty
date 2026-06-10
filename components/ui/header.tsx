@@ -1,7 +1,6 @@
 'use client';
 
 import { Logo } from "@/components/ui/logo";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
