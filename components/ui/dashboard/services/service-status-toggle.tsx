@@ -1,0 +1,53 @@
+'use client'
+
+import { useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { toggleServiceAction } from '@/features/services/actions'
+import { cn } from '@/lib/utils'
+
+type ServiceStatusToggleProps = {
+  serviceId: string
+  isActive: boolean
+}
+
+export function ServiceStatusToggle({ serviceId, isActive }: ServiceStatusToggleProps) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  const handleToggle = () => {
+    startTransition(async () => {
+      const newStatus = !isActive
+      const result = await toggleServiceAction(serviceId, newStatus)
+      if (result.success) {
+        router.refresh()
+      } else {
+        // En vrai, il faudrait afficher un toast d'erreur
+        console.error(result.error)
+      }
+    })
+  }
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isActive}
+      onClick={handleToggle}
+      disabled={isPending}
+      className={cn(
+        'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2',
+        isActive ? 'bg-secondary' : 'bg-outline-variant',
+        isPending && 'opacity-50 cursor-not-allowed'
+      )}
+    >
+      <span className="sr-only">Statut de la prestation</span>
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none inline-block size-3.5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+          isActive ? 'translate-x-2' : '-translate-x-2'
+        )}
+      />
+    </button>
+  )
+}

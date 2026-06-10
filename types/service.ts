@@ -15,3 +15,8 @@ export interface CreateServiceInput {
   price_cents: number;
   description?: string | null;
 }
+
+export interface PaginatedServices {
+  data: Service[];
+  total: number;
+}
