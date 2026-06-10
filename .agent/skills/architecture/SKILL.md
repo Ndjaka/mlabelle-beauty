@@ -16,7 +16,10 @@ description: Use this skill when creating new files, new folders, new features, 
 │   │           └── page.tsx    # Slot selection for a given date
 │   ├── (dashboard)/            # Protected routes (hairdresser only)
 │   │   ├── layout.tsx          # Auth guard
-│   │   ├── page.tsx            # Agenda view
+│   │   ├── dashboard/
+│   │   │   └── page.tsx        # Dashboard overview
+│   │   ├── agenda/
+│   │   │   └── page.tsx        # Full calendar agenda view
 │   │   ├── services/
 │   │   │   └── page.tsx        # Manage services
 │   │   └── schedule/
