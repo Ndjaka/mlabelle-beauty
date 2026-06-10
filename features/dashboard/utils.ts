@@ -5,6 +5,7 @@ import type {
   DashboardAgendaItem,
   DashboardAgendaMonth,
   DashboardAgendaSummary,
+  DashboardAgendaWeekColumn,
   DashboardBookingStatus,
   DashboardBookingWithCreatedAt,
   DashboardMetric,
@@ -159,6 +160,34 @@ export function buildDashboardAgendaHourRows(
     hour,
     items: items.filter((item) => getAgendaItemHour(item) === hour),
   }))
+}
+
+export function buildDashboardAgendaWeekColumns(
+  weekBookings: BookingWithService[],
+  referenceDate: Date
+): DashboardAgendaWeekColumn[] {
+  const parts = getSalonDateParts(referenceDate)
+  const activeDayIndex = (parts.weekday + 6) % 7
+  const mondayDay = parts.day - activeDayIndex
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index, 12, 0, 0)
+    const dateKey = formatSalonDateKey(date)
+    const dayLabel = formatAgendaWeekday(date)
+    const dayStart = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index, 0, 0, 0)
+    const dayEnd = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index + 1, 0, 0, 0)
+
+    const dayBookings = weekBookings.filter((booking) => {
+      const startsAt = new Date(booking.starts_at).getTime()
+      return startsAt >= dayStart.getTime() && startsAt < dayEnd.getTime()
+    })
+
+    return {
+      dateKey,
+      dayLabel,
+      items: mapBookingsToAgendaItems(dayBookings),
+    }
+  })
 }
 
 export function mapBookingsToRecentBookings(

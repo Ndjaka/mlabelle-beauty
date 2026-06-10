@@ -7,13 +7,16 @@ import { AgendaDaySummary } from '@/components/ui/dashboard/agenda/agenda-day-su
 import { AgendaDesktopGrid } from '@/components/ui/dashboard/agenda/agenda-desktop-grid'
 import { AgendaMiniMonth } from '@/components/ui/dashboard/agenda/agenda-mini-month'
 import { AgendaMobileList } from '@/components/ui/dashboard/agenda/agenda-mobile-list'
+import { AgendaWeekGrid } from '@/components/ui/dashboard/agenda/agenda-week-grid'
 import { AgendaWeekStrip } from '@/components/ui/dashboard/agenda/agenda-week-strip'
 import { buildDashboardAgendaHourRows } from '@/features/dashboard/utils'
 import type {
+  AgendaViewMode,
   DashboardAgendaDay,
   DashboardAgendaItem,
   DashboardAgendaMonth,
   DashboardAgendaSummary,
+  DashboardAgendaWeekColumn,
 } from '@/types/dashboard'
 
 type DashboardAgendaProps = {
@@ -21,8 +24,10 @@ type DashboardAgendaProps = {
   days: DashboardAgendaDay[]
   month: DashboardAgendaMonth
   summary: DashboardAgendaSummary
+  weekColumns: DashboardAgendaWeekColumn[]
   dateLabel: string
   selectedDateKey: string
+  view: AgendaViewMode
 }
 
 function countBookings(items: DashboardAgendaItem[]): number {
@@ -39,51 +44,88 @@ function getTodayDateKey(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
+function buildAgendaUrl(dateKey: string, view: AgendaViewMode): string {
+  const params = new URLSearchParams()
+  params.set('date', dateKey)
+  if (view === 'week') params.set('view', 'week')
+  return `/agenda?${params.toString()}`
+}
+
 export function DashboardAgenda({
   items,
   days,
   month,
   summary,
+  weekColumns,
   dateLabel,
   selectedDateKey,
+  view,
 }: DashboardAgendaProps) {
   const router = useRouter()
   const rows = buildDashboardAgendaHourRows(items)
 
   const navigateToDate = useCallback(
-    (dateKey: string) => {
-      router.push(`/agenda?date=${dateKey}`)
+    (dateKey: string, targetView: AgendaViewMode = view) => {
+      router.push(buildAgendaUrl(dateKey, targetView))
     },
-    [router]
+    [router, view]
   )
 
   const handlePrev = useCallback(() => {
-    navigateToDate(shiftDateKey(selectedDateKey, -1))
-  }, [selectedDateKey, navigateToDate])
+    const offset = view === 'week' ? -7 : -1
+    navigateToDate(shiftDateKey(selectedDateKey, offset))
+  }, [selectedDateKey, view, navigateToDate])
 
   const handleNext = useCallback(() => {
-    navigateToDate(shiftDateKey(selectedDateKey, 1))
-  }, [selectedDateKey, navigateToDate])
+    const offset = view === 'week' ? 7 : 1
+    navigateToDate(shiftDateKey(selectedDateKey, offset))
+  }, [selectedDateKey, view, navigateToDate])
 
   const handleToday = useCallback(() => {
     navigateToDate(getTodayDateKey())
   }, [navigateToDate])
+
+  const handleViewChange = useCallback(
+    (newView: AgendaViewMode) => {
+      navigateToDate(selectedDateKey, newView)
+    },
+    [selectedDateKey, navigateToDate]
+  )
+
+  const handleDayClick = useCallback(
+    (dateKey: string) => {
+      navigateToDate(dateKey, 'day')
+    },
+    [navigateToDate]
+  )
 
   return (
     <section className="space-y-5 border border-outline-variant bg-surface-container-low p-5 md:p-6">
       <AgendaControls
         dateLabel={dateLabel}
         bookingCount={countBookings(items)}
+        view={view}
         onPrev={handlePrev}
         onNext={handleNext}
         onToday={handleToday}
+        onViewChange={handleViewChange}
       />
       <div className="grid gap-5 xl:grid-cols-[220px_minmax(0,1fr)_260px]">
-        <AgendaMiniMonth month={month} onDayClick={navigateToDate} />
+        <AgendaMiniMonth month={month} onDayClick={handleDayClick} />
         <div className="space-y-5">
-          <AgendaWeekStrip days={days} onDayClick={navigateToDate} />
-          <AgendaDesktopGrid rows={rows} />
-          <AgendaMobileList rows={rows} />
+          {view === 'day' ? (
+            <>
+              <AgendaWeekStrip days={days} onDayClick={handleDayClick} />
+              <AgendaDesktopGrid rows={rows} />
+              <AgendaMobileList rows={rows} />
+            </>
+          ) : (
+            <AgendaWeekGrid
+              columns={weekColumns}
+              selectedDateKey={selectedDateKey}
+              onDayClick={handleDayClick}
+            />
+          )}
         </div>
         <AgendaDaySummary summary={summary} />
       </div>

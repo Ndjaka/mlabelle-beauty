@@ -4,6 +4,7 @@ import type { DashboardAgendaItem, DashboardBookingStatus } from '@/types/dashbo
 
 type AgendaBookingBlockProps = {
   item: DashboardAgendaItem
+  compact?: boolean
 }
 
 const statusClassNames: Record<DashboardBookingStatus, string> = {
@@ -12,12 +13,22 @@ const statusClassNames: Record<DashboardBookingStatus, string> = {
   Annulé: 'border-l-red-300 bg-red-50/80',
 }
 
-export function AgendaBookingBlock({ item }: AgendaBookingBlockProps) {
+export function AgendaBookingBlock({ item, compact = false }: AgendaBookingBlockProps) {
   if (item.kind === 'free') {
     return (
       <div className="border border-dashed border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-foreground/50">
         {item.label}
       </div>
+    )
+  }
+
+  if (compact) {
+    return (
+      <article className={cn('border border-l-4 border-outline-variant p-2 shadow-sm text-xs', statusClassNames[item.status])}>
+        <p className="font-semibold text-foreground/55">{item.time}</p>
+        <p className="mt-0.5 font-serif text-sm leading-tight text-foreground truncate">{item.service}</p>
+        <p className="mt-0.5 text-foreground/55 truncate">{item.client}</p>
+      </article>
     )
   }
 

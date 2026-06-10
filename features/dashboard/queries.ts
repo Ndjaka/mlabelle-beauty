@@ -1,11 +1,12 @@
 import { getBookingsByDateRange, getBookingStats } from '@/features/booking/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import type { BookingWithService } from '@/types/booking'
-import type { DashboardBookingWithCreatedAt, DashboardData } from '@/types/dashboard'
+import type { AgendaViewMode, DashboardBookingWithCreatedAt, DashboardData } from '@/types/dashboard'
 import {
   buildDashboardAgendaDays,
   buildDashboardAgendaMonth,
   buildDashboardAgendaSummary,
+  buildDashboardAgendaWeekColumns,
   buildDashboardMetrics,
   formatDashboardDateLabel,
   formatSalonDateKey,
@@ -20,28 +21,34 @@ const RECENT_BOOKINGS_LIMIT = 3
 /**
  * Builds the full dashboard data payload.
  * @param dateKey — optional YYYY-MM-DD string to select a specific date (from URL search params).
+ * @param view — 'day' (default) or 'week'.
  */
 export async function getDashboardData(
-  dateKey?: string
+  dateKey?: string,
+  view: AgendaViewMode = 'day'
 ): Promise<DashboardData> {
   const referenceDate = dateKey ? parseDateKey(dateKey) : new Date()
   const todayRange = getTodaySalonRange(referenceDate)
   const weekStart = getCurrentWeekSalonStart(referenceDate)
+  const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000)
 
-  const [stats, todayBookings, recentBookings] = await Promise.all([
+  const [stats, todayBookings, weekBookings, recentBookings] = await Promise.all([
     getBookingStats(),
     getBookingsByDateRange(todayRange.start, todayRange.end),
+    view === 'week' ? getBookingsByDateRange(weekStart, weekEnd) : Promise.resolve([]),
     getRecentDashboardBookings(weekStart),
   ])
 
   return {
     dateLabel: formatDashboardDateLabel(referenceDate),
     selectedDateKey: formatSalonDateKey(referenceDate),
+    view,
     agendaMonth: buildDashboardAgendaMonth(referenceDate),
     agendaSummary: buildDashboardAgendaSummary(todayBookings),
     metrics: buildDashboardMetrics(stats, todayBookings.length),
     agendaDays: buildDashboardAgendaDays(referenceDate),
     agendaItems: mapBookingsToAgendaItems(todayBookings),
+    agendaWeekColumns: buildDashboardAgendaWeekColumns(weekBookings, referenceDate),
     recentBookings: mapBookingsToRecentBookings(recentBookings, referenceDate),
   }
 }

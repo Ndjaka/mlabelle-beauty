@@ -91,13 +91,23 @@ export type DashboardBookingWithCreatedAt = BookingWithService & {
   created_at: string
 }
 
+export type DashboardAgendaWeekColumn = {
+  dateKey: string
+  dayLabel: string
+  items: DashboardAgendaItem[]
+}
+
+export type AgendaViewMode = 'day' | 'week'
+
 export type DashboardData = {
   dateLabel: string
   selectedDateKey: string
+  view: AgendaViewMode
   agendaMonth: DashboardAgendaMonth
   agendaSummary: DashboardAgendaSummary
   metrics: DashboardMetric[]
   agendaDays: DashboardAgendaDay[]
   agendaItems: DashboardAgendaItem[]
+  agendaWeekColumns: DashboardAgendaWeekColumn[]
   recentBookings: DashboardRecentBooking[]
 }
