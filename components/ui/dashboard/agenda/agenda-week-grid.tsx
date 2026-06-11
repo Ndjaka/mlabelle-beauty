@@ -1,5 +1,6 @@
 import { AgendaBookingBlock } from '@/components/ui/dashboard/agenda/agenda-booking-block'
 import { cn } from '@/lib/utils'
+import { buildDashboardAgendaVisibleHours } from '@/features/dashboard/utils'
 import type { DashboardAgendaWeekColumn, DashboardAgendaItem } from '@/types/dashboard'
 
 type AgendaWeekGridProps = {
@@ -9,13 +10,9 @@ type AgendaWeekGridProps = {
   onBookingClick?: (booking: DashboardAgendaItem) => void
 }
 
-const WEEK_HOURS = [
-  '08:00', '09:00', '10:00', '11:00', '12:00',
-  '13:00', '14:00', '15:00', '16:00', '17:00',
-  '18:00', '19:00',
-]
-
 export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBookingClick }: AgendaWeekGridProps) {
+  const visibleHours = buildDashboardAgendaVisibleHours(columns.flatMap((column) => column.items))
+
   return (
     <div className="hidden overflow-x-auto border border-outline-variant bg-background md:block">
       {/* Header row — days of the week */}
@@ -43,7 +40,7 @@ export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBooking
 
       {/* Time rows */}
       <div>
-        {WEEK_HOURS.map((hour) => (
+        {visibleHours.map((hour) => (
           <div key={hour} className="grid min-h-20 grid-cols-[80px_repeat(7,minmax(120px,1fr))]">
             <div className="border-r border-t border-outline-variant px-3 pt-4 text-xs font-semibold text-foreground/50">
               {hour}

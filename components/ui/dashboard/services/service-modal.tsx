@@ -15,13 +15,24 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  
+
   const isEditing = !!service
+
+  const formatDurationHint = (minsStr: string) => {
+    const m = parseInt(minsStr, 10)
+    if (isNaN(m) || m <= 0) return ''
+    const hours = Math.floor(m / 60)
+    const mins = m % 60
+    if (hours > 0) {
+      return `(${hours}h${mins > 0 ? mins.toString().padStart(2, '0') : '00'})`
+    }
+    return `(${mins} min)`
+  }
 
   const [name, setName] = useState(service?.name ?? '')
   const [description, setDescription] = useState(service?.description ?? '')
-  const [duration, setDuration] = useState(service?.duration_minutes ?? 60)
-  const [price, setPrice] = useState(service ? service.price_cents / 100 : 0)
+  const [durationStr, setDurationStr] = useState(service?.duration_minutes?.toString() ?? '60')
+  const [priceText, setPriceText] = useState(service ? (service.price_cents / 100).toString() : '')
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -31,12 +42,16 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
       setErrorMsg('Le nom est requis')
       return
     }
-    if (duration < 5) {
+
+    const durationMinutes = parseInt(durationStr, 10)
+    if (isNaN(durationMinutes) || durationMinutes < 5) {
       setErrorMsg('La durée minimum est de 5 minutes')
       return
     }
-    if (price < 0) {
-      setErrorMsg('Le prix ne peut pas être négatif')
+
+    const parsedPrice = parseFloat(priceText.replace(',', '.'))
+    if (isNaN(parsedPrice) || parsedPrice < 0) {
+      setErrorMsg('Le prix doit être un nombre valide (ex: 45 ou 45.50)')
       return
     }
 
@@ -45,8 +60,8 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
       const inputData: CreateServiceInput = {
         name: name.trim(),
         description: description.trim() || null,
-        duration_minutes: duration,
-        price_cents: Math.round(price * 100), 
+        duration_minutes: durationMinutes,
+        price_cents: Math.round(parsedPrice * 100),
       }
 
       const result = isEditing
@@ -64,7 +79,7 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
 
   return (
     <>
-      <div 
+      <div
         className="fixed inset-0 z-40 bg-black/40 transition-opacity"
         onClick={onClose}
         aria-hidden="true"
@@ -75,7 +90,7 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
           <h2 className="font-serif text-2xl text-foreground">
             {isEditing ? 'Modifier la prestation' : 'Nouvelle prestation'}
           </h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-foreground/65 hover:text-foreground p-2"
             aria-label="Fermer"
@@ -119,16 +134,16 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label htmlFor="duration" className="text-xs font-semibold uppercase text-foreground/70">
+              <label htmlFor="duration" className="flex items-center gap-2 text-xs font-semibold uppercase text-foreground/70">
                 Durée (minutes)
+                <span className="text-foreground/50 lowercase normal-case">{formatDurationHint(durationStr)}</span>
               </label>
               <input
                 id="duration"
-                type="number"
-                min="5"
-                step="5"
-                value={duration}
-                onChange={(e) => setDuration(Number(e.target.value))}
+                type="text"
+                placeholder="ex: 90"
+                value={durationStr}
+                onChange={(e) => setDurationStr(e.target.value)}
                 className="w-full border border-outline-variant bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-secondary"
               />
             </div>
@@ -139,11 +154,10 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
               </label>
               <input
                 id="price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
+                type="text"
+                placeholder="ex: 45 ou 45.50"
+                value={priceText}
+                onChange={(e) => setPriceText(e.target.value)}
                 className="w-full border border-outline-variant bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-secondary"
               />
             </div>

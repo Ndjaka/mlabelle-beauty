@@ -153,6 +153,17 @@ export function buildDashboardAgendaSummary(
 export function buildDashboardAgendaHourRows(
   items: DashboardAgendaItem[]
 ): DashboardAgendaHourRow[] {
+  const visibleHours = buildDashboardAgendaVisibleHours(items)
+
+  return visibleHours.map((hour) => ({
+    hour,
+    items: items.filter((item) => getAgendaItemHour(item) === hour),
+  }))
+}
+
+export function buildDashboardAgendaVisibleHours(
+  items: DashboardAgendaItem[]
+): string[] {
   const visibleHours = new Set(DASHBOARD_AGENDA_HOURS)
 
   items.forEach((item) => {
@@ -160,10 +171,7 @@ export function buildDashboardAgendaHourRows(
     if (itemHour) visibleHours.add(itemHour)
   })
 
-  return Array.from(visibleHours).sort().map((hour) => ({
-    hour,
-    items: items.filter((item) => getAgendaItemHour(item) === hour),
-  }))
+  return Array.from(visibleHours).sort()
 }
 
 export function buildDashboardAgendaWeekColumns(

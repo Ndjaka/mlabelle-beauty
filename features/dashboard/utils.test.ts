@@ -4,6 +4,7 @@ import {
   buildDashboardAgendaHourRows,
   buildDashboardAgendaMonth,
   buildDashboardAgendaSummary,
+  buildDashboardAgendaVisibleHours,
   buildDashboardMetrics,
   formatDashboardDateLabel,
   formatDashboardPrice,
@@ -243,6 +244,28 @@ describe('dashboard utils', () => {
 
     expect(rows.find((row) => row.hour === EARLY_BOOKING_HOUR)?.items).toHaveLength(1)
     expect(rows[0]?.hour).toBe(EARLY_BOOKING_HOUR)
+  })
+
+  it('keeps visible hours dynamic for week agenda views', () => {
+    const visibleHours = buildDashboardAgendaVisibleHours([
+      {
+        kind: 'booking',
+        id: 'late-booking',
+        time: '21:30',
+        endTime: '22:15',
+        service: 'Brushing',
+        client: 'Emma Rousseau',
+        duration: '45 min',
+        status: 'Confirmé',
+        price: '35,00 €',
+        email: 'emma@example.com',
+        phone: null,
+        date: 'Aujourd’hui',
+      },
+    ])
+
+    expect(visibleHours).toContain('21:00')
+    expect(visibleHours[0]).toBe('08:00')
   })
 
   it('maps recent bookings with relative labels', () => {
