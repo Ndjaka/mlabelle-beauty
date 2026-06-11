@@ -95,7 +95,7 @@ export function ServicesCatalogControls({
                 onClick={() => onFilterChange(option.id)}
                 className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-[999px] border px-4 font-sans text-[12px] font-semibold transition-colors ${
                   isActive
-                    ? 'border-secondary bg-secondary text-white shadow-[0_10px_24px_rgba(184,151,74,0.24)]'
+                    ? 'border-foreground bg-foreground text-white shadow-[0_4px_12px_rgba(30,27,21,0.18)]'
                     : 'border-secondary/20 bg-white text-foreground/75 hover:border-secondary/50 hover:text-foreground'
                 }`}
               >

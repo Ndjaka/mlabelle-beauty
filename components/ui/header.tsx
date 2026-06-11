@@ -19,7 +19,7 @@ export function Header({ variant = "home" }: HeaderProps) {
 
         {variant !== "booking" && (
           <div className="flex items-center gap-xl">
-            <Button href="/" size="sm" className="shadow-md">
+            <Button href="/#prestations" size="sm" className="shadow-md">
               RÉSERVER
             </Button>
           </div>

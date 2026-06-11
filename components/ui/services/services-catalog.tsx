@@ -64,7 +64,7 @@ export function ServicesCatalog({ services, today }: ServicesCatalogProps) {
   return (
     <section
       id="prestations"
-      className="mx-auto w-full max-w-[1500px] px-5 py-9 sm:px-7 md:px-10 md:py-14 xl:px-12"
+      className="mx-auto w-full max-w-[1440px] px-gutter py-9 md:px-xxl md:py-14"
     >
       <header className="mb-7 flex flex-col gap-4 md:mb-8 lg:flex-row lg:items-end lg:justify-between">
         <div className="w-full max-w-2xl">
