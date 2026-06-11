@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { toggleServiceAction } from '@/features/services/actions'
 import { cn } from '@/lib/utils'
 
@@ -24,9 +25,12 @@ export function ServiceStatusToggle({
       const newStatus = !isActive
       const result = await toggleServiceAction(serviceId, newStatus)
       if (result.success) {
+        toast.success(newStatus ? 'Prestation activée' : 'Prestation désactivée')
         router.refresh()
       } else {
-        onError?.(result.error ?? 'Impossible de modifier le statut.')
+        const message = result.error ?? 'Impossible de modifier le statut.'
+        toast.error(message)
+        onError?.(message)
       }
     })
   }

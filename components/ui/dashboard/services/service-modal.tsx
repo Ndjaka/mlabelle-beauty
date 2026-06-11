@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { ServiceFormField } from '@/components/ui/dashboard/services/service-form-field'
 import { ServiceImageUploadField } from '@/components/ui/dashboard/services/service-image-upload-field'
 import { ServiceModalFooter } from '@/components/ui/dashboard/services/service-modal-footer'
@@ -54,7 +55,7 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
 
   function handleActionResult(result: { success: boolean; error?: string }) {
     if (!result.success) {
-      setErrorMsg(result.error ?? 'Une erreur est survenue')
+      toast.error(result.error ?? 'Une erreur est survenue')
       return
     }
 
@@ -62,6 +63,7 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
   }
 
   function closeAfterSave() {
+    toast.success(isEditing ? 'Prestation modifiée avec succès' : 'Prestation créée avec succès')
     router.refresh()
     onClose()
   }

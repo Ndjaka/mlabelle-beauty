@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Noto_Serif } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -28,6 +29,7 @@ export default function RootLayout({
     <html lang="fr" className={`${manrope.variable} ${notoSerif.variable}`}>
       <body className="antialiased font-sans">
         {children}
+        <Toaster position="bottom-right" richColors closeButton />
       </body>
     </html>
   );
