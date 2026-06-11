@@ -3,6 +3,20 @@ import { cn } from '@/lib/utils'
 import { buildDashboardAgendaVisibleHours } from '@/features/dashboard/utils'
 import type { DashboardAgendaWeekColumn, DashboardAgendaItem } from '@/types/dashboard'
 
+function getEventStyles(itemTime: string, itemEndTime: string, rowHour: string) {
+  const [rowH] = rowHour.split(':').map(Number)
+  const [startH, startM] = itemTime.split(':').map(Number)
+  const [endH, endM] = itemEndTime.split(':').map(Number)
+
+  const startOffsetMinutes = (startH - rowH) * 60 + startM
+  const durationMinutes = (endH - startH) * 60 + (endM - startM)
+
+  const top = `${(startOffsetMinutes * 80) / 60}px`
+  const minHeight = `${(durationMinutes * 80) / 60}px`
+
+  return { top, minHeight }
+}
+
 type AgendaWeekGridProps = {
   columns: DashboardAgendaWeekColumn[]
   selectedDateKey: string
@@ -41,7 +55,7 @@ export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBooking
       {/* Time rows */}
       <div>
         {visibleHours.map((hour) => (
-          <div key={hour} className="grid min-h-20 grid-cols-[80px_repeat(7,minmax(120px,1fr))]">
+          <div key={hour} className="grid h-20 grid-cols-[80px_repeat(7,minmax(120px,1fr))]">
             <div className="border-r border-t border-outline-variant px-3 pt-4 text-xs font-semibold text-foreground/50">
               {hour}
             </div>
@@ -55,23 +69,29 @@ export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBooking
                 <div
                   key={`${col.dateKey}-${hour}`}
                   className={cn(
-                    'border-r border-t border-outline-variant p-2 last:border-r-0',
+                    'border-r border-t border-outline-variant relative',
                     col.dateKey === selectedDateKey && 'bg-tertiary/5'
                   )}
                 >
-                  {hourItems.length > 0 ? (
-                    <div className="space-y-2">
-                      {hourItems.map((item) => (
+                  {hourItems.length > 0 && hourItems.map((item, index) => {
+                    const styles = getEventStyles(item.time, item.endTime, hour)
+                    return (
+                      <div
+                        key={`${item.kind}-${item.time}-${item.endTime}-${index}`}
+                        className="absolute left-1 right-1 z-10 flex flex-col"
+                        style={styles}
+                      >
                         <AgendaBookingBlock
-                          key={`${item.kind}-${item.time}-${item.endTime}`}
                           item={item}
                           compact
                           onClick={item.kind === 'booking' && onBookingClick ? () => onBookingClick(item) : undefined}
+                          className="flex-1 w-full"
                         />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="h-full min-h-12" />
+                      </div>
+                    )
+                  })}
+                  {hourItems.length === 0 && (
+                    <div className="h-full w-full" />
                   )}
                 </div>
               )

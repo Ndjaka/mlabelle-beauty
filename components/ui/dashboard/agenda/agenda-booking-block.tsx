@@ -6,6 +6,7 @@ type AgendaBookingBlockProps = {
   item: DashboardAgendaItem
   compact?: boolean
   onClick?: () => void
+  className?: string
 }
 
 const statusClassNames: Record<DashboardBookingStatus, string> = {
@@ -14,7 +15,7 @@ const statusClassNames: Record<DashboardBookingStatus, string> = {
   Annulé: 'border-l-red-300 bg-red-50/80',
 }
 
-export function AgendaBookingBlock({ item, compact = false, onClick }: AgendaBookingBlockProps) {
+export function AgendaBookingBlock({ item, compact = false, onClick, className }: AgendaBookingBlockProps) {
   if (item.kind === 'free') {
     return (
       <div className="border border-dashed border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-foreground/50">
@@ -24,19 +25,20 @@ export function AgendaBookingBlock({ item, compact = false, onClick }: AgendaBoo
   }
 
   const Component = onClick ? 'button' : 'article'
-  const interactiveClasses = onClick 
-    ? 'cursor-pointer text-left w-full transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]' 
+  const interactiveClasses = onClick
+    ? 'cursor-pointer text-left w-full transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]'
     : ''
 
   if (compact) {
     return (
-      <Component 
+      <Component
         type={onClick ? 'button' : undefined}
         onClick={onClick}
         className={cn(
-          'block border border-l-4 border-outline-variant p-2 shadow-sm text-xs', 
+          'block border border-l-4 border-outline-variant p-2 shadow-sm text-xs',
           interactiveClasses,
-          statusClassNames[item.status]
+          statusClassNames[item.status],
+          className
         )}
       >
         <p className="font-semibold text-foreground/55">{item.time}</p>
@@ -47,13 +49,14 @@ export function AgendaBookingBlock({ item, compact = false, onClick }: AgendaBoo
   }
 
   return (
-    <Component 
+    <Component
       type={onClick ? 'button' : undefined}
       onClick={onClick}
       className={cn(
-        'block border border-l-4 border-outline-variant px-3 py-2 shadow-sm', 
+        'block border border-l-4 border-outline-variant px-3 py-2 shadow-sm flex flex-col',
         interactiveClasses,
-        statusClassNames[item.status]
+        statusClassNames[item.status],
+        className
       )}
     >
       <div className="flex items-start justify-between gap-2">

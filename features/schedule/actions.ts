@@ -22,6 +22,23 @@ export async function updateScheduleAction(
 }
 
 /**
+ * Updates multiple schedule rules at once.
+ */
+export async function updateMultipleScheduleRulesAction(
+  updates: { id: string; data: Partial<Omit<ScheduleRule, 'id'>> }[]
+): Promise<ActionResult> {
+  try {
+    await Promise.all(
+      updates.map((update) => updateScheduleRule(update.id, update.data))
+    );
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erreur inconnue';
+    return { success: false, error: `Impossible de modifier les horaires : ${message}` };
+  }
+}
+
+/**
  * Adds a new day off.
  */
 export async function addDayOffAction(
