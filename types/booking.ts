@@ -32,6 +32,7 @@ export interface BookingWithService {
   status: BookingStatus;
   cancel_token: string;
   service: {
+    image_url?: string | null;
     name: string;
     duration_minutes: number;
     price_cents: number;

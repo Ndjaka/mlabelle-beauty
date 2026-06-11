@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation'
 import type { Service } from '@/types/service'
 import { bookAppointment } from '@/features/booking/actions'
 import { buildBookingConfirmationPath } from '@/features/booking/utils'
-import { Button } from '@/components/ui/button'
+import { BookingFormHeader } from '@/components/ui/booking/BookingFormHeader'
 import { BookingFormSummary } from '@/components/ui/booking/BookingFormSummary'
+import { BookingFormStickySummary } from '@/components/ui/booking/BookingFormStickySummary'
+import { BookingSubmitButton } from '@/components/ui/booking/BookingSubmitButton'
 import { ClientDetailsFields } from '@/components/ui/booking/ClientDetailsFields'
 
 interface BookingFormClientProps {
@@ -88,7 +90,11 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
                 <ClientDetailsFields formData={formData} idSuffix="dt" onChange={handleChange} />
                 {error && <p className="text-error font-body-md">{error}</p>}
                 <div className="mt-auto">
-                  <SubmitButton isFormValid={isFormValid} loading={loading} label="VALIDER MES INFORMATIONS" />
+                  <BookingSubmitButton
+                    isFormValid={isFormValid}
+                    loading={loading}
+                    label="VALIDER MES INFORMATIONS"
+                  />
                 </div>
               </form>
             </section>
@@ -101,68 +107,27 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
       </div>
 
       <div className="flex md:hidden flex-col flex-grow bg-background selection:bg-secondary-container selection:text-on-secondary-container">
-        <main className="flex-1 pt-12 pb-32 px-6 max-w-container-max mx-auto w-full flex flex-col gap-6">
+        <main className="flex-1 pt-12 pb-[250px] px-6 max-w-container-max mx-auto w-full flex flex-col gap-6">
           <BookingFormHeader titleClassName="font-h3 text-h3 text-on-surface" />
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5 md:gap-lg w-full">
             <ClientDetailsFields formData={formData} idSuffix="mob" onChange={handleChange} />
           </form>
 
-          <BookingFormSummary compact service={service} date={date} slot={slot} />
           {error && <p className="text-error font-body-md text-center">{error}</p>}
         </main>
 
-        <div className="fixed bottom-0 left-0 w-full p-6 bg-background/95 backdrop-blur-sm border-t border-surface-variant z-40 pb-safe">
-          <SubmitButton
-            isFormValid={isFormValid}
-            loading={loading}
-            label="VALIDER"
-            type="button"
-            onClick={() => {
-              void handleSubmit()
-            }}
-          />
-        </div>
+        <BookingFormStickySummary
+          date={date}
+          isFormValid={isFormValid}
+          loading={loading}
+          onSubmit={() => {
+            void handleSubmit()
+          }}
+          service={service}
+          slot={slot}
+        />
       </div>
     </>
-  )
-}
-
-function BookingFormHeader({ titleClassName }: { titleClassName: string }) {
-  return (
-    <div className="mb-xl">
-      <span className="font-label-caps text-label-caps text-secondary tracking-widest uppercase">
-        Étape 2 sur 3
-      </span>
-      <h1 className={titleClassName}>Vos informations</h1>
-      <p className="font-body-lg text-body-lg text-on-surface-variant">
-        Veuillez renseigner vos coordonnées pour finaliser votre réservation
-      </p>
-    </div>
-  )
-}
-
-function SubmitButton({
-  isFormValid,
-  label,
-  loading,
-  onClick,
-  type = 'submit',
-}: {
-  isFormValid: boolean
-  label: string
-  loading: boolean
-  onClick?: () => void
-  type?: 'button' | 'submit'
-}) {
-  return (
-    <Button
-      disabled={!isFormValid || loading}
-      onClick={onClick}
-      className="w-full tracking-[0.15em]"
-      type={type}
-    >
-      {loading ? 'VALIDATION...' : label}
-    </Button>
   )
 }

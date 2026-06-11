@@ -17,7 +17,7 @@ export async function getActiveServices(): Promise<Service[]> {
 
   const { data, error } = await supabase
     .from('services')
-    .select('id, name, duration_minutes, price_cents, is_active')
+    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
     .eq('is_active', true)
     .order('name');
 
@@ -33,7 +33,7 @@ export async function getActiveServiceById(id: string): Promise<Service | null> 
 
   const { data, error } = await supabase
     .from('services')
-    .select('id, name, duration_minutes, price_cents, is_active, description')
+    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
     .eq('id', id)
     .eq('is_active', true)
     .single();
@@ -134,7 +134,7 @@ export async function getBookingsByDateRange(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
     .gte('starts_at', startDate.toISOString())
     .lte('starts_at', endDate.toISOString())
     .neq('status', 'cancelled')
@@ -247,7 +247,7 @@ export async function getBookingById(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
     .eq('id', id)
     .single();
 
@@ -277,7 +277,7 @@ export async function getBookingByIdAndCancelToken(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
     .eq('id', id)
     .eq('cancel_token', cancelToken)
     .single();

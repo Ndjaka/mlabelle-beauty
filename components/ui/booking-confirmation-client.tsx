@@ -51,6 +51,7 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
             date={dateStr}
             duration={durationStr}
             price={priceStr}
+            serviceImageUrl={booking.service.image_url}
             serviceName={serviceName}
             time={timeStr}
           />
@@ -93,6 +94,7 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
           date={dateStr}
           duration={durationStr}
           price={priceStr}
+          serviceImageUrl={booking.service.image_url}
           serviceName={serviceName}
           time={timeStr}
         />

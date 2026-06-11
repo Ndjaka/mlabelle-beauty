@@ -23,25 +23,25 @@ export function MobileDayPicker({
   return (
     <div className="mb-xl">
       <div className="flex justify-between items-end mb-4">
-        <h2 className="font-label-caps text-label-caps text-on-surface uppercase">
-          {format(currentMonth, 'MMMM', { locale: fr })}
+        <h2 className="font-serif text-[28px] capitalize text-on-surface">
+          {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </h2>
         <div className="flex gap-2">
           <button
             onClick={() => onMonthChange(subMonths(currentMonth, 1))}
-            className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors"
+            className="flex size-9 items-center justify-center border border-secondary/20 text-on-surface-variant transition-colors hover:border-secondary hover:text-secondary"
           >
             <span className="material-symbols-outlined text-sm">chevron_left</span>
           </button>
           <button
             onClick={() => onMonthChange(addMonths(currentMonth, 1))}
-            className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors"
+            className="flex size-9 items-center justify-center border border-secondary/20 text-on-surface-variant transition-colors hover:border-secondary hover:text-secondary"
           >
             <span className="material-symbols-outlined text-sm">chevron_right</span>
           </button>
         </div>
       </div>
-      <div className="flex overflow-x-auto gap-4 no-scrollbar pb-2 snap-x">
+      <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto pb-2">
         {monthDays.map((day) => {
           const isSelected = isSameDay(day, selectedDate)
           const isPast = isBefore(day, today)
@@ -50,16 +50,15 @@ export function MobileDayPicker({
               key={day.toISOString()}
               onClick={() => !isPast && onDateSelect(day)}
               disabled={isPast}
-              className={`snap-start flex-shrink-0 w-[64px] h-[80px] border flex flex-col items-center justify-center transition-colors relative
+              className={`relative flex h-[76px] w-[58px] flex-shrink-0 snap-start flex-col items-center justify-center border transition-colors
                 ${isPast ? 'opacity-50 cursor-not-allowed border-outline-variant bg-surface' : ''}
-                ${isSelected ? 'border-secondary bg-surface shadow-[0_0_15px_rgba(184,151,74,0.15)]' : !isPast ? 'border-outline-variant bg-surface hover:border-secondary/50' : ''}
+                ${isSelected ? 'border-foreground bg-foreground text-background shadow-[0_14px_30px_rgba(30,27,21,0.12)]' : !isPast ? 'border-secondary/20 bg-white hover:border-secondary/50' : ''}
               `}
             >
-              {isSelected && <div className="absolute top-0 w-full h-[2px] bg-secondary" />}
-              <span className={`font-label-caps text-label-caps uppercase mb-1 ${isSelected ? 'text-secondary' : 'text-on-surface-variant'}`}>
+              <span className={`mb-1 font-label-caps text-[10px] uppercase tracking-[0.15em] ${isSelected ? 'text-background/70' : 'text-on-surface-variant'}`}>
                 {format(day, 'EEE', { locale: fr })}
               </span>
-              <span className="font-h3 text-h3 text-on-background">
+              <span className={isSelected ? 'font-serif text-[26px] text-background' : 'font-serif text-[26px] text-on-background'}>
                 {format(day, 'd')}
               </span>
             </button>

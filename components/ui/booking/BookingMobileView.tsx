@@ -3,7 +3,6 @@
 import type { Service } from '@/types/service'
 import { MobileDayPicker } from '@/components/ui/booking/MobileDayPicker'
 import { MobileStickyRecap } from '@/components/ui/booking/MobileStickyRecap'
-import { ServiceRecap } from '@/components/ui/booking/ServiceRecap'
 import { TimeSlotGrid } from '@/components/ui/booking/TimeSlotGrid'
 
 interface BookingMobileViewProps {
@@ -36,14 +35,19 @@ export function BookingMobileView({
   today,
 }: BookingMobileViewProps) {
   return (
-    <div className="md:hidden flex flex-col bg-background pb-[120px]">
-      <main className="flex-grow px-gutter pt-lg">
-        <div className="mb-xl text-center mt-4">
-          <h1 className="font-h2 text-h2 text-on-background mb-sm">Votre parenthèse beauté</h1>
-          <p className="font-normal text-[16px] text-on-surface-variant">Sélectionnez le moment parfait pour vous.</p>
+    <div className="flex flex-col bg-background pb-[190px] md:hidden">
+      <main className="flex-grow px-5 pt-8">
+        <div className="mb-7">
+          <span className="mb-3 inline-flex border border-secondary/25 px-3 py-2 font-label-caps text-[10px] uppercase tracking-[0.22em] text-secondary">
+            Étape 1 sur 3
+          </span>
+          <h1 className="font-serif text-[42px] leading-none text-on-background">
+            Choisir un rendez-vous
+          </h1>
+          <p className="mt-4 font-body-md text-[16px] leading-7 text-on-surface-variant">
+            Sélectionnez une date puis un créneau disponible.
+          </p>
         </div>
-
-        <ServiceRecap service={service} />
 
         <MobileDayPicker
           currentMonth={currentMonth}
@@ -78,6 +82,7 @@ export function BookingMobileView({
       </main>
 
       <MobileStickyRecap
+        service={service}
         selectedDate={selectedDate}
         selectedSlot={selectedSlot}
         onConfirm={onConfirm}

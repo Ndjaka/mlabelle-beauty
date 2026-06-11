@@ -67,7 +67,7 @@ async function getRecentDashboardBookings(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, created_at, service:services(name, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, created_at, service:services(name, image_url, duration_minutes, price_cents)')
     .neq('status', 'cancelled')
     .gte('created_at', createdSince.toISOString())
     .order('created_at', { ascending: false })

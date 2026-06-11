@@ -76,7 +76,7 @@ export async function cancelBookingByToken(
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
     .select(
-      'id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, duration_minutes, price_cents)'
+      'id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)'
     )
     .eq('cancel_token', token)
     .single();

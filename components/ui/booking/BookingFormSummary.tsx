@@ -3,55 +3,30 @@ import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 import { formatDuration, formatPrice } from '@/features/booking/utils'
+import { ServiceImage } from '@/components/ui/service-image'
 
 interface BookingFormSummaryProps {
-  compact?: boolean
   date: Date
   service: Service
   slot: string
 }
 
 export function BookingFormSummary({
-  compact = false,
   date,
   service,
   slot,
 }: BookingFormSummaryProps) {
-  if (compact) {
-    return (
-      <div className="mt-md border border-outline-variant rounded-none p-6 bg-white flex flex-col gap-md">
-        <h3 className="font-label-caps text-label-caps text-secondary tracking-widest uppercase">Récapitulatif</h3>
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-baseline gap-4">
-            <span className="font-h3 text-h3 text-on-surface">{service.name}</span>
-            <span className="font-body-lg text-body-lg text-on-surface-variant whitespace-nowrap">{formatPrice(service.price_cents)}</span>
-          </div>
-          <div className="flex justify-between items-center text-on-surface-variant font-body-md text-body-md border-t border-outline-variant/30 pt-2">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-              <span className="capitalize">{format(date, 'EEE d MMMM', { locale: fr })}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">schedule</span>
-              <span>{slot}</span>
-            </div>
-          </div>
-        </div>
-        <p className="border-t border-outline-variant/30 pt-3 text-sm leading-6 text-on-surface-variant">
-          Acompte de {BOOKING_DEPOSIT_LABEL} à régler pour confirmer le rendez-vous.
-        </p>
-      </div>
-    )
-  }
-
   return (
     <div className="sticky top-[120px] bg-white p-xl flex flex-col gap-5 border border-neutral">
       <h2 className="font-h3 text-h3 text-on-background pb-2 border-b border-outline-variant/30">
         Votre Réservation
       </h2>
       <div className="flex flex-col gap-4 py-sm">
-        <div className="flex justify-between items-start">
-          <span className="font-body-lg text-body-lg text-on-background font-semibold">{service.name}</span>
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <ServiceImage imageUrl={service.image_url} label={service.name} variant="sm" />
+            <span className="font-body-lg text-body-lg text-on-background font-semibold">{service.name}</span>
+          </div>
           <span className="font-body-lg text-body-lg text-on-background">{formatPrice(service.price_cents)}</span>
         </div>
         <div className="flex items-center gap-2 text-on-surface-variant">

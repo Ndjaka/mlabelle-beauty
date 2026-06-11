@@ -8,9 +8,14 @@ import { cn } from '@/lib/utils'
 type ServiceStatusToggleProps = {
   serviceId: string
   isActive: boolean
+  onError?: (message: string) => void
 }
 
-export function ServiceStatusToggle({ serviceId, isActive }: ServiceStatusToggleProps) {
+export function ServiceStatusToggle({
+  serviceId,
+  isActive,
+  onError,
+}: ServiceStatusToggleProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -21,8 +26,7 @@ export function ServiceStatusToggle({ serviceId, isActive }: ServiceStatusToggle
       if (result.success) {
         router.refresh()
       } else {
-        // En vrai, il faudrait afficher un toast d'erreur
-        console.error(result.error)
+        onError?.(result.error ?? 'Impossible de modifier le statut.')
       }
     })
   }

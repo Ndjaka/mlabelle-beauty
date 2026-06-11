@@ -2,16 +2,20 @@
 'use server';
 
 import type { ActionResult } from '@/types/action';
-import type { CreateServiceInput } from '@/types/service';
+import type { CreateServiceInput, Service } from '@/types/service';
 import { createService, updateService, toggleServiceActive } from '@/features/services/mutations';
+
+type ServiceActionResult = ActionResult & {
+  service?: Service
+}
 
 /**
  * Creates a new service.
  */
-export async function createServiceAction(data: CreateServiceInput): Promise<ActionResult> {
+export async function createServiceAction(data: CreateServiceInput): Promise<ServiceActionResult> {
   try {
-    await createService(data);
-    return { success: true };
+    const service = await createService(data);
+    return { success: true, service };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
     return { success: false, error: `Impossible de créer le service : ${message}` };
@@ -24,10 +28,10 @@ export async function createServiceAction(data: CreateServiceInput): Promise<Act
 export async function updateServiceAction(
   id: string,
   data: Partial<CreateServiceInput>
-): Promise<ActionResult> {
+): Promise<ServiceActionResult> {
   try {
-    await updateService(id, data);
-    return { success: true };
+    const service = await updateService(id, data);
+    return { success: true, service };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
     return { success: false, error: `Impossible de modifier le service : ${message}` };

@@ -6,6 +6,7 @@ import type { Service } from '@/types/service'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 import { formatPrice, formatDuration } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
+import { ServiceImage } from '@/components/ui/service-image'
 
 interface SummaryCardProps {
   service: Service
@@ -21,31 +22,55 @@ export function SummaryCard({
   onConfirm,
 }: SummaryCardProps) {
   return (
-    <div className="sticky top-32 bg-white border border-outline-variant/20 rounded p-[49px] shadow-[0_4px_24px_rgba(30,27,21,0.02)]">
-      <h3 className="font-h3 font-normal text-[24px] text-on-surface mb-8 pb-4 border-b border-outline-variant/10">Résumé</h3>
+    <div className="sticky top-28 border border-secondary/20 bg-white p-8 shadow-[0_24px_70px_rgba(30,27,21,0.06)]">
+      <p className="font-label-caps text-label-caps uppercase tracking-[0.22em] text-secondary">
+        Votre réservation
+      </p>
+      <h3 className="mt-2 border-b border-secondary/15 pb-5 font-serif text-[30px] leading-tight text-on-surface">
+        Récapitulatif
+      </h3>
 
-      <div className="flex flex-col gap-6 mb-12">
-        <div className="flex justify-between items-baseline">
-          <span className="font-body-lg text-[18px] text-on-surface">{service.name}</span>
-          <span className="font-body-lg text-[18px] text-on-surface">{formatPrice(service.price_cents)}</span>
+      <div className="mb-10 mt-7 flex flex-col gap-6">
+        <div className="flex items-center justify-between gap-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <ServiceImage imageUrl={service.image_url} label={service.name} variant="sm" />
+            <span className="font-body-lg text-[18px] font-semibold text-on-surface">
+              {service.name}
+            </span>
+          </div>
+          <span className="font-body-lg text-[18px] font-semibold text-on-surface">
+            {formatPrice(service.price_cents)}
+          </span>
         </div>
+        <Button
+          href="/#prestations"
+          variant="ghost"
+          size="sm"
+          className="w-fit px-0 py-0 text-[10px] text-secondary hover:text-foreground"
+        >
+          Changer de prestation
+        </Button>
 
         <div className="flex items-start gap-3 text-on-surface-variant">
-          <span className="material-symbols-outlined text-[20px] mt-1">calendar_today</span>
-          <div className="font-normal text-[16px]">
+          <span className="material-symbols-outlined mt-1 text-[20px] text-secondary">
+            calendar_today
+          </span>
+          <div className="font-body-md text-[16px]">
             <span className="capitalize block">{format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}</span>
             {selectedSlot ? (
-              <span className="block mt-1">{selectedSlot} ({formatDuration(service.duration_minutes)})</span>
+              <span className="mt-1 block font-semibold text-on-surface">
+                {selectedSlot} ({formatDuration(service.duration_minutes)})
+              </span>
             ) : (
-              <span className="italic text-outline block mt-1">Sélectionnez un créneau</span>
+              <span className="mt-1 block italic text-outline">Sélectionnez un créneau</span>
             )}
           </div>
         </div>
       </div>
 
-      <div className="border-t border-outline-variant/10 pt-8 mb-12 flex justify-between items-center">
-        <span className="font-h3 font-normal text-[24px] text-on-surface">Total</span>
-        <span className="font-h3 font-normal text-[24px] text-on-surface">{formatPrice(service.price_cents)}</span>
+      <div className="mb-10 flex items-center justify-between border-t border-secondary/15 pt-6">
+        <span className="font-serif text-[26px] text-on-surface">Total</span>
+        <span className="font-serif text-[28px] text-on-surface">{formatPrice(service.price_cents)}</span>
       </div>
 
       <Button

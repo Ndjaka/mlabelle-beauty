@@ -1,6 +1,5 @@
-// Read-only Supabase queries for services data
-import { createServerClient } from '@/lib/supabase/server';
-import type { Service, PaginatedServices } from '@/types/service';
+import { createServerClient } from '@/lib/supabase/server'
+import type { PaginatedServices, Service } from '@/types/service'
 
 /**
  * Fetches all services with server-side pagination and filtering.
@@ -12,32 +11,33 @@ export async function getAllServices(
   search = '',
   status: 'all' | 'active' | 'inactive' = 'all'
 ): Promise<PaginatedServices> {
-  const supabase = await createServerClient();
+  const supabase = await createServerClient()
 
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
 
   let query = supabase
     .from('services')
-    .select('id, name, duration_minutes, price_cents, is_active', { count: 'exact' });
+    .select('id, name, description, image_url, duration_minutes, price_cents, is_active', {
+      count: 'exact',
+    })
 
   if (search) {
-    // Search in name or description
-    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
   }
 
   if (status === 'active') {
-    query = query.eq('is_active', true);
+    query = query.eq('is_active', true)
   } else if (status === 'inactive') {
-    query = query.eq('is_active', false);
+    query = query.eq('is_active', false)
   }
 
-  query = query.order('name').range(from, to);
+  query = query.order('name').range(from, to)
 
-  const { data, error, count } = await query;
+  const { data, error, count } = await query
 
-  if (error) throw new Error(error.message);
-  return { data: data || [], total: count || 0 };
+  if (error) throw new Error(error.message)
+  return { data: data ?? [], total: count ?? 0 }
 }
 
 /**
@@ -45,14 +45,14 @@ export async function getAllServices(
  * Used by the public booking page.
  */
 export async function getActiveServices(): Promise<Service[]> {
-  const supabase = await createServerClient();
+  const supabase = await createServerClient()
 
   const { data, error } = await supabase
     .from('services')
-    .select('id, name, duration_minutes, price_cents, is_active')
+    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
     .eq('is_active', true)
-    .order('name');
+    .order('name')
 
-  if (error) throw new Error(error.message);
-  return data;
+  if (error) throw new Error(error.message)
+  return data
 }

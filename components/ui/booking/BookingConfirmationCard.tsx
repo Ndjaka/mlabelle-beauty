@@ -1,7 +1,10 @@
+import { ServiceImage } from '@/components/ui/service-image'
+
 interface BookingConfirmationCardProps {
   date: string
   duration: string
   price: string
+  serviceImageUrl?: string | null
   serviceName: string
   time: string
 }
@@ -10,6 +13,7 @@ export function BookingConfirmationCard({
   date,
   duration,
   price,
+  serviceImageUrl,
   serviceName,
   time,
 }: BookingConfirmationCardProps) {
@@ -21,7 +25,10 @@ export function BookingConfirmationCard({
       <div className="space-y-6 relative z-10">
         <div>
           <span className="font-label-caps text-on-surface-variant uppercase text-[10px] tracking-widest block mb-1">Prestation</span>
-          <p className="font-serif text-h3 text-on-surface">{serviceName}</p>
+          <div className="mt-3 flex items-center gap-4">
+            <ServiceImage imageUrl={serviceImageUrl} label={serviceName} variant="md" />
+            <p className="font-serif text-h3 text-on-surface">{serviceName}</p>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-8 border-t border-neutral pt-6">
           <div>
