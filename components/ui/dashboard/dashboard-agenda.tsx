@@ -12,7 +12,7 @@ import { AgendaWeekStrip } from '@/components/ui/dashboard/agenda/agenda-week-st
 import { BookingDetailPanel } from '@/components/ui/dashboard/booking-detail-panel'
 import {
   buildDashboardAgendaUrl,
-  countDashboardAgendaBookings,
+  countDashboardAgendaViewBookings,
   getTodayDashboardAgendaDateKey,
   mapAgendaItemToRecentBooking,
   shiftDashboardAgendaDateKey,
@@ -96,7 +96,7 @@ export function DashboardAgenda({
     <section className="space-y-5 border border-outline-variant bg-surface-container-low p-5 md:p-6">
       <AgendaControls
         dateLabel={dateLabel}
-        bookingCount={countDashboardAgendaBookings(items)}
+        bookingCount={countDashboardAgendaViewBookings(view, items, weekColumns)}
         view={view}
         onPrev={handlePrev}
         onNext={handleNext}
@@ -105,26 +105,21 @@ export function DashboardAgenda({
       />
       <div className="grid gap-5 xl:grid-cols-[220px_minmax(0,1fr)_260px]">
         <AgendaMiniMonth month={month} onDayClick={handleDayClick} />
-        <div className="space-y-5">
-          <div className="md:hidden space-y-5">
-            <AgendaWeekStrip days={days} onDayClick={handleDayClick} />
-            <AgendaMobileList rows={rows} onBookingClick={handleBookingClick} />
-          </div>
-          <div className="hidden md:block space-y-5">
-            {view === 'day' ? (
-              <>
-                <AgendaWeekStrip days={days} onDayClick={handleDayClick} />
-                <AgendaDesktopGrid rows={rows} onBookingClick={handleBookingClick} />
-              </>
-            ) : (
-              <AgendaWeekGrid
-                columns={weekColumns}
-                selectedDateKey={selectedDateKey}
-                onDayClick={handleDayClick}
-                onBookingClick={handleBookingClick}
-              />
-            )}
-          </div>
+        <div className="min-w-0 space-y-5">
+          {view === 'day' ? (
+            <>
+              <AgendaWeekStrip days={days} onDayClick={handleDayClick} />
+              <AgendaMobileList rows={rows} onBookingClick={handleBookingClick} />
+              <AgendaDesktopGrid rows={rows} onBookingClick={handleBookingClick} />
+            </>
+          ) : (
+            <AgendaWeekGrid
+              columns={weekColumns}
+              selectedDateKey={selectedDateKey}
+              onDayClick={handleDayClick}
+              onBookingClick={handleBookingClick}
+            />
+          )}
         </div>
 
         <AgendaDaySummary summary={summary} />

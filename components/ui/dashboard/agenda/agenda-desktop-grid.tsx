@@ -1,5 +1,4 @@
 import { AgendaBookingBlock } from '@/components/ui/dashboard/agenda/agenda-booking-block'
-import { cn } from '@/lib/utils'
 import type { DashboardAgendaHourRow, DashboardAgendaItem } from '@/types/dashboard'
 
 function getEventStyles(itemTime: string, itemEndTime: string, rowHour: string) {

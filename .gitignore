@@ -44,3 +44,4 @@ next-env.d.ts
 
 # Antigravity generated files
 .agent/design/DESIGN.md
+.env*

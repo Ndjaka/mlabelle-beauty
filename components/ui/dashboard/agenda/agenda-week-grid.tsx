@@ -1,3 +1,6 @@
+'use client'
+
+import { useRef, type UIEvent } from 'react'
 import { AgendaBookingBlock } from '@/components/ui/dashboard/agenda/agenda-booking-block'
 import { cn } from '@/lib/utils'
 import { buildDashboardAgendaVisibleHours } from '@/features/dashboard/utils'
@@ -26,37 +29,54 @@ type AgendaWeekGridProps = {
 
 export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBookingClick }: AgendaWeekGridProps) {
   const visibleHours = buildDashboardAgendaVisibleHours(columns.flatMap((column) => column.items))
+  const headerScrollRef = useRef<HTMLDivElement>(null)
+
+  function handleGridScroll(event: UIEvent<HTMLDivElement>) {
+    if (headerScrollRef.current) {
+      headerScrollRef.current.scrollLeft = event.currentTarget.scrollLeft
+    }
+  }
 
   return (
-    <div className="hidden overflow-x-auto border border-outline-variant bg-background md:block">
-      {/* Header row — days of the week */}
-      <div className="grid grid-cols-[80px_repeat(7,minmax(120px,1fr))] border-b border-outline-variant bg-surface-container-low">
-        <div className="border-r border-outline-variant px-3 py-4 text-xs font-semibold uppercase text-foreground/45">
-          Heure
+    <div
+      role="region"
+      aria-label="Planning de la semaine"
+      className="border border-outline-variant bg-background"
+    >
+      <div
+        ref={headerScrollRef}
+        className="sticky top-[86px] z-20 overflow-hidden border-b border-outline-variant bg-surface-container-low lg:top-0"
+      >
+        <div className="grid grid-cols-[64px_repeat(7,minmax(104px,1fr))] md:grid-cols-[80px_repeat(7,minmax(120px,1fr))]">
+          <div className="sticky left-0 z-20 border-r border-outline-variant bg-surface-container-low px-2 py-4 text-xs font-semibold uppercase text-foreground/45 md:px-3">
+            Heure
+          </div>
+          {columns.map((col) => (
+            <button
+              key={col.dateKey}
+              type="button"
+              onClick={() => onDayClick(col.dateKey)}
+              className={cn(
+                'border-r border-outline-variant px-3 py-4 text-center text-xs font-semibold uppercase last:border-r-0 transition-colors hover:bg-primary/30',
+                col.dateKey === selectedDateKey && 'bg-tertiary text-white hover:bg-tertiary'
+              )}
+            >
+              <span className="block">{col.dayLabel}</span>
+              <span className="mt-1 block font-serif text-lg leading-none">
+                {col.dateKey.slice(8)}
+              </span>
+            </button>
+          ))}
         </div>
-        {columns.map((col) => (
-          <button
-            key={col.dateKey}
-            type="button"
-            onClick={() => onDayClick(col.dateKey)}
-            className={cn(
-              'border-r border-outline-variant px-3 py-4 text-center text-xs font-semibold uppercase last:border-r-0 transition-colors hover:bg-primary/30',
-              col.dateKey === selectedDateKey && 'bg-tertiary text-white hover:bg-tertiary'
-            )}
-          >
-            <span className="block">{col.dayLabel}</span>
-            <span className="mt-1 block font-serif text-lg leading-none">
-              {col.dateKey.slice(8)}
-            </span>
-          </button>
-        ))}
       </div>
 
-      {/* Time rows */}
-      <div>
+      <div className="overflow-x-auto" onScroll={handleGridScroll}>
         {visibleHours.map((hour) => (
-          <div key={hour} className="grid h-20 grid-cols-[80px_repeat(7,minmax(120px,1fr))]">
-            <div className="border-r border-t border-outline-variant px-3 pt-4 text-xs font-semibold text-foreground/50">
+          <div
+            key={hour}
+            className="grid h-20 grid-cols-[64px_repeat(7,minmax(104px,1fr))] md:grid-cols-[80px_repeat(7,minmax(120px,1fr))]"
+          >
+            <div className="sticky left-0 z-10 border-r border-t border-outline-variant bg-background px-2 pt-4 text-xs font-semibold text-foreground/50 md:px-3">
               {hour}
             </div>
             {columns.map((col) => {

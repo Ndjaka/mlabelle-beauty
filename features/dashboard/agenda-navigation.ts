@@ -1,8 +1,24 @@
-import type { AgendaViewMode, DashboardAgendaItem, DashboardRecentBooking } from '@/types/dashboard'
+import type {
+  AgendaViewMode,
+  DashboardAgendaItem,
+  DashboardAgendaWeekColumn,
+  DashboardRecentBooking,
+} from '@/types/dashboard'
 import { formatSalonDateKey } from '@/features/dashboard/utils'
 
 export function countDashboardAgendaBookings(items: DashboardAgendaItem[]): number {
   return items.filter((item) => item.kind === 'booking').length
+}
+
+export function countDashboardAgendaViewBookings(
+  view: AgendaViewMode,
+  dayItems: DashboardAgendaItem[],
+  weekColumns: DashboardAgendaWeekColumn[]
+): number {
+  const visibleItems =
+    view === 'week' ? weekColumns.flatMap((column) => column.items) : dayItems
+
+  return countDashboardAgendaBookings(visibleItems)
 }
 
 export function shiftDashboardAgendaDateKey(dateKey: string, dayOffset: number): string {
