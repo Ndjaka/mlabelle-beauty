@@ -8,7 +8,7 @@ type DashboardBottomNavProps = {
 
 export function DashboardBottomNav({ items }: DashboardBottomNavProps) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-outline-variant bg-background/95 px-3 py-2 backdrop-blur lg:hidden" aria-label="Navigation mobile">
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-outline-variant bg-background/95 px-3 py-2 backdrop-blur lg:hidden" aria-label="Navigation mobile">
       <div className="grid grid-cols-4 gap-1">
         {items.map((item) => (
           <Link

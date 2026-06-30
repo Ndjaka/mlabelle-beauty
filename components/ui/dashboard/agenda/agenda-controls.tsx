@@ -59,12 +59,17 @@ export function AgendaControls({
           </span>
         </button>
 
-        <div className="hidden border border-outline-variant bg-background p-1 md:ml-2 md:flex">
+        <div
+          role="group"
+          aria-label="Vue de l’agenda"
+          className="flex w-full border border-outline-variant bg-background p-1 sm:w-auto md:ml-2"
+        >
           <button
             type="button"
             onClick={() => onViewChange('day')}
+            aria-pressed={view === 'day'}
             className={cn(
-              'px-4 py-2 text-xs font-semibold uppercase transition-colors',
+              'flex-1 px-4 py-2 text-xs font-semibold uppercase transition-colors sm:flex-none',
               view === 'day' ? 'bg-tertiary text-white' : 'text-foreground/55 hover:text-foreground'
             )}
           >
@@ -73,8 +78,9 @@ export function AgendaControls({
           <button
             type="button"
             onClick={() => onViewChange('week')}
+            aria-pressed={view === 'week'}
             className={cn(
-              'px-4 py-2 text-xs font-semibold uppercase transition-colors',
+              'flex-1 px-4 py-2 text-xs font-semibold uppercase transition-colors sm:flex-none',
               view === 'week' ? 'bg-tertiary text-white' : 'text-foreground/55 hover:text-foreground'
             )}
           >

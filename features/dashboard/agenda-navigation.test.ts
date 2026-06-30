@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildDashboardAgendaUrl,
   countDashboardAgendaBookings,
+  countDashboardAgendaViewBookings,
   getTodayDashboardAgendaDateKey,
   mapAgendaItemToRecentBooking,
   shiftDashboardAgendaDateKey,
@@ -57,6 +58,24 @@ describe('dashboard agenda navigation', () => {
     ]
 
     expect(countDashboardAgendaBookings(items)).toBe(1)
+  })
+
+  it('counts bookings across all columns in week view', () => {
+    const weekColumns = [
+      {
+        dateKey: '2026-06-08',
+        dayLabel: 'Lun',
+        items: [bookingItem],
+      },
+      {
+        dateKey: '2026-06-09',
+        dayLabel: 'Mar',
+        items: [{ ...bookingItem, id: 'second-booking-id' }],
+      },
+    ]
+
+    expect(countDashboardAgendaViewBookings('day', [bookingItem], weekColumns)).toBe(1)
+    expect(countDashboardAgendaViewBookings('week', [bookingItem], weekColumns)).toBe(2)
   })
 
   it('maps agenda bookings to detail panel bookings', () => {
