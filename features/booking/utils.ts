@@ -204,6 +204,15 @@ export function buildBookingConfirmationPath(bookingId: string, cancelToken: str
   return `/booking/confirmation?${params.toString()}`;
 }
 
+export function buildBookingFormPath(date: Date, serviceId: string, slot: string): string {
+  const params = new URLSearchParams({
+    service_id: serviceId,
+    slot,
+  });
+
+  return `/booking/${formatDateToISO(date)}/confirm?${params.toString()}`;
+}
+
 // --- Internal helpers ---
 
 function addMinutes(date: Date, minutes: number): Date {

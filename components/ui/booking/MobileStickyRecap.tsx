@@ -3,7 +3,7 @@
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
-import { formatDuration, formatPrice } from '@/features/booking/utils'
+import { buildBookingFormPath, formatDuration, formatPrice } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 import { ServiceImage } from '@/components/ui/service-image'
 
@@ -11,16 +11,17 @@ interface MobileStickyRecapProps {
   service: Service
   selectedDate: Date
   selectedSlot: string | null
-  onConfirm: () => void
 }
 
 export function MobileStickyRecap({
   service,
   selectedDate,
   selectedSlot,
-  onConfirm,
 }: MobileStickyRecapProps) {
-  const actionLabel = selectedSlot ? 'CONTINUER' : 'CHOISIR'
+  const actionLabel = selectedSlot ? 'CONTINUER' : 'CHOISIR UN CRÉNEAU'
+  const confirmHref = selectedSlot
+    ? buildBookingFormPath(selectedDate, service.id, selectedSlot)
+    : null
 
   return (
     <div className="fixed bottom-0 z-40 w-full border-t border-secondary/20 bg-surface/95 px-5 py-4 shadow-[0_-18px_45px_rgba(30,27,21,0.08)] backdrop-blur-md">
@@ -35,8 +36,8 @@ export function MobileStickyRecap({
           <p className="font-label-caps text-[9px] uppercase tracking-[0.18em] text-secondary">
             Prestation
           </p>
-          <div className="mt-1 flex items-baseline justify-between gap-3">
-            <h3 className="truncate font-serif text-[22px] leading-none text-on-background">
+          <div className="mt-1 flex items-center justify-between gap-3">
+            <h3 className="truncate font-serif text-[22px] leading-[1.15] text-on-background">
               {service.name}
             </h3>
             <span className="shrink-0 font-body-lg text-[16px] font-semibold text-on-background">
@@ -62,13 +63,15 @@ export function MobileStickyRecap({
             {selectedSlot ? ` à ${selectedSlot}` : ' · Choisir un créneau'}
           </p>
         </div>
-        <Button
-          onClick={onConfirm}
-          disabled={!selectedSlot}
-          className="shrink-0 whitespace-nowrap px-5"
-        >
-          {actionLabel}
-        </Button>
+        {confirmHref ? (
+          <Button href={confirmHref} className="shrink-0 whitespace-nowrap px-4 text-[10px]">
+            {actionLabel}
+          </Button>
+        ) : (
+          <Button disabled className="shrink-0 whitespace-nowrap px-4 text-[10px]">
+            {actionLabel}
+          </Button>
+        )}
       </div>
     </div>
   )

@@ -7,16 +7,16 @@ import { Calendar } from '@/components/ui/booking/Calendar'
 import { SummaryCard } from '@/components/ui/booking/SummaryCard'
 import { TimeSlotGrid } from '@/components/ui/booking/TimeSlotGrid'
 import { BookingProgressPills } from '@/components/ui/booking/booking-progress-pills'
-import { BookingTrustChips } from '@/components/ui/booking/booking-trust-chips'
+import { SlotLoadingState } from '@/components/ui/booking/slot-loading-state'
 
 interface BookingDesktopViewProps {
   allSlotsCount: number
   currentMonth: Date
   monthDays: Date[]
-  onConfirm: () => void
   onDateSelect: (date: Date) => void
   onMonthChange: (date: Date) => void
   onSlotSelect: (slot: string) => void
+  isLoadingSlots: boolean
   selectedDate: Date
   selectedSlot: string | null
   service: Service
@@ -28,10 +28,10 @@ export function BookingDesktopView({
   allSlotsCount,
   currentMonth,
   monthDays,
-  onConfirm,
   onDateSelect,
   onMonthChange,
   onSlotSelect,
+  isLoadingSlots,
   selectedDate,
   selectedSlot,
   service,
@@ -43,17 +43,16 @@ export function BookingDesktopView({
       <main className="mx-auto w-full max-w-[1280px] px-8 py-14 xl:px-10 xl:py-16">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_370px] xl:gap-10">
           <section className="flex flex-col gap-8">
-            <div className="max-w-none">
+            <div className="max-w-[680px]">
               <div className="mb-6 max-w-[520px]">
                 <BookingProgressPills currentStep={1} />
               </div>
               <h1 className="font-serif text-[56px] leading-none text-on-surface">
                 Choisissez votre créneau
               </h1>
-              <p className="mt-4 font-body-lg text-[17px] leading-7 text-on-surface-variant md:whitespace-nowrap">
-                Votre prestation est prête. Sélectionnez la date et l’heure qui vous conviennent.
+              <p className="mt-4 font-body-lg text-[17px] leading-7 text-on-surface-variant">
+                Sélectionnez la date et l’heure qui vous conviennent pour continuer.
               </p>
-              <BookingTrustChips />
             </div>
 
             <div className="border border-secondary/15 bg-surface/70 p-7 shadow-[0_24px_70px_rgba(30,27,21,0.04)]">
@@ -85,25 +84,31 @@ export function BookingDesktopView({
                 />
 
                 <div className="flex flex-col gap-3">
-                  <TimeSlotGrid
-                    title="Matin"
-                    slots={slots.morning}
-                    selectedSlot={selectedSlot}
-                    onSlotSelect={onSlotSelect}
-                    icon="light_mode"
-                    columns={2}
-                    variant="desktop"
-                  />
-                  <TimeSlotGrid
-                    title="Après-midi"
-                    slots={slots.afternoon}
-                    selectedSlot={selectedSlot}
-                    onSlotSelect={onSlotSelect}
-                    icon="sunny"
-                    columns={2}
-                    variant="desktop"
-                  />
-                  {allSlotsCount === 0 && (
+                  {isLoadingSlots ? (
+                    <SlotLoadingState variant="desktop" />
+                  ) : (
+                    <>
+                      <TimeSlotGrid
+                        title="Matin"
+                        slots={slots.morning}
+                        selectedSlot={selectedSlot}
+                        onSlotSelect={onSlotSelect}
+                        icon="light_mode"
+                        columns={2}
+                        variant="desktop"
+                      />
+                      <TimeSlotGrid
+                        title="Après-midi"
+                        slots={slots.afternoon}
+                        selectedSlot={selectedSlot}
+                        onSlotSelect={onSlotSelect}
+                        icon="sunny"
+                        columns={2}
+                        variant="desktop"
+                      />
+                    </>
+                  )}
+                  {!isLoadingSlots && allSlotsCount === 0 && (
                     <div className="border border-secondary/15 bg-white p-5 shadow-[0_14px_34px_rgba(30,27,21,0.04)]">
                       <p className="font-body-lg text-[16px] font-semibold text-on-surface">
                         Aucun créneau disponible ce jour.
@@ -123,7 +128,6 @@ export function BookingDesktopView({
               service={service}
               selectedDate={selectedDate}
               selectedSlot={selectedSlot}
-              onConfirm={onConfirm}
             />
           </aside>
         </div>

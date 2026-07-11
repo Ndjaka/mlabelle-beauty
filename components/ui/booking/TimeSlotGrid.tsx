@@ -45,6 +45,7 @@ export function TimeSlotGrid({
             key={slot}
             type="button"
             aria-pressed={selectedSlot === slot}
+            aria-label={`Sélectionner le créneau de ${slot}`}
             onClick={() => onSlotSelect(slot)}
             className={`border py-3 text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary
               ${variant === 'mobile' ? 'font-body-md text-body-md' : 'font-body-lg text-body-lg'}

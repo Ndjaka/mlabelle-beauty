@@ -58,6 +58,7 @@ export function MobileDayPicker({
             <button
               key={day.toISOString()}
               type="button"
+              aria-label={`Sélectionner le ${format(day, 'EEEE d MMMM yyyy', { locale: fr })}`}
               aria-pressed={isSelected}
               onClick={() => !isPast && onDateSelect(day)}
               disabled={isPast}

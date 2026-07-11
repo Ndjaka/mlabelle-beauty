@@ -17,12 +17,7 @@ interface BookingFormClientProps {
   slot: string
 }
 
-const INITIAL_FORM_DATA = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-}
+const INITIAL_FORM_DATA = { firstName: '', lastName: '', email: '', phone: '' }
 
 export function BookingFormClient({ service, date, slot }: BookingFormClientProps) {
   const router = useRouter()
@@ -79,55 +74,73 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
     && formData.email.includes('@')
 
   return (
-    <>
-      <div className="hidden md:flex flex-col flex-grow bg-background">
-        <main className="flex-grow flex justify-center py-xxl px-xxl w-full max-w-container-max mx-auto">
-          <div className="flex flex-col lg:flex-row w-full gap-xxl">
-            <section className="w-full lg:w-3/5 flex flex-col">
-              <BookingFormHeader titleClassName="font-h1 text-h1 text-on-background mb-sm" />
+    <div className="flex flex-grow flex-col bg-background selection:bg-secondary-container selection:text-on-secondary-container">
+      <main className="mx-auto grid w-full max-w-[1180px] flex-1 gap-8 px-5 pb-[230px] pt-6 md:grid-cols-[minmax(0,1fr)_360px] md:px-8 md:py-14 lg:gap-12 xl:px-0">
+        <section className="min-w-0">
+          <BookingFormHeader />
 
-              <form onSubmit={handleSubmit} className="space-y-xl flex-grow flex flex-col">
-                <ClientDetailsFields formData={formData} idSuffix="dt" onChange={handleChange} />
-                {error && <p className="text-error font-body-md">{error}</p>}
-                <div className="mt-auto">
-                  <BookingSubmitButton
-                    isFormValid={isFormValid}
-                    loading={loading}
-                    label="ENVOYER MA DEMANDE"
-                  />
+          <form
+            onSubmit={handleSubmit}
+            className="border border-secondary/15 bg-surface/70 p-5 shadow-[0_18px_45px_rgba(30,27,21,0.04)] md:p-7"
+          >
+            <div className="mb-5 border-b border-outline-variant/25 pb-4">
+              <p className="font-label-caps text-[10px] uppercase tracking-[0.2em] text-secondary">
+                Informations personnelles
+              </p>
+              <p className="mt-2 font-body-md text-[13px] leading-5 text-on-surface-variant">
+                Les champs marqués d’un astérisque sont nécessaires pour envoyer la demande.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-5">
+              <ClientDetailsFields formData={formData} idSuffix="booking" onChange={handleChange} />
+
+              <div className="border border-secondary/15 bg-white p-4">
+                <div className="flex gap-3">
+                  <span className="material-symbols-outlined text-[20px] text-secondary">
+                    lock
+                  </span>
+                  <p className="font-body-md text-[13px] leading-5 text-on-surface-variant">
+                    Vos informations servent uniquement à traiter cette demande de rendez-vous.
+                  </p>
                 </div>
-              </form>
-            </section>
+              </div>
 
-            <aside className="w-full lg:w-2/5">
-              <BookingFormSummary service={service} date={date} slot={slot} />
-            </aside>
-          </div>
-        </main>
-      </div>
+              {error && (
+                <p
+                  role="alert"
+                  className="border border-error/25 bg-error/5 p-4 font-body-md text-[14px] text-error"
+                >
+                  {error}
+                </p>
+              )}
 
-      <div className="flex md:hidden flex-col flex-grow bg-background selection:bg-secondary-container selection:text-on-secondary-container">
-        <main className="flex-1 pt-12 pb-[250px] px-6 max-w-container-max mx-auto w-full flex flex-col gap-6">
-          <BookingFormHeader titleClassName="font-h3 text-h3 text-on-surface" />
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5 md:gap-lg w-full">
-            <ClientDetailsFields formData={formData} idSuffix="mob" onChange={handleChange} />
+              <div className="hidden md:block">
+                <BookingSubmitButton
+                  isFormValid={isFormValid}
+                  loading={loading}
+                  label="ENVOYER MA DEMANDE"
+                />
+              </div>
+            </div>
           </form>
+        </section>
 
-          {error && <p className="text-error font-body-md text-center">{error}</p>}
-        </main>
+        <aside className="hidden md:block">
+          <BookingFormSummary service={service} date={date} slot={slot} />
+        </aside>
+      </main>
 
-        <BookingFormStickySummary
-          date={date}
-          isFormValid={isFormValid}
-          loading={loading}
-          onSubmit={() => {
-            void handleSubmit()
-          }}
-          service={service}
-          slot={slot}
-        />
-      </div>
-    </>
+      <BookingFormStickySummary
+        date={date}
+        isFormValid={isFormValid}
+        loading={loading}
+        onSubmit={() => {
+          void handleSubmit()
+        }}
+        service={service}
+        slot={slot}
+      />
+    </div>
   )
 }

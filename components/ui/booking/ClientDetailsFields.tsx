@@ -42,6 +42,7 @@ export function ClientDetailsFields({
       </div>
       <FormInput
         autoComplete="email"
+        hint="Votre récapitulatif sera envoyé à cette adresse."
         id={`email-${idSuffix}`}
         label="Email *"
         name="email"
@@ -53,6 +54,7 @@ export function ClientDetailsFields({
       />
       <FormInput
         autoComplete="tel"
+        hint="Utile uniquement si la coiffeuse doit vous joindre rapidement."
         id={`telephone-${idSuffix}`}
         label="Téléphone (optionnel)"
         name="phone"
@@ -72,6 +74,7 @@ function FormInput({
   name,
   onChange,
   placeholder,
+  hint,
   required = false,
   type = 'text',
   value,
@@ -82,18 +85,22 @@ function FormInput({
   name: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   placeholder: string
+  hint?: string
   required?: boolean
   type?: string
   value: string
 }) {
+  const hintId = hint ? `${id}-hint` : undefined
+
   return (
-    <div className="flex flex-col">
-      <label className="font-label-caps text-label-caps text-on-surface-variant mb-xs" htmlFor={id}>
+    <div className="flex flex-col gap-2">
+      <label className="font-label-caps text-[10px] uppercase tracking-[0.18em] text-on-surface-variant" htmlFor={id}>
         {label}
       </label>
       <input
-        className="border-0 border-b border-neutral bg-white py-3 font-body-md text-on-background w-full focus:ring-0 focus:border-secondary transition-all outline-none"
+        aria-describedby={hintId}
         autoComplete={autoComplete}
+        className="h-14 w-full border border-secondary/15 bg-white px-4 font-body-md text-[15px] text-on-background outline-none transition-all placeholder:text-on-surface-variant/55 focus:border-secondary focus:ring-2 focus:ring-secondary/15"
         id={id}
         name={name}
         placeholder={placeholder}
@@ -102,6 +109,11 @@ function FormInput({
         value={value}
         onChange={onChange}
       />
+      {hint && (
+        <p id={hintId} className="font-body-md text-[12px] leading-5 text-on-surface-variant">
+          {hint}
+        </p>
+      )}
     </div>
   )
 }

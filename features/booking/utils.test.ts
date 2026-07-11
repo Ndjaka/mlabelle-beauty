@@ -13,6 +13,7 @@ import {
   formatMonthlyRevenue,
   groupSlotsByPeriod,
   buildBookingConfirmationPath,
+  buildBookingFormPath,
 } from './utils';
 import type { TimeRange } from '@/types/booking';
 import type { BookingWithService } from '@/types/booking';
@@ -356,5 +357,25 @@ describe('buildBookingConfirmationPath', () => {
     const result = buildBookingConfirmationPath(bookingId, cancelToken);
 
     expect(result).toBe('/booking/confirmation?booking_id=booking+123&token=token%2F456');
+  });
+});
+
+// --- buildBookingFormPath ---
+
+describe('buildBookingFormPath', () => {
+  it('construit le lien vers le formulaire de coordonnées', () => {
+    const date = new Date('2026-07-11T00:00:00');
+
+    const result = buildBookingFormPath(date, 'service-123', '09:00');
+
+    expect(result).toBe('/booking/2026-07-11/confirm?service_id=service-123&slot=09%3A00');
+  });
+
+  it('encode le service et le créneau', () => {
+    const date = new Date('2026-07-11T00:00:00');
+
+    const result = buildBookingFormPath(date, 'service 123', '09:15');
+
+    expect(result).toBe('/booking/2026-07-11/confirm?service_id=service+123&slot=09%3A15');
   });
 });
