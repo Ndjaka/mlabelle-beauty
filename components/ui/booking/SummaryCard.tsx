@@ -27,7 +27,7 @@ export function SummaryCard({
         Votre réservation
       </p>
       <h3 className="mt-2 border-b border-secondary/15 pb-5 font-serif text-[30px] leading-tight text-on-surface">
-        Récapitulatif
+        Votre choix
       </h3>
 
       <div className="mb-10 mt-7 flex flex-col gap-6">
@@ -66,6 +66,15 @@ export function SummaryCard({
             )}
           </div>
         </div>
+
+        <div className="border border-secondary/15 bg-surface/70 p-4">
+          <p className="font-body-md text-[14px] font-semibold text-on-surface">
+            {selectedSlot ? 'Prête pour l’étape suivante ?' : 'Choisissez un créneau pour continuer.'}
+          </p>
+          <p className="mt-1 font-body-md text-[13px] leading-5 text-on-surface-variant">
+            Vous pourrez vérifier vos informations avant d’envoyer la demande.
+          </p>
+        </div>
       </div>
 
       <div className="mb-10 flex items-center justify-between border-t border-secondary/15 pt-6">
@@ -79,11 +88,11 @@ export function SummaryCard({
         size="lg"
         className="w-full"
       >
-        CONFIRMER MON RENDEZ-VOUS
+        CONTINUER VERS MES INFORMATIONS
       </Button>
 
       <p className="text-center mt-6 font-normal text-[12px] text-outline leading-relaxed px-4">
-        Acompte de {BOOKING_DEPOSIT_LABEL} nécessaire pour confirmer. Solde à régler sur place.
+        Acompte de {BOOKING_DEPOSIT_LABEL} nécessaire pour confirmer définitivement. Solde à régler sur place.
       </p>
     </div>
   )

@@ -12,7 +12,7 @@ export function ServiceCard({ service, today }: ServiceCardProps) {
   const description = service.description?.trim();
 
   return (
-    <article className="group flex h-[154px] overflow-hidden bg-white shadow-[0_14px_34px_rgba(30,27,21,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(30,27,21,0.09)] sm:h-[172px] xl:h-[184px]">
+    <article className="group flex h-[164px] overflow-hidden border border-secondary/10 bg-white shadow-[0_14px_34px_rgba(30,27,21,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/25 hover:shadow-[0_20px_42px_rgba(30,27,21,0.09)] sm:h-[176px] xl:h-[190px]">
       <div className="h-full w-[36%] min-w-[118px] max-w-[152px] sm:min-w-[142px] xl:w-[42%] xl:min-w-[176px] xl:max-w-[205px]">
         <ServiceImage
           imageUrl={service.image_url}
@@ -50,9 +50,10 @@ export function ServiceCard({ service, today }: ServiceCardProps) {
             <Button
               href={`/booking/${today}?service_id=${service.id}`}
               size="sm"
-              className="w-full border-0 bg-foreground px-3 py-2.5 text-[10px] tracking-[0.08em] text-white hover:bg-foreground/85"
+              aria-label={`Choisir la prestation ${service.name}`}
+              className="w-full border-0 bg-foreground px-3 py-2.5 text-[10px] tracking-[0.06em] text-white hover:bg-foreground/85"
             >
-              RÉSERVER
+              CHOISIR CETTE PRESTATION
             </Button>
           </div>
         </div>

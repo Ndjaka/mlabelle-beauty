@@ -19,7 +19,7 @@ export function BookingFormSummary({
   return (
     <div className="sticky top-[120px] bg-white p-xl flex flex-col gap-5 border border-neutral">
       <h2 className="font-h3 text-h3 text-on-background pb-2 border-b border-outline-variant/30">
-        Votre Réservation
+        Votre demande
       </h2>
       <div className="flex flex-col gap-4 py-sm">
         <div className="flex justify-between items-start gap-4">
@@ -48,7 +48,7 @@ export function BookingFormSummary({
           <span className="font-h3 text-h3 text-on-background">{formatPrice(service.price_cents)}</span>
         </div>
         <p className="font-body-md text-body-md text-on-surface-variant text-sm">
-          Acompte de {BOOKING_DEPOSIT_LABEL} à régler pour confirmer le rendez-vous.
+          Acompte de {BOOKING_DEPOSIT_LABEL} nécessaire pour confirmer définitivement le rendez-vous.
         </p>
       </div>
     </div>

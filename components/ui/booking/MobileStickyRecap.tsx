@@ -20,6 +20,8 @@ export function MobileStickyRecap({
   selectedSlot,
   onConfirm,
 }: MobileStickyRecapProps) {
+  const actionLabel = selectedSlot ? 'CONTINUER' : 'CHOISIR'
+
   return (
     <div className="fixed bottom-0 z-40 w-full border-t border-secondary/20 bg-surface/95 px-5 py-4 shadow-[0_-18px_45px_rgba(30,27,21,0.08)] backdrop-blur-md">
       <div className="mb-3 flex items-center gap-3">
@@ -65,7 +67,7 @@ export function MobileStickyRecap({
           disabled={!selectedSlot}
           className="shrink-0 whitespace-nowrap px-5"
         >
-          CONFIRMER
+          {actionLabel}
         </Button>
       </div>
     </div>

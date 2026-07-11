@@ -67,14 +67,14 @@ export function BookingFormStickySummary({
           </span>
         </div>
         <span className="font-body-md text-[12px] text-on-surface-variant">
-          Acompte {BOOKING_DEPOSIT_LABEL}
+          Acompte {BOOKING_DEPOSIT_LABEL} avant confirmation définitive
         </span>
       </div>
 
       <BookingSubmitButton
         isFormValid={isFormValid}
         loading={loading}
-        label="VALIDER"
+        label="ENVOYER MA DEMANDE"
         type="button"
         onClick={onSubmit}
       />

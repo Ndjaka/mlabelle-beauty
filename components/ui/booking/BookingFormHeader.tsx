@@ -1,3 +1,5 @@
+import { BookingProgressPills } from '@/components/ui/booking/booking-progress-pills'
+
 interface BookingFormHeaderProps {
   titleClassName: string
 }
@@ -5,12 +7,12 @@ interface BookingFormHeaderProps {
 export function BookingFormHeader({ titleClassName }: BookingFormHeaderProps) {
   return (
     <div className="mb-xl">
-      <span className="font-label-caps text-label-caps text-secondary tracking-widest uppercase">
-        Étape 2 sur 3
-      </span>
-      <h1 className={titleClassName}>Vos informations</h1>
+      <div className="mb-5 max-w-[520px]">
+        <BookingProgressPills currentStep={2} />
+      </div>
+      <h1 className={titleClassName}>Vos coordonnées</h1>
       <p className="font-body-lg text-body-lg text-on-surface-variant">
-        Veuillez renseigner vos coordonnées pour finaliser votre réservation
+        Dernière étape avant d’envoyer votre demande de réservation. Le récapitulatif reste visible pour vérifier votre choix.
       </p>
     </div>
   )

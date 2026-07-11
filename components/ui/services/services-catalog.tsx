@@ -8,6 +8,9 @@ import {
   type ServiceFilter,
   type ServiceSort,
 } from '@/components/ui/services/services-catalog-controls'
+import { ServicesFinalCta } from '@/components/ui/services/services-final-cta'
+import { ServicesHero } from '@/components/ui/services/services-hero'
+import { ServicesProcess } from '@/components/ui/services/services-process'
 import { ServicesTrustBar } from '@/components/ui/services/services-trust-bar'
 
 interface ServicesCatalogProps {
@@ -64,30 +67,38 @@ export function ServicesCatalog({ services, today }: ServicesCatalogProps) {
   return (
     <section
       id="prestations"
-      className="mx-auto w-full max-w-[1440px] px-gutter py-9 md:px-xxl md:py-14"
+      className="mx-auto w-full max-w-[1440px] px-gutter py-8 md:px-xxl md:py-14"
     >
-      <header className="mb-7 flex flex-col gap-4 md:mb-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="w-full max-w-2xl">
-          <h1 className="font-serif text-[42px] leading-none text-foreground md:text-[56px]">
-            Nos prestations
-          </h1>
-          <p className="mt-3 w-fit max-w-full whitespace-nowrap font-sans text-[14px] leading-7 text-foreground/70 sm:text-[15px] md:text-[17px]">
-            Choisissez le service qui vous correspond.
-          </p>
-          <span className="mt-4 block h-px w-10 bg-secondary" aria-hidden="true" />
-        </div>
-      </header>
+      <ServicesHero />
+      <ServicesTrustBar />
+      <ServicesProcess />
 
-      <ServicesCatalogControls
-        activeFilter={activeFilter}
-        filterOptions={FILTER_OPTIONS}
-        resultCount={filteredServices.length}
-        search={search}
-        sort={sort}
-        onFilterChange={setActiveFilter}
-        onSearchChange={setSearch}
-        onSortChange={setSort}
-      />
+      <div id="prestations-catalog" className="scroll-mt-28 pt-9 md:pt-12">
+        <div className="mb-5 flex flex-col gap-2 md:mb-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="font-label-caps text-[10px] uppercase tracking-[0.2em] text-secondary">
+              Prestations
+            </p>
+            <h2 className="mt-2 font-serif text-[34px] leading-none text-foreground md:text-[44px]">
+              Choisissez votre prestation
+            </h2>
+          </div>
+          <p className="max-w-[430px] font-sans text-[13px] leading-6 text-foreground/60 md:text-right">
+            Comparez les durées et les prix, puis sélectionnez une prestation pour voir les créneaux disponibles.
+          </p>
+        </div>
+
+        <ServicesCatalogControls
+          activeFilter={activeFilter}
+          filterOptions={FILTER_OPTIONS}
+          resultCount={filteredServices.length}
+          search={search}
+          sort={sort}
+          onFilterChange={setActiveFilter}
+          onSearchChange={setSearch}
+          onSortChange={setSort}
+        />
+      </div>
 
       {filteredServices.length > 0 ? (
         <div className="mt-6 grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-2 xl:grid-cols-3">
@@ -97,11 +108,16 @@ export function ServicesCatalog({ services, today }: ServicesCatalogProps) {
         </div>
       ) : (
         <div className="mt-6 rounded-[8px] border border-secondary/15 bg-white p-8 text-center text-foreground/70 shadow-[0_14px_34px_rgba(30,27,21,0.04)]">
-          Aucune prestation ne correspond à cette recherche.
+          <p className="font-sans text-[15px] font-semibold text-foreground">
+            Aucune prestation ne correspond à cette recherche.
+          </p>
+          <p className="mt-2 font-sans text-[13px] leading-6 text-foreground/60">
+            Essayez un autre mot-clé ou revenez à toutes les prestations.
+          </p>
         </div>
       )}
 
-      <ServicesTrustBar />
+      <ServicesFinalCta />
     </section>
   )
 }

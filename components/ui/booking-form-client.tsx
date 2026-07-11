@@ -93,7 +93,7 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
                   <BookingSubmitButton
                     isFormValid={isFormValid}
                     loading={loading}
-                    label="VALIDER MES INFORMATIONS"
+                    label="ENVOYER MA DEMANDE"
                   />
                 </div>
               </form>
