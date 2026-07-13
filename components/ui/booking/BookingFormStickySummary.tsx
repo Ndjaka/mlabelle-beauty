@@ -67,7 +67,9 @@ export function BookingFormStickySummary({
           </span>
         </div>
         <span className="col-span-2 font-body-md text-[12px] text-on-surface-variant">
-          Acompte {BOOKING_DEPOSIT_LABEL} avant confirmation définitive
+          Acompte{' '}
+          <strong className="font-semibold text-on-background">{BOOKING_DEPOSIT_LABEL}</strong>{' '}
+          avant confirmation définitive
         </span>
       </div>
 

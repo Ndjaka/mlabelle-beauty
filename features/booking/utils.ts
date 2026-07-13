@@ -7,6 +7,13 @@ import type { DayOff, ScheduleRule } from '@/types/schedule';
 
 export const SLOT_INTERVAL_MINUTES = 15;
 export const MAX_ADVANCE_BOOKING_DAYS = 60;
+export const CANCELLATION_PAST_APPOINTMENT_MESSAGE =
+  'Impossible d\'annuler un rendez-vous passé.';
+
+export type ClientCancellationState =
+  | { status: 'available' }
+  | { status: 'cancelled' }
+  | { status: 'unavailable'; message: string };
 
 /**
  * Returns true if the given date is a day off.
@@ -211,6 +218,24 @@ export function buildBookingFormPath(date: Date, serviceId: string, slot: string
   });
 
   return `/booking/${formatDateToISO(date)}/confirm?${params.toString()}`;
+}
+
+export function getClientCancellationState(
+  booking: Pick<BookingWithService, 'status' | 'starts_at'>,
+  now: Date = new Date()
+): ClientCancellationState {
+  if (booking.status === 'cancelled') {
+    return { status: 'cancelled' };
+  }
+
+  if (new Date(booking.starts_at) <= now) {
+    return {
+      status: 'unavailable',
+      message: CANCELLATION_PAST_APPOINTMENT_MESSAGE,
+    };
+  }
+
+  return { status: 'available' };
 }
 
 // --- Internal helpers ---

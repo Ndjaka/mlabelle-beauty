@@ -1,3 +1,4 @@
+import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 import { BookingProgressPills } from '@/components/ui/booking/booking-progress-pills'
 
 export function BookingFormHeader() {
@@ -13,7 +14,8 @@ export function BookingFormHeader() {
         Vos coordonnées
       </h1>
       <p className="mt-4 max-w-[620px] font-body-md text-[14px] leading-6 text-on-surface-variant md:font-body-lg md:text-[17px] md:leading-7">
-        Renseignez vos informations pour recevoir le récapitulatif par e-mail. Le rendez-vous sera confirmé définitivement après validation de l’acompte.
+        Renseignez vos informations pour recevoir le récapitulatif par e-mail. Le rendez-vous sera confirmé définitivement après validation de l’acompte de{' '}
+        <strong className="font-semibold text-on-background">{BOOKING_DEPOSIT_LABEL}</strong>.
       </p>
     </div>
   )

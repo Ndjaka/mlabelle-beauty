@@ -64,7 +64,9 @@ export function BookingFormSummary({
           </span>
         </div>
         <p className="mt-3 font-body-md text-[13px] leading-5 text-on-surface-variant">
-          Acompte de {BOOKING_DEPOSIT_LABEL} nécessaire pour confirmer définitivement le rendez-vous.
+          Acompte de{' '}
+          <strong className="font-semibold text-on-background">{BOOKING_DEPOSIT_LABEL}</strong>{' '}
+          nécessaire pour confirmer définitivement le rendez-vous.
         </p>
       </div>
     </div>
