@@ -44,8 +44,8 @@ export function buildBookingEmailHtml({
   const renderedBody = options.trustedBodyHtml ?? escapeHtml(body);
   const renderedPaymentNotice =
     options.trustedPaymentNoticeHtml ?? escapeHtml(paymentNotice);
-  const titleFontSize = options.titleFontSize ?? '34px';
-  const bodyTextAlign = options.bodyTextAlign ?? 'center';
+  const titleFontSize = options.titleFontSize ?? '28px';
+  const bodyTextAlign = options.bodyTextAlign ?? 'left';
 
   return `<!doctype html>
 <html lang="fr">

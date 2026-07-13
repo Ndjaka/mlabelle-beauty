@@ -15,12 +15,22 @@ const REMINDER_SUBJECT = 'Rappel — Votre rendez-vous demain chez Mlabelle Beau
 export type { BookingEmailData } from '@/features/notifications/utils';
 
 export async function sendBookingConfirmation(data: BookingEmailData): Promise<void> {
+  const depositValidatedHtml =
+    '<strong style="font-weight:700; color:#1A1A1A;">Votre acompte a bien été validé.</strong>';
+  const confirmedAppointmentHtml =
+    '<strong style="font-weight:700; color:#1A1A1A;">Votre rendez-vous est confirmé.</strong>';
+
   await sendBookingEmail({
     data,
     subject: CONFIRMATION_SUBJECT,
     intro: 'Votre réservation est confirmée.',
     body: 'Votre acompte a bien été validé. Votre rendez-vous chez Mlabelle Beauty est confirmé.',
     paymentNotice: 'Acompte validé. Le solde pourra être réglé sur place.',
+    templateOptions: {
+      trustedBodyHtml: `${depositValidatedHtml} ${confirmedAppointmentHtml}`,
+      trustedPaymentNoticeHtml:
+        '<strong style="font-weight:700; color:#1A1A1A;">Acompte validé.</strong> Le solde pourra être réglé sur place.',
+    },
   });
 }
 
@@ -48,16 +58,30 @@ export async function sendBookingReminder(data: BookingEmailData): Promise<void>
     subject: REMINDER_SUBJECT,
     intro: 'Nous vous rappelons votre rendez-vous demain.',
     body: 'Votre parenthèse beauté approche. Voici le récapitulatif de votre rendez-vous.',
+    paymentNotice:
+      'Besoin d\'annuler ? Utilisez le lien ci-dessous afin de libérer le créneau.',
+    templateOptions: {
+      trustedBodyHtml:
+        'Votre parenthèse beauté approche. Voici le <strong style="font-weight:700; color:#1A1A1A;">récapitulatif de votre rendez-vous</strong>.',
+      trustedPaymentNoticeHtml:
+        'Besoin d’annuler ? Utilisez le lien ci-dessous afin de <strong style="font-weight:700; color:#1A1A1A;">libérer le créneau</strong>.',
+    },
   });
 }
 
 export async function sendBookingCancellation(data: BookingEmailData): Promise<void> {
+  const cancellationConfirmedHtml =
+    '<strong style="font-weight:700; color:#1A1A1A;">Votre rendez-vous a bien été annulé.</strong>';
+
   await sendBookingEmail({
     data,
     subject: 'Annulation confirmée — Mlabelle Beauty',
     intro: 'Votre rendez-vous est annulé.',
     body: 'Nous vous confirmons l\'annulation de votre rendez-vous chez Mlabelle Beauty. Nous espérons vous revoir bientôt.',
     isCancellation: true,
+    templateOptions: {
+      trustedBodyHtml: `${cancellationConfirmedHtml} Nous espérons vous revoir bientôt chez Mlabelle Beauty.`,
+    },
   });
 }
 
