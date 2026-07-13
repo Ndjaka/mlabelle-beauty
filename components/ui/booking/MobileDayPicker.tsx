@@ -23,17 +23,26 @@ export function MobileDayPicker({
   return (
     <div className="mb-xl">
       <div className="flex justify-between items-end mb-4">
-        <h2 className="font-serif text-[28px] capitalize text-on-surface">
-          {format(currentMonth, 'MMMM yyyy', { locale: fr })}
-        </h2>
+        <div>
+          <p className="font-label-caps text-[10px] uppercase tracking-[0.18em] text-secondary">
+            Date du rendez-vous
+          </p>
+          <h2 className="mt-1 font-serif text-[28px] capitalize text-on-surface">
+            {format(currentMonth, 'MMMM yyyy', { locale: fr })}
+          </h2>
+        </div>
         <div className="flex gap-2">
           <button
+            type="button"
+            aria-label="Voir le mois précédent"
             onClick={() => onMonthChange(subMonths(currentMonth, 1))}
             className="flex size-9 items-center justify-center border border-secondary/20 text-on-surface-variant transition-colors hover:border-secondary hover:text-secondary"
           >
             <span className="material-symbols-outlined text-sm">chevron_left</span>
           </button>
           <button
+            type="button"
+            aria-label="Voir le mois suivant"
             onClick={() => onMonthChange(addMonths(currentMonth, 1))}
             className="flex size-9 items-center justify-center border border-secondary/20 text-on-surface-variant transition-colors hover:border-secondary hover:text-secondary"
           >
@@ -48,6 +57,9 @@ export function MobileDayPicker({
           return (
             <button
               key={day.toISOString()}
+              type="button"
+              aria-label={`Sélectionner le ${format(day, 'EEEE d MMMM yyyy', { locale: fr })}`}
+              aria-pressed={isSelected}
               onClick={() => !isPast && onDateSelect(day)}
               disabled={isPast}
               className={`relative flex h-[76px] w-[58px] flex-shrink-0 snap-start flex-col items-center justify-center border transition-colors

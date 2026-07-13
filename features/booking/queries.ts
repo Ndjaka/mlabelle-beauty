@@ -299,3 +299,32 @@ export async function getBookingByIdAndCancelToken(
     service: Array.isArray(data.service) ? data.service[0] : data.service as BookingWithService['service'],
   };
 }
+
+export async function getBookingByCancelToken(
+  cancelToken: string
+): Promise<BookingWithService | null> {
+  const supabase = createServiceRoleClient();
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
+    .eq('cancel_token', cancelToken)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    client_name: data.client_name,
+    client_email: data.client_email,
+    client_phone: data.client_phone ?? undefined,
+    starts_at: data.starts_at,
+    ends_at: data.ends_at,
+    status: data.status as BookingWithService['status'],
+    cancel_token: data.cancel_token,
+    service: Array.isArray(data.service) ? data.service[0] : data.service as BookingWithService['service'],
+  };
+}

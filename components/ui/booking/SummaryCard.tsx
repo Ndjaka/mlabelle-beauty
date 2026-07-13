@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
-import { formatPrice, formatDuration } from '@/features/booking/utils'
+import { buildBookingFormPath, formatPrice, formatDuration } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 import { ServiceImage } from '@/components/ui/service-image'
 
@@ -12,22 +12,27 @@ interface SummaryCardProps {
   service: Service
   selectedDate: Date
   selectedSlot: string | null
-  onConfirm: () => void
 }
 
 export function SummaryCard({
   service,
   selectedDate,
   selectedSlot,
-  onConfirm,
 }: SummaryCardProps) {
+  const actionLabel = selectedSlot
+    ? 'CONTINUER VERS MES INFORMATIONS'
+    : 'CHOISISSEZ UN CRÉNEAU'
+  const confirmHref = selectedSlot
+    ? buildBookingFormPath(selectedDate, service.id, selectedSlot)
+    : null
+
   return (
     <div className="sticky top-28 border border-secondary/20 bg-white p-8 shadow-[0_24px_70px_rgba(30,27,21,0.06)]">
       <p className="font-label-caps text-label-caps uppercase tracking-[0.22em] text-secondary">
         Votre réservation
       </p>
       <h3 className="mt-2 border-b border-secondary/15 pb-5 font-serif text-[30px] leading-tight text-on-surface">
-        Récapitulatif
+        Votre choix
       </h3>
 
       <div className="mb-10 mt-7 flex flex-col gap-6">
@@ -43,7 +48,7 @@ export function SummaryCard({
           </span>
         </div>
         <Button
-          href="/#prestations"
+          href="/#prestations-catalog"
           variant="ghost"
           size="sm"
           className="w-fit px-0 py-0 text-[10px] text-secondary hover:text-foreground"
@@ -66,6 +71,15 @@ export function SummaryCard({
             )}
           </div>
         </div>
+
+        <div className="border border-secondary/15 bg-surface/70 p-4">
+          <p className="font-body-md text-[14px] font-semibold text-on-surface">
+            {selectedSlot ? 'Prête pour l’étape suivante ?' : 'Choisissez un créneau pour continuer.'}
+          </p>
+          <p className="mt-1 font-body-md text-[13px] leading-5 text-on-surface-variant">
+            Vous pourrez vérifier vos informations avant d’envoyer la demande.
+          </p>
+        </div>
       </div>
 
       <div className="mb-10 flex items-center justify-between border-t border-secondary/15 pt-6">
@@ -73,17 +87,18 @@ export function SummaryCard({
         <span className="font-serif text-[28px] text-on-surface">{formatPrice(service.price_cents)}</span>
       </div>
 
-      <Button
-        onClick={onConfirm}
-        disabled={!selectedSlot}
-        size="lg"
-        className="w-full"
-      >
-        CONFIRMER MON RENDEZ-VOUS
-      </Button>
+      {confirmHref ? (
+        <Button href={confirmHref} size="lg" className="w-full">
+          {actionLabel}
+        </Button>
+      ) : (
+        <Button disabled size="lg" className="w-full">
+          {actionLabel}
+        </Button>
+      )}
 
       <p className="text-center mt-6 font-normal text-[12px] text-outline leading-relaxed px-4">
-        Acompte de {BOOKING_DEPOSIT_LABEL} nécessaire pour confirmer. Solde à régler sur place.
+        Acompte de {BOOKING_DEPOSIT_LABEL} nécessaire pour confirmer définitivement. Solde à régler sur place.
       </p>
     </div>
   )

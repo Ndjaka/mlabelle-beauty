@@ -109,6 +109,8 @@ Admin opens booking detail
 
 ```
 Client clicks cancel link (email contains /cancel?token=UUID)
+  → Display a confirmation page first (do not mutate on GET)
+  → Client explicitly confirms the cancellation
   → Verify cancel_token exists and booking status is not 'cancelled'
   → Update booking status to 'cancelled'
   → Send cancellation confirmation email

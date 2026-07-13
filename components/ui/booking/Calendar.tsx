@@ -24,6 +24,8 @@ export function Calendar({
     <div className="h-fit border border-secondary/20 bg-white p-5 shadow-[0_18px_50px_rgba(30,27,21,0.04)]">
       <div className="flex justify-between items-center mb-4">
         <button 
+          type="button"
+          aria-label="Voir le mois précédent"
           onClick={() => onMonthChange(subMonths(currentMonth, 1))} 
           className="flex size-9 items-center justify-center border border-secondary/20 text-on-surface-variant transition-colors hover:border-secondary hover:text-secondary"
         >
@@ -33,6 +35,8 @@ export function Calendar({
           {format(currentMonth, 'MMMM yyyy', { locale: fr })}
         </span>
         <button 
+          type="button"
+          aria-label="Voir le mois suivant"
           onClick={() => onMonthChange(addMonths(currentMonth, 1))} 
           className="flex size-9 items-center justify-center border border-secondary/20 text-on-surface-variant transition-colors hover:border-secondary hover:text-secondary"
         >
@@ -55,6 +59,8 @@ export function Calendar({
           return (
             <button
               key={day.toISOString()}
+              type="button"
+              aria-pressed={isSelected}
               onClick={() => !isPast && onDateSelect(day)}
               disabled={isPast || !isCurrentMonth}
               className={`mx-auto flex size-9 items-center justify-center transition-colors

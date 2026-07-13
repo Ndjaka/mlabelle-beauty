@@ -26,7 +26,7 @@ export function BookingFormStickySummary({
   slot,
 }: BookingFormStickySummaryProps) {
   return (
-    <div className="fixed bottom-0 left-0 z-40 w-full border-t border-secondary/20 bg-surface/95 px-5 py-3 shadow-[0_-18px_45px_rgba(30,27,21,0.08)] backdrop-blur-md pb-safe">
+    <div className="fixed bottom-0 left-0 z-40 w-full border-t border-secondary/20 bg-surface/95 px-5 py-3 shadow-[0_-18px_45px_rgba(30,27,21,0.08)] backdrop-blur-md pb-safe md:hidden">
       <div className="mb-2 flex items-center gap-3">
         <ServiceImage
           imageUrl={service.image_url}
@@ -49,7 +49,7 @@ export function BookingFormStickySummary({
         </div>
       </div>
 
-      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-secondary/15 pt-2 text-on-surface-variant">
+      <div className="mb-3 grid grid-cols-2 gap-2 border-t border-secondary/15 pt-2 text-on-surface-variant">
         <div className="flex min-w-0 items-center gap-1.5">
           <span className="material-symbols-outlined text-[17px] text-secondary">
             calendar_today
@@ -66,15 +66,17 @@ export function BookingFormStickySummary({
             {slot}
           </span>
         </div>
-        <span className="font-body-md text-[12px] text-on-surface-variant">
-          Acompte {BOOKING_DEPOSIT_LABEL}
+        <span className="col-span-2 font-body-md text-[12px] text-on-surface-variant">
+          Acompte{' '}
+          <strong className="font-semibold text-on-background">{BOOKING_DEPOSIT_LABEL}</strong>{' '}
+          avant confirmation définitive
         </span>
       </div>
 
       <BookingSubmitButton
         isFormValid={isFormValid}
         loading={loading}
-        label="VALIDER"
+        label="ENVOYER MA DEMANDE"
         type="button"
         onClick={onSubmit}
       />

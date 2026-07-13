@@ -20,7 +20,7 @@ export function Footer() {
           </a>
         </div>
         <p className="font-sans text-[16px] text-foreground/80 text-sm leading-[1.6]">
-          © {new Date().getFullYear()} Mlabelle Beauty - Coiffure & Esthétique. L&apos;art de la beauté à la française.
+          © {new Date().getFullYear()} Mlabelle Beauty - Coiffure & Esthétique.
         </p>
       </div>
     </footer>

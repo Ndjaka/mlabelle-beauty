@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import type { Service } from '@/types/service'
 import { useBookingSelection } from '@/hooks/use-booking-selection'
 import { BookingDesktopView } from '@/components/ui/booking/BookingDesktopView'
@@ -16,10 +17,15 @@ export function BookingClient({
   initialDate,
   initialSlots,
 }: BookingClientProps) {
-  const availableSlots = [...initialSlots.morning, ...initialSlots.afternoon]
+  const [slots, setSlots] = useState(initialSlots)
+  const availableSlots = useMemo(
+    () => [...slots.morning, ...slots.afternoon],
+    [slots]
+  )
   const bookingSelection = useBookingSelection({
     availableSlots,
     initialDate,
+    onSlotsChange: setSlots,
     serviceId: service.id,
   })
   const allSlotsCount = availableSlots.length
@@ -30,14 +36,14 @@ export function BookingClient({
         allSlotsCount={allSlotsCount}
         currentMonth={bookingSelection.currentMonth}
         monthDays={bookingSelection.monthDays}
-        onConfirm={bookingSelection.handleConfirm}
         onDateSelect={bookingSelection.handleDateSelect}
         onMonthChange={bookingSelection.handleMonthChange}
         onSlotSelect={bookingSelection.handleSlotSelect}
+        isLoadingSlots={bookingSelection.isLoadingSlots}
         selectedDate={bookingSelection.selectedDate}
         selectedSlot={bookingSelection.selectedSlot}
         service={service}
-        slots={initialSlots}
+        slots={slots}
         today={bookingSelection.today}
       />
 
@@ -45,14 +51,14 @@ export function BookingClient({
         allSlotsCount={allSlotsCount}
         currentMonth={bookingSelection.currentMonth}
         monthDays={bookingSelection.monthDays}
-        onConfirm={bookingSelection.handleConfirm}
         onDateSelect={bookingSelection.handleDateSelect}
         onMonthChange={bookingSelection.handleMonthChange}
         onSlotSelect={bookingSelection.handleSlotSelect}
+        isLoadingSlots={bookingSelection.isLoadingSlots}
         selectedDate={bookingSelection.selectedDate}
         selectedSlot={bookingSelection.selectedSlot}
         service={service}
-        slots={initialSlots}
+        slots={slots}
         today={bookingSelection.today}
       />
     </>

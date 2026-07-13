@@ -2,7 +2,7 @@
 
 import { Logo } from "@/components/ui/logo";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { CatalogScrollButton } from "@/components/ui/services/catalog-scroll-button";
 
 interface HeaderProps {
   variant?: "home" | "booking";
@@ -19,9 +19,9 @@ export function Header({ variant = "home" }: HeaderProps) {
 
         {variant !== "booking" && (
           <div className="flex items-center gap-xl">
-            <Button href="/#prestations" size="sm" className="shadow-md">
+            <CatalogScrollButton size="sm" className="shadow-md">
               RÉSERVER
-            </Button>
+            </CatalogScrollButton>
           </div>
         )}
       </div>

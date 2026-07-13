@@ -22,7 +22,7 @@ interface ServicesCatalogControlsProps {
 
 const sortLabels: Record<ServiceSort, string> = {
   duration: 'Durée courte',
-  name: 'Nom',
+  name: 'Nom A-Z',
   price: 'Prix croissant',
 }
 
@@ -37,9 +37,9 @@ export function ServicesCatalogControls({
   onSortChange,
 }: ServicesCatalogControlsProps) {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 rounded-[8px] border border-secondary/15 bg-white/70 p-4 shadow-[0_12px_30px_rgba(30,27,21,0.04)] md:p-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <label className="relative block lg:w-[360px]">
+        <label className="relative block lg:w-[380px]">
           <span className="sr-only">Rechercher une prestation</span>
           <span
             className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-foreground/45"
@@ -51,14 +51,14 @@ export function ServicesCatalogControls({
             type="search"
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Rechercher un service..."
-            className="h-11 w-full rounded-[999px] border border-secondary/20 bg-white px-11 font-sans text-[13px] text-foreground shadow-[0_8px_20px_rgba(30,27,21,0.04)] outline-none transition-colors placeholder:text-foreground/45 focus:border-secondary"
+            placeholder="Rechercher une prestation"
+            className="h-12 w-full rounded-[999px] border border-secondary/20 bg-white px-11 font-sans text-[13px] text-foreground shadow-[0_8px_20px_rgba(30,27,21,0.04)] outline-none transition-colors placeholder:text-foreground/45 focus:border-secondary"
           />
         </label>
 
         <div className="flex items-center justify-between gap-3 lg:justify-end">
           <span className="font-sans text-[12px] font-semibold text-foreground/55">
-            {resultCount} prestation{resultCount > 1 ? 's' : ''}
+            {resultCount} prestation{resultCount > 1 ? 's' : ''} trouvée{resultCount > 1 ? 's' : ''}
           </span>
           <label className="flex items-center gap-2">
             <span className="hidden font-sans text-[12px] font-semibold text-foreground/60 sm:inline">
@@ -82,7 +82,7 @@ export function ServicesCatalogControls({
 
       <div>
         <p className="mb-3 font-sans text-[12px] font-semibold text-foreground/70">
-          Filtrer par prestation
+          Catégories
         </p>
         <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
           {filterOptions.map((option) => {

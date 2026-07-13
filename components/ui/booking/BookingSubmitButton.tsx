@@ -24,7 +24,7 @@ export function BookingSubmitButton({
       className="w-full tracking-[0.15em]"
       type={type}
     >
-      {loading ? 'VALIDATION...' : label}
+      {loading ? 'ENVOI EN COURS...' : label}
     </Button>
   )
 }
