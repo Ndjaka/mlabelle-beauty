@@ -9,7 +9,7 @@ export function DashboardMobileHeader({ dateLabel }: DashboardMobileHeaderProps)
     <header className="sticky top-0 z-30 h-[86px] border-b border-outline-variant bg-background/95 px-5 backdrop-blur lg:hidden">
       <div className="flex h-full items-center justify-between gap-4">
         <div>
-          <Logo />
+          <Logo size="sm" priority />
           <p className="mt-1 text-xs text-foreground/55">{dateLabel}</p>
         </div>
         <button

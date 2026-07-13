@@ -11,7 +11,7 @@ export function DashboardSidebar({ items }: DashboardSidebarProps) {
   return (
     <aside className="hidden min-h-screen w-[280px] shrink-0 border-r border-outline-variant bg-surface-container-low px-6 py-8 lg:flex lg:flex-col">
       <div className="mb-10">
-        <Logo />
+        <Logo size="md" priority />
         <p className="mt-3 text-sm leading-6 text-foreground/60">
           Espace privé coiffeuse
         </p>
