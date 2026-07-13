@@ -1,8 +1,12 @@
 // Write operations for booking data (create, update, cancel)
 import { createServerClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
-import type { CreateBookingInput, BookingWithService } from '@/types/booking';
+import type { Database } from '@/lib/supabase/types';
+import type { BookingWithService, ClientReminderKind, CreateBookingInput } from '@/types/booking';
 import { CLIENT_CREATED_BOOKING_STATUS } from '@/features/booking/status';
+import { getClientReminderSentColumn } from '@/features/booking/utils';
+
+type BookingUpdate = Database['public']['Tables']['bookings']['Update'];
 
 /**
  * Creates a new client booking waiting for admin confirmation after deposit.
@@ -118,4 +122,24 @@ export async function cancelBookingByToken(
     cancel_token: booking.cancel_token,
     service: service as BookingWithService['service'],
   };
+}
+
+export async function markClientReminderSent(
+  bookingId: string,
+  kind: ClientReminderKind,
+  sentAt: Date
+): Promise<void> {
+  const supabase = createServiceRoleClient();
+  const reminderSentColumn = getClientReminderSentColumn(kind);
+  const updates: BookingUpdate = {
+    [reminderSentColumn]: sentAt.toISOString(),
+  };
+
+  const { error } = await supabase
+    .from('bookings')
+    .update(updates)
+    .eq('id', bookingId)
+    .is(reminderSentColumn, null);
+
+  if (error) throw new Error(error.message);
 }

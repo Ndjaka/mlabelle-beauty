@@ -3,12 +3,21 @@
 
 import type { TimeRange } from '@/types/booking';
 import type { BookingWithService } from '@/types/booking';
+import type { ClientReminderKind } from '@/types/booking';
 import type { DayOff, ScheduleRule } from '@/types/schedule';
 
 export const SLOT_INTERVAL_MINUTES = 15;
 export const MAX_ADVANCE_BOOKING_DAYS = 60;
+export const CLIENT_REMINDER_CRON_INTERVAL_MINUTES = 15;
 export const CANCELLATION_PAST_APPOINTMENT_MESSAGE =
   'Impossible d\'annuler un rendez-vous passé.';
+
+const DAY_BEFORE_REMINDER_LEAD_MINUTES = 24 * 60;
+const TWO_HOURS_REMINDER_LEAD_MINUTES = 2 * 60;
+
+export type ClientReminderSentColumn =
+  | 'client_day_before_reminder_sent_at'
+  | 'client_two_hours_reminder_sent_at';
 
 export type ClientCancellationState =
   | { status: 'available' }
@@ -238,10 +247,41 @@ export function getClientCancellationState(
   return { status: 'available' };
 }
 
+export function getClientReminderWindow(
+  kind: ClientReminderKind,
+  now: Date = new Date()
+): TimeRange {
+  const scheduledNow = floorDateToInterval(now, CLIENT_REMINDER_CRON_INTERVAL_MINUTES);
+  const leadMinutes = kind === 'day_before'
+    ? DAY_BEFORE_REMINDER_LEAD_MINUTES
+    : TWO_HOURS_REMINDER_LEAD_MINUTES;
+  const start = addMinutes(scheduledNow, leadMinutes);
+  const end = addMinutes(start, CLIENT_REMINDER_CRON_INTERVAL_MINUTES);
+
+  return { start, end };
+}
+
+export function getClientReminderSentColumn(
+  kind: ClientReminderKind
+): ClientReminderSentColumn {
+  return kind === 'day_before'
+    ? 'client_day_before_reminder_sent_at'
+    : 'client_two_hours_reminder_sent_at';
+}
+
 // --- Internal helpers ---
 
 function addMinutes(date: Date, minutes: number): Date {
   return new Date(date.getTime() + minutes * 60 * 1000);
+}
+
+function floorDateToInterval(date: Date, intervalMinutes: number): Date {
+  const result = new Date(date);
+  const flooredMinutes =
+    Math.floor(result.getMinutes() / intervalMinutes) * intervalMinutes;
+
+  result.setMinutes(flooredMinutes, 0, 0);
+  return result;
 }
 
 function formatDateToISO(date: Date): string {

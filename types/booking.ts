@@ -15,6 +15,8 @@ export interface CreateBookingInput {
 
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled';
 
+export type ClientReminderKind = 'day_before' | 'two_hours_before';
+
 export interface BookingResult {
   success: boolean;
   bookingId?: string;

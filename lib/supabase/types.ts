@@ -17,9 +17,11 @@ export type Database = {
       bookings: {
         Row: {
           cancel_token: string
+          client_day_before_reminder_sent_at: string | null
           client_email: string
           client_name: string
           client_phone: string | null
+          client_two_hours_reminder_sent_at: string | null
           created_at: string
           ends_at: string
           id: string
@@ -29,9 +31,11 @@ export type Database = {
         }
         Insert: {
           cancel_token?: string
+          client_day_before_reminder_sent_at?: string | null
           client_email: string
           client_name: string
           client_phone?: string | null
+          client_two_hours_reminder_sent_at?: string | null
           created_at?: string
           ends_at: string
           id?: string
@@ -41,9 +45,11 @@ export type Database = {
         }
         Update: {
           cancel_token?: string
+          client_day_before_reminder_sent_at?: string | null
           client_email?: string
           client_name?: string
           client_phone?: string | null
+          client_two_hours_reminder_sent_at?: string | null
           created_at?: string
           ends_at?: string
           id?: string

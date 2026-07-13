@@ -50,6 +50,8 @@ description: Use this skill when writing any code that interacts with Supabase o
 | `status` | `text` | `pending` \| `confirmed` \| `cancelled` |
 | `cancel_token` | `uuid` | Used in cancellation emails |
 | `created_at` | `timestamptz` | Default `now()` |
+| `client_day_before_reminder_sent_at` | `timestamptz` | Tracks J-1 client reminder email |
+| `client_two_hours_reminder_sent_at` | `timestamptz` | Tracks 2h-before client reminder email |
 
 ---
 
