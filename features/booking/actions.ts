@@ -11,7 +11,9 @@ import {
   sendBookingCancellation,
   sendBookingConfirmation,
   sendBookingRequestReceived,
+  sendHairdresserBookingRequestReceived,
 } from '@/features/notifications/email';
+import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit';
 import { getAvailableSlots, groupSlotsByPeriod, formatDuration, formatPrice } from '@/features/booking/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -74,20 +76,40 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
   // 4. Create booking
   try {
     const result = await createBooking(data, service.duration_minutes);
+    const formattedDate = format(data.starts_at, 'EEEE d MMMM yyyy', { locale: fr });
+    const duration = formatDuration(service.duration_minutes);
+    const price = formatPrice(service.price_cents);
 
     try {
       await sendBookingRequestReceived({
         clientName: data.client_name,
         clientEmail: data.client_email,
+        clientPhone: data.client_phone,
         serviceName: service.name,
-        date: format(data.starts_at, 'EEEE d MMMM yyyy', { locale: fr }),
+        date: formattedDate,
         slot: requestedTime,
-        duration: formatDuration(service.duration_minutes),
-        price: formatPrice(service.price_cents),
+        duration,
+        price,
         cancelToken: result.cancel_token,
       });
     } catch (emailError) {
       console.error('Failed to send booking request email', emailError);
+    }
+
+    try {
+      await sendHairdresserBookingRequestReceived({
+        clientName: data.client_name,
+        clientEmail: data.client_email,
+        clientPhone: data.client_phone,
+        serviceName: service.name,
+        date: formattedDate,
+        slot: requestedTime,
+        duration,
+        price,
+        deposit: BOOKING_DEPOSIT_LABEL,
+      });
+    } catch (emailError) {
+      console.error('Failed to send hairdresser booking notification', emailError);
     }
 
     return {

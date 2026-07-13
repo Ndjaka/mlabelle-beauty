@@ -3,11 +3,17 @@ import { createServerClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import type { Service } from '@/types/service';
 import type { ScheduleRule, DayOff } from '@/types/schedule';
-import type { TimeRange, BookingWithService, BookingStats } from '@/types/booking';
+import type {
+  BookingStats,
+  BookingWithService,
+  ClientReminderKind,
+  TimeRange,
+} from '@/types/booking';
 import {
   BOOKING_STATUS_COUNTED_AS_REVENUE,
   BOOKING_STATUSES_BLOCKING_AVAILABILITY,
 } from '@/features/booking/status';
+import { getClientReminderSentColumn } from '@/features/booking/utils';
 
 /**
  * Fetches all active services, ordered by name.
@@ -327,4 +333,36 @@ export async function getBookingByCancelToken(
     cancel_token: data.cancel_token,
     service: Array.isArray(data.service) ? data.service[0] : data.service as BookingWithService['service'],
   };
+}
+
+export async function getConfirmedBookingsDueForClientReminder(
+  kind: ClientReminderKind,
+  startDate: Date,
+  endDate: Date
+): Promise<BookingWithService[]> {
+  const supabase = createServiceRoleClient();
+  const reminderSentColumn = getClientReminderSentColumn(kind);
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
+    .eq('status', 'confirmed')
+    .gte('starts_at', startDate.toISOString())
+    .lt('starts_at', endDate.toISOString())
+    .is(reminderSentColumn, null)
+    .order('starts_at', { ascending: true });
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    client_name: row.client_name,
+    client_email: row.client_email,
+    client_phone: row.client_phone ?? undefined,
+    starts_at: row.starts_at,
+    ends_at: row.ends_at,
+    status: row.status as BookingWithService['status'],
+    cancel_token: row.cancel_token,
+    service: Array.isArray(row.service) ? row.service[0] : row.service as BookingWithService['service'],
+  }));
 }

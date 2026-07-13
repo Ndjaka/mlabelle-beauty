@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit';
 import {
   buildBookingEmailHtml,
+  buildHairdresserBookingRequestEmailHtml,
   type BookingEmailData,
 } from '@/features/notifications/utils';
 
@@ -100,5 +101,29 @@ describe('booking email HTML', () => {
 
     expect(html).not.toContain('Annuler ma réservation');
     expect(html).not.toContain('/booking/cancel?token=');
+  });
+
+  it('renders the hairdresser notification with escaped client details and dashboard link', () => {
+    process.env.NEXT_PUBLIC_SITE_URL = SITE_URL;
+
+    const html = buildHairdresserBookingRequestEmailHtml({
+      clientName: CLIENT_NAME,
+      clientEmail: 'cliente+test@example.com',
+      clientPhone: '<script>0600000000</script>',
+      serviceName: SERVICE_NAME,
+      date: 'Jeudi 13 août 2026',
+      slot: '09:00',
+      duration: '45min',
+      price: '35,00 €',
+      deposit: BOOKING_DEPOSIT_LABEL,
+    });
+
+    expect(html).toContain('Nouvelle demande à valider');
+    expect(html).toContain('Eugénie &amp; Co');
+    expect(html).toContain('&lt;script&gt;0600000000&lt;/script&gt;');
+    expect(html).toContain('Brushing &lt;signature&gt;');
+    expect(html).toContain(`${SITE_URL}/dashboard`);
+    expect(html).not.toContain(CLIENT_NAME);
+    expect(html).not.toContain(SERVICE_NAME);
   });
 });

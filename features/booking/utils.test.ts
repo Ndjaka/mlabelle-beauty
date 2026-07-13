@@ -15,6 +15,8 @@ import {
   buildBookingConfirmationPath,
   buildBookingFormPath,
   getClientCancellationState,
+  getClientReminderSentColumn,
+  getClientReminderWindow,
   CANCELLATION_PAST_APPOINTMENT_MESSAGE,
 } from './utils';
 import type { TimeRange } from '@/types/booking';
@@ -415,5 +417,43 @@ describe('getClientCancellationState', () => {
       status: 'unavailable',
       message: CANCELLATION_PAST_APPOINTMENT_MESSAGE,
     });
+  });
+});
+
+// --- client reminders ---
+
+describe('getClientReminderWindow', () => {
+  const NOW_BETWEEN_CRON_TICKS = new Date('2026-08-13T07:07:30');
+
+  it('cible la fenêtre J-1 en se calant sur le dernier passage de cron', () => {
+    const result = getClientReminderWindow('day_before', NOW_BETWEEN_CRON_TICKS);
+
+    expect(result).toEqual({
+      start: new Date('2026-08-14T07:00:00'),
+      end: new Date('2026-08-14T07:15:00'),
+    });
+  });
+
+  it('cible la fenêtre 2h avant en se calant sur le dernier passage de cron', () => {
+    const result = getClientReminderWindow('two_hours_before', NOW_BETWEEN_CRON_TICKS);
+
+    expect(result).toEqual({
+      start: new Date('2026-08-13T09:00:00'),
+      end: new Date('2026-08-13T09:15:00'),
+    });
+  });
+});
+
+describe('getClientReminderSentColumn', () => {
+  it('retourne la colonne anti-doublon du rappel J-1', () => {
+    expect(getClientReminderSentColumn('day_before')).toBe(
+      'client_day_before_reminder_sent_at'
+    );
+  });
+
+  it('retourne la colonne anti-doublon du rappel 2h avant', () => {
+    expect(getClientReminderSentColumn('two_hours_before')).toBe(
+      'client_two_hours_reminder_sent_at'
+    );
   });
 });
