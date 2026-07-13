@@ -11,6 +11,7 @@ description: Use this skill for every task in this project. It provides the tech
 - **Email**: Resend (transactional emails only — no SMS)
 - **Deployment**: Vercel
 - **Language**: TypeScript (strict mode — `strict: true` in tsconfig)
+- **Fonts**: Self-hosted with `next/font/local` from `app/fonts/` to keep builds independent from Google Fonts network fetches.
 
 ## Project Description
 Single-provider hair salon booking application.
@@ -25,6 +26,7 @@ Single-provider hair salon booking application.
 - **No business logic in Server Actions or API routes** — delegate to `/features`.
 - **No component over 150 lines** — split into sub-components.
 - **One responsibility per file** — a file exports one primary thing.
+- **No `next/font/google`** — use local font files through `next/font/local` to avoid build-time network failures.
 
 ## Naming Conventions
 | Item | Convention | Example |
