@@ -1,6 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
+import {
+  PWA_APP_NAME,
+  PWA_DESCRIPTION,
+  PWA_SHORT_NAME,
+} from "@/features/pwa/utils";
 import "./globals.css";
 
 const manrope = localFont({
@@ -28,8 +33,40 @@ const notoSerif = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Mlabelle Beauty | Réservation en ligne",
-  description: "Réservez votre séance de coiffure chez Mlabelle Beauty.",
+  applicationName: PWA_APP_NAME,
+  title: {
+    default: "Mlabelle Beauty | Réservation en ligne",
+    template: "%s | Mlabelle Beauty",
+  },
+  description: PWA_DESCRIPTION,
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: PWA_SHORT_NAME,
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      { url: "/brand/mlabelle-favicon-32.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", type: "image/png", sizes: "180x180" },
+    ],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1B1B18",
+  colorScheme: "light",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
