@@ -48,7 +48,7 @@ export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBooking
         className="sticky top-[86px] z-20 overflow-hidden border-b border-outline-variant bg-surface-container-low lg:top-0"
       >
         <div className="grid grid-cols-[64px_repeat(7,minmax(104px,1fr))] md:grid-cols-[80px_repeat(7,minmax(120px,1fr))]">
-          <div className="sticky left-0 z-20 border-r border-outline-variant bg-surface-container-low px-2 py-4 text-xs font-semibold uppercase text-foreground/45 md:px-3">
+          <div className="sticky left-0 z-30 border-r border-outline-variant bg-surface-container-low px-2 py-4 text-xs font-semibold uppercase text-foreground/45 md:px-3">
             Heure
           </div>
           {columns.map((col) => (
@@ -70,13 +70,13 @@ export function AgendaWeekGrid({ columns, selectedDateKey, onDayClick, onBooking
         </div>
       </div>
 
-      <div className="overflow-x-auto" onScroll={handleGridScroll}>
+      <div className="overflow-x-auto pb-16" onScroll={handleGridScroll}>
         {visibleHours.map((hour) => (
           <div
             key={hour}
             className="grid h-20 grid-cols-[64px_repeat(7,minmax(104px,1fr))] md:grid-cols-[80px_repeat(7,minmax(120px,1fr))]"
           >
-            <div className="sticky left-0 z-10 border-r border-t border-outline-variant bg-background px-2 pt-4 text-xs font-semibold text-foreground/50 md:px-3">
+            <div className="sticky left-0 z-30 border-r border-t border-outline-variant bg-background px-2 pt-4 text-xs font-semibold text-foreground/50 md:px-3">
               {hour}
             </div>
             {columns.map((col) => {

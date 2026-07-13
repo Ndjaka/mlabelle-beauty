@@ -22,7 +22,7 @@ type AgendaDesktopGridProps = {
 
 export function AgendaDesktopGrid({ rows, onBookingClick }: AgendaDesktopGridProps) {
   return (
-    <div className="hidden overflow-hidden border border-outline-variant bg-background md:block">
+    <div className="hidden border border-outline-variant bg-background md:block">
       <div className="grid grid-cols-[80px_1fr] border-b border-outline-variant bg-surface-container-low">
         <div className="border-r border-outline-variant px-3 py-4 text-xs font-semibold uppercase text-foreground/45">
           Heure
@@ -32,7 +32,7 @@ export function AgendaDesktopGrid({ rows, onBookingClick }: AgendaDesktopGridPro
         </div>
       </div>
 
-      <div>
+      <div className="pb-16">
         {rows.map((row) => (
           <div key={row.hour} className="grid h-20 grid-cols-[80px_1fr]">
             <div className="border-r border-t border-outline-variant px-3 pt-3 text-xs font-semibold text-foreground/50">
