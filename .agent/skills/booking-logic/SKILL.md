@@ -106,7 +106,7 @@ Admin opens booking detail
 ## Client Reminder Flow
 
 ```
-Vercel Cron calls /api/cron/client-reminders every 15 minutes
+An external scheduler calls /api/cron/client-reminders every 15 minutes
   → Verify Authorization header against CRON_SECRET
   → Find confirmed bookings around J-1 and 2h before the appointment
   → Send the client reminder email through Resend
@@ -116,6 +116,8 @@ Vercel Cron calls /api/cron/client-reminders every 15 minutes
 > Client reminders are sent only for `confirmed` bookings.
 > Each reminder type has its own idempotency column:
 > `client_day_before_reminder_sent_at` and `client_two_hours_reminder_sent_at`.
+> Vercel Hobby only supports daily Cron Jobs, so 15-minute reminders must use
+> an external scheduler or a Vercel Pro plan.
 
 ---
 
