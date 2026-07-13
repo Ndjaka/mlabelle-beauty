@@ -1,18 +1,30 @@
 import type { Metadata } from "next";
-import { Manrope, Noto_Serif } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const manrope = Manrope({
-  subsets: ["latin"],
+const manrope = localFont({
   variable: "--font-manrope",
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  fallback: ["Arial", "sans-serif"],
+  adjustFontFallback: "Arial",
+  src: [
+    { path: "./fonts/manrope-400.ttf", weight: "400", style: "normal" },
+    { path: "./fonts/manrope-500.ttf", weight: "500", style: "normal" },
+    { path: "./fonts/manrope-600.ttf", weight: "600", style: "normal" },
+    { path: "./fonts/manrope-700.ttf", weight: "700", style: "normal" },
+  ],
 });
 
-const notoSerif = Noto_Serif({
-  subsets: ["latin"],
+const notoSerif = localFont({
   variable: "--font-noto-serif",
-  weight: ["400", "700"],
+  display: "swap",
+  fallback: ["Georgia", "serif"],
+  adjustFontFallback: "Times New Roman",
+  src: [
+    { path: "./fonts/noto-serif-400.ttf", weight: "400", style: "normal" },
+    { path: "./fonts/noto-serif-700.ttf", weight: "700", style: "normal" },
+  ],
 });
 
 export const metadata: Metadata = {

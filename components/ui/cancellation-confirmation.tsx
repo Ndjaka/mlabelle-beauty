@@ -1,6 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
+import { ServiceImage } from '@/components/ui/service-image';
 import { formatPrice } from '@/features/booking/utils';
 import type { BookingWithService } from '@/types/booking';
 
@@ -19,84 +20,109 @@ export function CancellationConfirmation({
   const dateLabel = format(startsAt, 'EEEE d MMMM yyyy', { locale: fr });
   const timeLabel = format(startsAt, 'HH:mm');
   const priceLabel = formatPrice(booking.service.price_cents);
+  const durationLabel = `${booking.service.duration_minutes}min`;
 
   return (
-    <main className="flex-grow flex items-center justify-center px-6 py-[var(--spacing-xxl,80px)]">
-      <div className="w-full max-w-[620px] text-center animate-fade-in">
-        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full border border-[#ba1a1a]/20 bg-[#ffdad6]">
-          <span className="material-symbols-outlined text-4xl text-[#ba1a1a]">
-            warning
+    <main className="flex-grow px-5 py-10 md:px-10 md:py-[var(--spacing-xxl,80px)]">
+      <div className="mx-auto grid w-full max-w-[1040px] gap-8 animate-fade-in md:grid-cols-[0.9fr_1.1fr] md:items-start">
+        <div className="rounded-[32px] border border-secondary/20 bg-surface-container p-6 shadow-[0_24px_70px_rgba(30,27,21,0.08)] md:p-10">
+          <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-full border border-[#ba1a1a]/20 bg-[#ffdad6]">
+            <span className="material-symbols-outlined text-[30px] text-[#ba1a1a]">
+              priority_high
+            </span>
+          </div>
+
+          <span className="label-caps text-secondary tracking-[0.2em]">
+            Annulation
           </span>
-        </div>
 
-        <div className="mb-4">
-          <span className="label-caps text-[var(--secondary)] tracking-[0.2em]">
-            ANNULATION
-          </span>
-        </div>
+          <h1 className="mt-4 font-serif text-[38px] leading-[1.02] tracking-[-0.02em] text-foreground md:text-[58px]">
+            Annuler ce rendez-vous ?
+          </h1>
 
-        <h1 className="font-serif text-[36px] leading-[1.15] tracking-[-0.02em] text-[var(--foreground)] mb-4 md:text-[48px]">
-          Annuler ce rendez-vous ?
-        </h1>
+          <p className="mt-5 font-sans text-[16px] leading-7 text-foreground/70 md:text-[18px] md:leading-8">
+            Votre rendez-vous restera actif tant que vous n’aurez pas confirmé
+            l’annulation.
+          </p>
 
-        <p className="font-sans text-[18px] leading-[1.6] text-[var(--outline)] mb-8">
-          Votre rendez-vous ne sera annulé qu’après confirmation.
-        </p>
-
-        {errorMessage ? (
-          <div className="mb-6 border border-[#ba1a1a]/20 bg-[#ffdad6]/40 p-4 text-left">
-            <p className="font-sans text-[15px] leading-[1.6] text-[#ba1a1a]">
-              {errorMessage}
+          <div className="mt-7 border-l-4 border-secondary bg-background px-5 py-4">
+            <p className="font-sans text-[14px] leading-6 text-foreground/70">
+              Si vous gardez ce rendez-vous, aucune action n’est nécessaire :
+              vous pouvez simplement revenir à l’accueil.
             </p>
           </div>
-        ) : null}
+        </div>
 
-        <div className="bg-[var(--surface-container)] border border-[var(--outline-variant)] p-6 mb-8 text-left md:p-10">
-          <div className="flex flex-col gap-3 border-b border-[var(--outline-variant)] pb-5 mb-5 md:flex-row md:items-baseline md:justify-between">
-            <div>
-              <span className="label-caps text-[var(--secondary)]">
-                PRESTATION
-              </span>
-              <p className="font-serif text-[28px] leading-[1.3] text-[var(--foreground)] mt-1">
-                {booking.service.name}
+        <section className="border border-outline-variant/70 bg-background p-5 shadow-[0_22px_60px_rgba(30,27,21,0.06)] md:p-8">
+          {errorMessage ? (
+            <div className="mb-5 border border-[#ba1a1a]/20 bg-[#ffdad6]/40 p-4">
+              <p className="font-sans text-[15px] leading-[1.6] text-[#ba1a1a]">
+                {errorMessage}
               </p>
             </div>
-            <p className="font-sans text-[22px] font-semibold text-[var(--foreground)]">
+          ) : null}
+
+          <div className="flex items-start gap-4 border-b border-secondary/15 pb-5">
+            <ServiceImage
+              imageUrl={booking.service.image_url}
+              label={booking.service.name}
+              variant="sm"
+              className="size-16"
+            />
+            <div className="min-w-0 flex-1">
+              <span className="label-caps text-secondary">
+                Récapitulatif
+              </span>
+              <h2 className="mt-1 truncate font-serif text-[30px] leading-tight text-foreground">
+                {booking.service.name}
+              </h2>
+              <p className="mt-2 font-sans text-[13px] leading-5 text-foreground/60">
+                Demande liée à cette adresse e-mail.
+              </p>
+            </div>
+            <p className="shrink-0 font-sans text-[20px] font-semibold text-foreground">
               {priceLabel}
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-4 border-b border-secondary/15 py-5 md:grid-cols-2">
             <div>
-              <span className="label-caps text-[var(--secondary)] block mb-1">
-                DATE
+              <span className="label-caps mb-1 block text-secondary">
+                Date
               </span>
-              <span className="font-sans text-[16px] leading-[1.6] text-[var(--foreground)] capitalize">
+              <span className="font-sans text-[16px] font-semibold leading-[1.6] text-foreground capitalize">
                 {dateLabel}
               </span>
             </div>
             <div>
-              <span className="label-caps text-[var(--secondary)] block mb-1">
-                HORAIRE
+              <span className="label-caps mb-1 block text-secondary">
+                Horaire
               </span>
-              <span className="font-sans text-[16px] leading-[1.6] text-[var(--foreground)]">
-                {timeLabel} · {booking.service.duration_minutes}min
+              <span className="font-sans text-[16px] font-semibold leading-[1.6] text-foreground">
+                {timeLabel} · {durationLabel}
               </span>
             </div>
           </div>
-        </div>
 
-        <form action={action} className="space-y-4">
-          <Button
-            type="submit"
-            className="w-full bg-[#ba1a1a] hover:bg-[#9f1717]"
-          >
-            CONFIRMER L&apos;ANNULATION
-          </Button>
-          <Button href="/" variant="outline" className="w-full">
-            CONSERVER MON RENDEZ-VOUS
-          </Button>
-        </form>
+          <div className="py-5">
+            <p className="font-sans text-[14px] leading-6 text-foreground/65">
+              Après confirmation, le créneau sera libéré et un e-mail
+              d’annulation vous sera envoyé.
+            </p>
+          </div>
+
+          <form action={action} className="space-y-3">
+            <Button href="/" variant="outline" className="w-full">
+              CONSERVER MON RENDEZ-VOUS
+            </Button>
+            <Button
+              type="submit"
+              className="w-full bg-[#ba1a1a] hover:bg-[#9f1717]"
+            >
+              CONFIRMER L&apos;ANNULATION
+            </Button>
+          </form>
+        </section>
       </div>
     </main>
   );

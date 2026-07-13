@@ -27,7 +27,7 @@ export function CancellationError({ message }: CancellationErrorProps) {
           <h1 className="font-serif text-[48px] leading-[1.2] tracking-[-0.02em] text-[var(--foreground)]">
             Lien invalide
           </h1>
-          <div className="h-px w-4/5 mx-auto" style={{ background: 'linear-gradient(90deg, transparent, var(--neutral) 50%, transparent)' }} />
+          <div className="h-px w-4/5 mx-auto bg-gradient-to-r from-transparent via-neutral to-transparent" />
           <p className="font-sans text-[18px] leading-[1.6] text-[var(--outline)] max-w-[480px] mx-auto">
             {message}
           </p>

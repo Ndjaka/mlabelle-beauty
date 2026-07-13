@@ -58,6 +58,19 @@ describe('booking email HTML', () => {
     expect(html).toContain('Acompte à régler pour confirmation');
   });
 
+  it('uses the harmonized compact layout by default', () => {
+    const html = buildBookingEmailHtml({
+      data: bookingEmailData,
+      intro: 'Votre réservation est confirmée.',
+      body: 'Votre acompte a bien été validé.',
+      paymentNotice: 'Acompte validé.',
+      isCancellation: false,
+    });
+
+    expect(html).toContain('font-size:28px');
+    expect(html).toContain('text-align:left');
+  });
+
   it('escapes customer-provided content and keeps the cancellation link available', () => {
     process.env.NEXT_PUBLIC_SITE_URL = SITE_URL;
 
@@ -74,5 +87,18 @@ describe('booking email HTML', () => {
     expect(html).toContain(`${SITE_URL}/booking/cancel?token=cancel-token`);
     expect(html).not.toContain(CLIENT_NAME);
     expect(html).not.toContain(SERVICE_NAME);
+  });
+
+  it('does not render a cancellation link inside cancellation confirmation emails', () => {
+    const html = buildBookingEmailHtml({
+      data: bookingEmailData,
+      intro: 'Votre rendez-vous est annulé.',
+      body: 'Votre rendez-vous a bien été annulé.',
+      paymentNotice: 'Paiement sur place.',
+      isCancellation: true,
+    });
+
+    expect(html).not.toContain('Annuler ma réservation');
+    expect(html).not.toContain('/booking/cancel?token=');
   });
 });
