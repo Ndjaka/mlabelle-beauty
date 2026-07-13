@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import {
-  PWA_APP_NAME,
-  PWA_DESCRIPTION,
-  PWA_SHORT_NAME,
+  CLIENT_MANIFEST_PATH,
+  CLIENT_PWA_APP_NAME,
+  CLIENT_PWA_DESCRIPTION,
+  CLIENT_PWA_SHORT_NAME,
 } from "@/features/pwa/utils";
 import "./globals.css";
 
@@ -33,16 +34,16 @@ const notoSerif = localFont({
 });
 
 export const metadata: Metadata = {
-  applicationName: PWA_APP_NAME,
+  applicationName: CLIENT_PWA_APP_NAME,
   title: {
     default: "Mlabelle Beauty | Réservation en ligne",
     template: "%s | Mlabelle Beauty",
   },
-  description: PWA_DESCRIPTION,
-  manifest: "/manifest.webmanifest",
+  description: CLIENT_PWA_DESCRIPTION,
+  manifest: CLIENT_MANIFEST_PATH,
   appleWebApp: {
     capable: true,
-    title: PWA_SHORT_NAME,
+    title: CLIENT_PWA_SHORT_NAME,
     statusBarStyle: "default",
   },
   formatDetection: {
