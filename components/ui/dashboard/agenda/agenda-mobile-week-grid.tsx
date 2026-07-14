@@ -34,12 +34,11 @@ export function AgendaMobileWeekGrid({
       aria-label="Planning mobile de la semaine"
       className="overflow-hidden border border-outline-variant bg-background md:hidden"
     >
-      <p className="border-b border-outline-variant px-3 py-2 text-[11px] text-foreground/50">Glissez horizontalement pour parcourir la semaine.</p>
       <div className="overflow-x-auto">
         <div className="min-w-[896px]">
           <div
             className={cn(
-              'sticky top-[86px] z-20 grid border-b border-outline-variant bg-surface-container-low',
+              'grid border-b border-outline-variant bg-surface-container-low',
               mobileWeekGridClassName
             )}
           >
