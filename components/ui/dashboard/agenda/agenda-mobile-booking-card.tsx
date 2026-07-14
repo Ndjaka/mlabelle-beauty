@@ -27,7 +27,7 @@ export function AgendaMobileBookingCard({
     return (
       <div
         className={cn(
-          'h-full border border-dashed border-outline-variant bg-surface-container-low px-2 py-2 text-xs text-foreground/55',
+          'block h-full w-full min-w-0 max-w-full border border-dashed border-outline-variant bg-surface-container-low px-2 py-2 text-xs text-foreground/55',
           className
         )}
       >
@@ -37,7 +37,7 @@ export function AgendaMobileBookingCard({
   }
 
   const cardClassName = cn(
-    'h-full overflow-hidden border border-l-4 border-outline-variant shadow-sm',
+    'block h-full w-full min-w-0 max-w-full overflow-hidden border border-l-4 border-outline-variant shadow-sm',
     'text-left transition-all',
     variant === 'day' ? 'px-3 py-2' : 'px-2 py-1.5',
     onClick && 'cursor-pointer hover:shadow-md active:scale-[0.99]',
@@ -69,7 +69,7 @@ function AgendaMobileBookingContent({
 }) {
   if (variant === 'week') {
     return (
-      <div className="min-w-0">
+      <div className="w-full min-w-0 max-w-full">
         <p className="truncate text-[10px] font-semibold leading-tight text-foreground/55">
           {item.time}
         </p>

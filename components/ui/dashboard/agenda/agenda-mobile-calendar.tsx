@@ -29,10 +29,12 @@ export function AgendaMobileCalendar({
       >
         <span>
           <span className="label-caps text-secondary">Calendrier</span>
-          <span className="mt-1 block font-serif text-2xl text-foreground">{month.label}</span>
-        </span>
-        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/55">
-          {isOpen ? 'Fermer' : 'Ouvrir'}
+          <span className="mt-1 flex items-center gap-2 font-serif text-2xl text-foreground">
+            {month.label}
+            <span className="material-symbols-outlined text-[24px]" aria-hidden="true">
+              {isOpen ? 'expand_less' : 'expand_more'}
+            </span>
+          </span>
         </span>
       </button>
 

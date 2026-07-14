@@ -119,7 +119,7 @@ function AgendaMobileWeekCell({
         <div
           key={`${item.kind}-${item.time}-${item.endTime}-${index}`}
           className={cn(
-            'absolute left-0.5 right-0.5 z-10',
+            'absolute left-0.5 right-0.5 z-10 min-w-0 max-w-full',
             getMobileAgendaWeekOffsetClass(item.time),
             getMobileAgendaWeekDurationClass(item.time, item.endTime)
           )}
