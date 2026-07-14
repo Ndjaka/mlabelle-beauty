@@ -1,12 +1,12 @@
 'use client'
 
-import { AgendaMobileBookingCard } from '@/components/ui/dashboard/agenda/agenda-mobile-booking-card'
+import { useEffect, useRef } from 'react'
+import { AgendaMobileWeekCell } from '@/components/ui/dashboard/agenda/agenda-mobile-week-cell'
 import { cn } from '@/lib/utils'
 import {
   buildDashboardAgendaBookingCountsByDate,
   buildDashboardAgendaVisibleHours,
-  getMobileAgendaWeekDurationClass,
-  getMobileAgendaWeekOffsetClass,
+  getMobileAgendaWeekSelectedScrollLeft,
 } from '@/features/dashboard/utils'
 import type { DashboardAgendaItem, DashboardAgendaWeekColumn } from '@/types/dashboard'
 
@@ -25,8 +25,14 @@ export function AgendaMobileWeekGrid({
   onDayClick,
   onBookingClick,
 }: AgendaMobileWeekGridProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
   const visibleHours = buildDashboardAgendaVisibleHours(columns.flatMap((column) => column.items))
   const bookingCountsByDate = buildDashboardAgendaBookingCountsByDate(columns)
+  const selectedScrollLeft = getMobileAgendaWeekSelectedScrollLeft(columns, selectedDateKey)
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ left: selectedScrollLeft })
+  }, [selectedScrollLeft])
 
   return (
     <div
@@ -34,7 +40,7 @@ export function AgendaMobileWeekGrid({
       aria-label="Planning mobile de la semaine"
       className="overflow-hidden border border-outline-variant bg-background md:hidden"
     >
-      <div className="overflow-x-auto">
+      <div ref={scrollRef} className="overflow-x-auto">
         <div className="min-w-[896px]">
           <div
             className={cn(
@@ -98,51 +104,6 @@ export function AgendaMobileWeekGrid({
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function AgendaMobileWeekCell({
-  column,
-  hour,
-  selected,
-  onBookingClick,
-}: {
-  column: DashboardAgendaWeekColumn
-  hour: string
-  selected: boolean
-  onBookingClick?: (booking: DashboardAgendaItem) => void
-}) {
-  const hourItems = column.items.filter((item) => {
-    const [itemHour] = item.time.split(':')
-    return `${itemHour?.padStart(2, '0')}:00` === hour
-  })
-
-  return (
-    <div
-      className={cn(
-        'relative border-r border-t border-outline-variant last:border-r-0',
-        selected && 'bg-tertiary/5'
-      )}
-    >
-      {hourItems.map((item, index) => (
-        <div
-          key={`${item.kind}-${item.time}-${item.endTime}-${index}`}
-          className={cn(
-            'absolute left-0.5 right-0.5 z-10 min-w-0 max-w-full',
-            getMobileAgendaWeekOffsetClass(item.time),
-            getMobileAgendaWeekDurationClass(item.time, item.endTime)
-          )}
-        >
-          <AgendaMobileBookingCard
-            item={item}
-            variant="week"
-            onClick={
-              item.kind === 'booking' && onBookingClick ? () => onBookingClick(item) : undefined
-            }
-          />
-        </div>
-      ))}
     </div>
   )
 }

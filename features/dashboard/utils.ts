@@ -59,6 +59,7 @@ const MOBILE_AGENDA_WEEK_DURATION_CLASSES = [
   { maxMinutes: 120, className: 'min-h-40' },
   { maxMinutes: 150, className: 'min-h-[200px]' },
 ]
+const MOBILE_AGENDA_WEEK_DAY_COLUMN_WIDTH = 120
 
 export function buildDashboardMetrics(
   stats: BookingStats,
@@ -234,6 +235,16 @@ export function buildDashboardAgendaBookingCountsByDate(
   })
 
   return counts
+}
+
+export function getMobileAgendaWeekSelectedScrollLeft(
+  columns: DashboardAgendaWeekColumn[],
+  selectedDateKey: string
+): number {
+  const selectedIndex = columns.findIndex((column) => column.dateKey === selectedDateKey)
+  if (selectedIndex <= 1) return 0
+
+  return (selectedIndex - 1) * MOBILE_AGENDA_WEEK_DAY_COLUMN_WIDTH
 }
 
 export function getMobileAgendaDayOffsetClass(time: string): string {

@@ -12,6 +12,7 @@ import {
   getCurrentWeekSalonStart,
   getMobileAgendaDayDurationClass,
   getMobileAgendaDayOffsetClass,
+  getMobileAgendaWeekSelectedScrollLeft,
   getMobileAgendaWeekDurationClass,
   getMobileAgendaWeekOffsetClass,
   getTodaySalonRange,
@@ -313,6 +314,19 @@ describe('dashboard utils', () => {
     expect(buildDashboardAgendaBookingCountsByDate(columns)).toEqual({
       '2026-06-10': 1,
     })
+  })
+
+  it('keeps the selected mobile week day near the beginning of the scrollable agenda', () => {
+    const columns: DashboardAgendaWeekColumn[] = [
+      { dateKey: '2026-06-08', dayLabel: 'Lun', items: [] },
+      { dateKey: '2026-06-09', dayLabel: 'Mar', items: [] },
+      { dateKey: '2026-06-10', dayLabel: 'Mer', items: [] },
+      { dateKey: '2026-06-11', dayLabel: 'Jeu', items: [] },
+    ]
+
+    expect(getMobileAgendaWeekSelectedScrollLeft(columns, '2026-06-08')).toBe(0)
+    expect(getMobileAgendaWeekSelectedScrollLeft(columns, '2026-06-10')).toBe(120)
+    expect(getMobileAgendaWeekSelectedScrollLeft(columns, '2026-06-11')).toBe(240)
   })
 
   it('maps mobile agenda time offsets to quarter-hour classes', () => {
