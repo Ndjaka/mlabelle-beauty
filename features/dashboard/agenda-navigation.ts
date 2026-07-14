@@ -27,6 +27,13 @@ export function shiftDashboardAgendaDateKey(dateKey: string, dayOffset: number):
   return date.toISOString().slice(0, 10)
 }
 
+export function shiftDashboardAgendaMonthDateKey(dateKey: string, monthOffset: number): string {
+  const date = new Date(`${dateKey}T12:00:00Z`)
+  date.setUTCDate(1)
+  date.setUTCMonth(date.getUTCMonth() + monthOffset)
+  return date.toISOString().slice(0, 10)
+}
+
 export function getTodayDashboardAgendaDateKey(referenceDate = new Date()): string {
   return formatSalonDateKey(referenceDate)
 }

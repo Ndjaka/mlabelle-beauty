@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { shiftDashboardAgendaMonthDateKey } from '@/features/dashboard/agenda-navigation'
+import { buildDashboardAgendaMonthForDateKeys } from '@/features/dashboard/utils'
 import type { DashboardAgendaMonth } from '@/types/dashboard'
 
 type AgendaMobileCalendarProps = {
@@ -17,7 +19,27 @@ export function AgendaMobileCalendar({
   bookingCountsByDate,
   onDayClick,
 }: AgendaMobileCalendarProps) {
+  const activeDateKey = getAgendaMonthActiveDateKey(month)
   const [isOpen, setIsOpen] = useState(false)
+  const [displayMonthState, setDisplayMonthState] = useState({
+    activeDateKey,
+    displayMonthDateKey: activeDateKey,
+  })
+  const displayMonthDateKey =
+    displayMonthState.activeDateKey === activeDateKey
+      ? displayMonthState.displayMonthDateKey
+      : activeDateKey
+  const displayedMonth = useMemo(
+    () => buildDashboardAgendaMonthForDateKeys(displayMonthDateKey, activeDateKey),
+    [activeDateKey, displayMonthDateKey]
+  )
+
+  function handleMonthShift(monthOffset: number) {
+    setDisplayMonthState({
+      activeDateKey,
+      displayMonthDateKey: shiftDashboardAgendaMonthDateKey(displayMonthDateKey, monthOffset),
+    })
+  }
 
   return (
     <section className="border border-outline-variant bg-background xl:hidden">
@@ -30,7 +52,7 @@ export function AgendaMobileCalendar({
         <span>
           <span className="label-caps text-secondary">Calendrier</span>
           <span className="mt-1 flex items-center gap-2 font-serif text-2xl text-foreground">
-            {month.label}
+            {displayedMonth.label}
             <span className="material-symbols-outlined text-[24px]" aria-hidden="true">
               {isOpen ? 'expand_less' : 'expand_more'}
             </span>
@@ -40,6 +62,29 @@ export function AgendaMobileCalendar({
 
       {isOpen && (
         <div className="border-t border-outline-variant px-3 pb-4">
+          <div className="flex items-center justify-between border-b border-outline-variant py-3">
+            <button
+              type="button"
+              aria-label="Mois précédent"
+              onClick={() => handleMonthShift(-1)}
+              className="flex h-10 w-10 items-center justify-center border border-outline-variant text-foreground transition-colors hover:bg-primary/50"
+            >
+              <span className="material-symbols-outlined text-[22px]" aria-hidden="true">
+                chevron_left
+              </span>
+            </button>
+            <span className="font-serif text-xl text-foreground">{displayedMonth.label}</span>
+            <button
+              type="button"
+              aria-label="Mois suivant"
+              onClick={() => handleMonthShift(1)}
+              className="flex h-10 w-10 items-center justify-center border border-outline-variant text-foreground transition-colors hover:bg-primary/50"
+            >
+              <span className="material-symbols-outlined text-[22px]" aria-hidden="true">
+                chevron_right
+              </span>
+            </button>
+          </div>
           <div className="grid grid-cols-7 gap-1 pt-3 text-center">
             {weekdayLabels.map((weekday, index) => (
               <span
@@ -50,7 +95,7 @@ export function AgendaMobileCalendar({
               </span>
             ))}
 
-            {month.days.map((day) => {
+            {displayedMonth.days.map((day) => {
               const bookingCount = bookingCountsByDate[day.dateKey] ?? 0
 
               return (
@@ -82,5 +127,14 @@ export function AgendaMobileCalendar({
         </div>
       )}
     </section>
+  )
+}
+
+function getAgendaMonthActiveDateKey(month: DashboardAgendaMonth): string {
+  return (
+    month.days.find((day) => day.active)?.dateKey ??
+    month.days.find((day) => day.isCurrentMonth)?.dateKey ??
+    month.days[0]?.dateKey ??
+    '1970-01-01'
   )
 }

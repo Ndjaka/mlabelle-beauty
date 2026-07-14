@@ -5,6 +5,7 @@ import {
   buildDashboardAgendaHourRows,
   buildDashboardAgendaMobileWeekColumns,
   buildDashboardAgendaMonth,
+  buildDashboardAgendaMonthForDateKeys,
   buildDashboardAgendaSummary,
   buildDashboardAgendaVisibleHours,
   buildDashboardAgendaWeekColumns,
@@ -199,6 +200,18 @@ describe('dashboard utils', () => {
       isCurrentMonth: false,
       active: false,
     })
+  })
+
+  it('builds a displayed calendar month while keeping another selected date active', () => {
+    const month = buildDashboardAgendaMonthForDateKeys('2026-07-01', '2026-06-10')
+
+    expect(month.label).toBe('Juillet 2026')
+    expect(month.days.find((day) => day.dateKey === '2026-07-01')).toMatchObject({
+      dayNumber: '1',
+      isCurrentMonth: true,
+      active: false,
+    })
+    expect(month.days.some((day) => day.active)).toBe(false)
   })
 
   it('builds the agenda day summary from bookings', () => {

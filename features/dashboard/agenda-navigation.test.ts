@@ -6,6 +6,7 @@ import {
   getTodayDashboardAgendaDateKey,
   mapAgendaItemToRecentBooking,
   shiftDashboardAgendaDateKey,
+  shiftDashboardAgendaMonthDateKey,
 } from '@/features/dashboard/agenda-navigation'
 import type { DashboardAgendaItem } from '@/types/dashboard'
 
@@ -40,6 +41,12 @@ describe('dashboard agenda navigation', () => {
   it('shifts the selected agenda date by day offsets', () => {
     expect(shiftDashboardAgendaDateKey(SELECTED_DATE_KEY, 1)).toBe('2026-06-12')
     expect(shiftDashboardAgendaDateKey(SELECTED_DATE_KEY, -7)).toBe('2026-06-04')
+  })
+
+  it('shifts the displayed calendar month without keeping an unsafe day number', () => {
+    expect(shiftDashboardAgendaMonthDateKey('2026-06-11', 1)).toBe('2026-07-01')
+    expect(shiftDashboardAgendaMonthDateKey('2026-06-11', -1)).toBe('2026-05-01')
+    expect(shiftDashboardAgendaMonthDateKey('2026-01-31', 1)).toBe('2026-02-01')
   })
 
   it('uses the salon timezone for today date keys', () => {

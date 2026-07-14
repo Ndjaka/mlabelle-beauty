@@ -137,14 +137,31 @@ export function buildDashboardAgendaDays(referenceDate: Date): DashboardAgendaDa
 }
 
 export function buildDashboardAgendaMonth(referenceDate: Date): DashboardAgendaMonth {
-  const parts = getSalonDateParts(referenceDate)
+  return buildDashboardAgendaMonthView(referenceDate, referenceDate)
+}
+
+export function buildDashboardAgendaMonthForDateKeys(
+  displayDateKey: string,
+  activeDateKey: string
+): DashboardAgendaMonth {
+  return buildDashboardAgendaMonthView(
+    parseSalonDateKey(displayDateKey),
+    parseSalonDateKey(activeDateKey)
+  )
+}
+
+function buildDashboardAgendaMonthView(
+  displayDate: Date,
+  activeDate: Date
+): DashboardAgendaMonth {
+  const parts = getSalonDateParts(displayDate)
   const firstMonthDay = zonedDateTimeToUtc(parts.year, parts.month, 1, 12, 0, 0)
   const firstMonthDayParts = getSalonDateParts(firstMonthDay)
   const gridStartDay = 1 - ((firstMonthDayParts.weekday + 6) % 7)
-  const activeDateKey = formatSalonDateKey(referenceDate)
+  const activeDateKey = formatSalonDateKey(activeDate)
 
   return {
-    label: formatDashboardMonthLabel(referenceDate),
+    label: formatDashboardMonthLabel(displayDate),
     days: Array.from({ length: 42 }, (_, index) => {
       const date = zonedDateTimeToUtc(parts.year, parts.month, gridStartDay + index, 12, 0, 0)
       const dateParts = getSalonDateParts(date)
@@ -158,6 +175,13 @@ export function buildDashboardAgendaMonth(referenceDate: Date): DashboardAgendaM
       }
     }),
   }
+}
+
+function parseSalonDateKey(dateKey: string): Date {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateKey)
+  if (!match) return new Date()
+
+  return new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12, 0, 0))
 }
 
 export function buildDashboardAgendaSummary(
