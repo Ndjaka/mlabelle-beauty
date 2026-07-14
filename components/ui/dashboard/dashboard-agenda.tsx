@@ -58,7 +58,7 @@ export function DashboardAgenda({
   const [selectedBooking, setSelectedBooking] = useState<DashboardRecentBooking | null>(null)
   const navigateToDate = useCallback(
     (dateKey: string, targetView: AgendaViewMode = view) => {
-      router.push(buildDashboardAgendaUrl(dateKey, targetView))
+      router.push(buildDashboardAgendaUrl(dateKey, targetView), { scroll: false })
     },
     [router, view]
   )
@@ -81,9 +81,9 @@ export function DashboardAgenda({
   )
   const handleDayClick = useCallback(
     (dateKey: string) => {
-      navigateToDate(dateKey, 'day')
+      navigateToDate(dateKey, view)
     },
-    [navigateToDate]
+    [view, navigateToDate]
   )
   const handleBookingClick = useCallback((item: DashboardAgendaItem) => {
     setSelectedBooking(mapAgendaItemToRecentBooking(item))
