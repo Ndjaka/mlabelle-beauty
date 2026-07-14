@@ -1,11 +1,17 @@
 import { getBookingsByDateRange, getBookingStats } from '@/features/booking/queries'
+import {
+  buildDashboardReservationSearchFilter,
+  getBookingStatusFromReservationFilter,
+  normalizeDashboardReservationSearch,
+  type DashboardReservationStatusFilter,
+} from '@/features/dashboard/reservation-filters'
 import { createServerClient } from '@/lib/supabase/server'
 import type { BookingWithService } from '@/types/booking'
 import type {
   AgendaViewMode,
   DashboardBookingWithCreatedAt,
   DashboardData,
-  DashboardRecentBooking,
+  PaginatedDashboardReservations,
 } from '@/types/dashboard'
 import {
   buildDashboardAgendaDays,
@@ -24,6 +30,7 @@ import {
 } from '@/features/dashboard/utils'
 
 const RECENT_BOOKINGS_LIMIT = 3
+const DEFAULT_RESERVATIONS_PAGE_SIZE = 10
 
 /**
  * Builds the full dashboard data payload.
@@ -63,13 +70,44 @@ export async function getDashboardData(
   }
 }
 
-export async function getDashboardReservations(): Promise<DashboardRecentBooking[]> {
+export async function getDashboardReservations({
+  page = 1,
+  pageSize = DEFAULT_RESERVATIONS_PAGE_SIZE,
+  search = '',
+  status = 'all',
+}: {
+  page?: number
+  pageSize?: number
+  search?: string
+  status?: DashboardReservationStatusFilter
+} = {}): Promise<PaginatedDashboardReservations> {
   const supabase = await createServerClient()
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  const normalizedSearch = normalizeDashboardReservationSearch(search)
+  const serviceIds = normalizedSearch
+    ? await getServiceIdsMatchingReservationSearch(normalizedSearch)
+    : []
+  const searchFilter = buildDashboardReservationSearchFilter(normalizedSearch, serviceIds)
+  const bookingStatus = getBookingStatusFromReservationFilter(status)
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, created_at, service:services(name, image_url, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, created_at, service:services(name, image_url, duration_minutes, price_cents)', {
+      count: 'exact',
+    })
+
+  if (bookingStatus) {
+    query = query.eq('status', bookingStatus)
+  }
+
+  if (searchFilter) {
+    query = query.or(searchFilter)
+  }
+
+  const { data, error, count } = await query
     .order('starts_at', { ascending: false })
+    .range(from, to)
 
   if (error) throw new Error(error.message)
 
@@ -88,7 +126,23 @@ export async function getDashboardReservations(): Promise<DashboardRecentBooking
       : (row.service as BookingWithService['service']),
   }))
 
-  return mapBookingsToRecentBookings(bookings, new Date())
+  return {
+    data: mapBookingsToRecentBookings(bookings, new Date()),
+    total: count ?? 0,
+  }
+}
+
+async function getServiceIdsMatchingReservationSearch(search: string): Promise<string[]> {
+  const supabase = await createServerClient()
+
+  const { data, error } = await supabase
+    .from('services')
+    .select('id')
+    .or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+
+  if (error) throw new Error(error.message)
+
+  return (data ?? []).map((service) => service.id)
 }
 
 function parseDateKey(dateKey: string): Date {

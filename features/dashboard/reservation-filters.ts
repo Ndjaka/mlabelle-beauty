@@ -1,20 +1,19 @@
-import type { DashboardBookingStatus, DashboardRecentBooking } from '@/types/dashboard'
+import type { BookingStatus } from '@/types/booking'
 
 export type DashboardReservationStatusFilter = 'all' | 'pending' | 'confirmed' | 'cancelled'
 
-type DashboardReservationFilters = {
+export type DashboardReservationSearchParams = {
+  page: number
   search: string
   status: DashboardReservationStatusFilter
 }
 
-const statusByFilter: Record<
-  Exclude<DashboardReservationStatusFilter, 'all'>,
-  DashboardBookingStatus
-> = {
-  pending: 'À confirmer',
-  confirmed: 'Confirmé',
-  cancelled: 'Annulé',
-}
+const bookingStatusByFilter: Record<Exclude<DashboardReservationStatusFilter, 'all'>, BookingStatus> =
+  {
+    pending: 'pending',
+    confirmed: 'confirmed',
+    cancelled: 'cancelled',
+  }
 
 export function isDashboardReservationStatusFilter(
   value: string
@@ -22,58 +21,57 @@ export function isDashboardReservationStatusFilter(
   return value === 'all' || value === 'pending' || value === 'confirmed' || value === 'cancelled'
 }
 
-export function filterDashboardReservations(
-  reservations: DashboardRecentBooking[],
-  filters: DashboardReservationFilters
-): DashboardRecentBooking[] {
-  const normalizedSearch = normalizeSearch(filters.search)
-  const expectedStatus = filters.status === 'all' ? null : statusByFilter[filters.status]
+export function parseDashboardReservationPage(value: string | undefined): number {
+  const parsedPage = value ? Number.parseInt(value, 10) : 1
 
-  return reservations.filter((reservation) => {
-    const matchesStatus = expectedStatus === null || reservation.status === expectedStatus
-    const matchesSearch =
-      normalizedSearch.length === 0 ||
-      normalizeSearch(
-        [
-          reservation.client,
-          reservation.email,
-          reservation.phone ?? '',
-          reservation.service,
-          reservation.date,
-          reservation.time,
-        ].join(' ')
-      ).includes(normalizedSearch)
-
-    return matchesStatus && matchesSearch
-  })
+  return Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1
 }
 
-export function countDashboardReservationsByStatus(
-  reservations: DashboardRecentBooking[]
-): Record<DashboardReservationStatusFilter, number> {
-  return reservations.reduce(
-    (counts, reservation) => {
-      counts.all += 1
-
-      if (reservation.status === 'À confirmer') counts.pending += 1
-      if (reservation.status === 'Confirmé') counts.confirmed += 1
-      if (reservation.status === 'Annulé') counts.cancelled += 1
-
-      return counts
-    },
-    {
-      all: 0,
-      pending: 0,
-      confirmed: 0,
-      cancelled: 0,
-    }
-  )
-}
-
-function normalizeSearch(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
+export function normalizeDashboardReservationSearch(value: string | undefined): string {
+  return (value ?? '')
+    .replace(/[%*,()]/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim()
+}
+
+export function getBookingStatusFromReservationFilter(
+  status: DashboardReservationStatusFilter
+): BookingStatus | null {
+  return status === 'all' ? null : bookingStatusByFilter[status]
+}
+
+export function buildDashboardReservationSearchFilter(
+  search: string,
+  serviceIds: string[]
+): string {
+  const normalizedSearch = normalizeDashboardReservationSearch(search)
+  if (!normalizedSearch) return ''
+
+  const filters = [
+    `client_name.ilike.%${normalizedSearch}%`,
+    `client_email.ilike.%${normalizedSearch}%`,
+    `client_phone.ilike.%${normalizedSearch}%`,
+  ]
+
+  if (serviceIds.length > 0) {
+    filters.push(`service_id.in.(${serviceIds.join(',')})`)
+  }
+
+  return filters.join(',')
+}
+
+export function parseDashboardReservationFilters(params: {
+  page?: string
+  search?: string
+  status?: string
+}): DashboardReservationSearchParams {
+  const status = params.status && isDashboardReservationStatusFilter(params.status)
+    ? params.status
+    : 'all'
+
+  return {
+    page: parseDashboardReservationPage(params.page),
+    search: normalizeDashboardReservationSearch(params.search),
+    status,
+  }
 }

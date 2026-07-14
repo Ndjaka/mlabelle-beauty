@@ -84,6 +84,11 @@ export type DashboardRecentBooking = {
   note: string
 }
 
+export type PaginatedDashboardReservations = {
+  data: DashboardRecentBooking[]
+  total: number
+}
+
 export type DashboardQuickAction = {
   label: string
   description: string
