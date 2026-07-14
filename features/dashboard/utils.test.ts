@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildDashboardAgendaDays,
+  buildDashboardAgendaBookingCountsByDate,
   buildDashboardAgendaHourRows,
   buildDashboardAgendaMonth,
   buildDashboardAgendaSummary,
@@ -9,12 +10,16 @@ import {
   formatDashboardDateLabel,
   formatDashboardPrice,
   getCurrentWeekSalonStart,
+  getMobileAgendaDayDurationClass,
+  getMobileAgendaDayOffsetClass,
+  getMobileAgendaWeekDurationClass,
+  getMobileAgendaWeekOffsetClass,
   getTodaySalonRange,
   mapBookingsToAgendaItems,
   mapBookingsToRecentBookings,
 } from '@/features/dashboard/utils'
 import type { BookingStats, BookingWithService } from '@/types/booking'
-import type { DashboardBookingWithCreatedAt } from '@/types/dashboard'
+import type { DashboardAgendaWeekColumn, DashboardBookingWithCreatedAt } from '@/types/dashboard'
 
 const REFERENCE_DATE = new Date('2026-06-10T10:00:00.000Z')
 const EARLY_BOOKING_HOUR = '06:00'
@@ -264,8 +269,64 @@ describe('dashboard utils', () => {
       },
     ])
 
+    expect(visibleHours).toContain('20:00')
     expect(visibleHours).toContain('21:00')
+    expect(visibleHours).toContain('22:00')
     expect(visibleHours[0]).toBe('08:00')
+  })
+
+  it('builds booking counters by week column date', () => {
+    const columns: DashboardAgendaWeekColumn[] = [
+      {
+        dateKey: '2026-06-10',
+        dayLabel: 'Mer',
+        items: [
+          {
+            kind: 'booking',
+            id: 'booking-id',
+            time: '09:00',
+            endTime: '09:45',
+            service: 'Brushing',
+            client: 'Camille Laurent',
+            duration: '45 min',
+            status: 'Confirmé',
+            price: '35,00 €',
+            email: 'camille@example.com',
+            phone: null,
+            date: 'Aujourd’hui',
+          },
+          {
+            kind: 'free',
+            time: '10:00',
+            endTime: '10:45',
+            label: 'Disponible',
+          },
+        ],
+      },
+      {
+        dateKey: '2026-06-11',
+        dayLabel: 'Jeu',
+        items: [],
+      },
+    ]
+
+    expect(buildDashboardAgendaBookingCountsByDate(columns)).toEqual({
+      '2026-06-10': 1,
+    })
+  })
+
+  it('maps mobile agenda time offsets to quarter-hour classes', () => {
+    expect(getMobileAgendaDayOffsetClass('09:30')).toBe('top-12')
+    expect(getMobileAgendaDayOffsetClass('09:45')).toBe('top-[72px]')
+    expect(getMobileAgendaWeekOffsetClass('09:15')).toBe('top-5')
+    expect(getMobileAgendaWeekOffsetClass('09:45')).toBe('top-[60px]')
+  })
+
+  it('maps mobile agenda durations to stable utility classes', () => {
+    expect(getMobileAgendaDayDurationClass('09:00', '09:45')).toBe('min-h-[72px]')
+    expect(getMobileAgendaDayDurationClass('09:00', '11:30')).toBe('min-h-[240px]')
+    expect(getMobileAgendaWeekDurationClass('09:00', '10:00')).toBe('min-h-20')
+    expect(getMobileAgendaWeekDurationClass('09:00', '11:30')).toBe('min-h-[200px]')
   })
 
   it('maps recent bookings with relative labels', () => {

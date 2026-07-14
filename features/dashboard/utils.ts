@@ -31,6 +31,34 @@ const DASHBOARD_AGENDA_HOURS = [
   '18:00',
   '19:00',
 ]
+const MOBILE_AGENDA_DAY_OFFSET_CLASSES: Record<number, string> = {
+  0: 'top-0',
+  15: 'top-6',
+  30: 'top-12',
+  45: 'top-[72px]',
+}
+const MOBILE_AGENDA_WEEK_OFFSET_CLASSES: Record<number, string> = {
+  0: 'top-0',
+  15: 'top-5',
+  30: 'top-10',
+  45: 'top-[60px]',
+}
+const MOBILE_AGENDA_DAY_DURATION_CLASSES = [
+  { maxMinutes: 30, className: 'min-h-12' },
+  { maxMinutes: 45, className: 'min-h-[72px]' },
+  { maxMinutes: 60, className: 'min-h-24' },
+  { maxMinutes: 90, className: 'min-h-36' },
+  { maxMinutes: 120, className: 'min-h-48' },
+  { maxMinutes: 150, className: 'min-h-[240px]' },
+]
+const MOBILE_AGENDA_WEEK_DURATION_CLASSES = [
+  { maxMinutes: 30, className: 'min-h-10' },
+  { maxMinutes: 45, className: 'min-h-[60px]' },
+  { maxMinutes: 60, className: 'min-h-20' },
+  { maxMinutes: 90, className: 'min-h-[120px]' },
+  { maxMinutes: 120, className: 'min-h-40' },
+  { maxMinutes: 150, className: 'min-h-[200px]' },
+]
 
 export function buildDashboardMetrics(
   stats: BookingStats,
@@ -164,14 +192,72 @@ export function buildDashboardAgendaHourRows(
 export function buildDashboardAgendaVisibleHours(
   items: DashboardAgendaItem[]
 ): string[] {
-  const visibleHours = new Set(DASHBOARD_AGENDA_HOURS)
+  const visibleHours = new Set(
+    DASHBOARD_AGENDA_HOURS.map((hour) => getAgendaTimeHourValue(hour)).filter(
+      (hour): hour is number => hour !== null
+    )
+  )
 
   items.forEach((item) => {
-    const itemHour = getAgendaItemHour(item)
-    if (itemHour) visibleHours.add(itemHour)
+    const startMinutes = getAgendaTimeTotalMinutes(item.time)
+    const endMinutes = getAgendaTimeTotalMinutes(item.endTime)
+
+    if (startMinutes === null) return
+
+    const startHour = Math.floor(startMinutes / 60)
+    const endHour =
+      endMinutes !== null && endMinutes > startMinutes
+        ? Math.floor((endMinutes - 1) / 60)
+        : startHour
+
+    visibleHours.add(startHour)
+    visibleHours.add(endHour)
   })
 
-  return Array.from(visibleHours).sort()
+  const sortedHours = Array.from(visibleHours).sort((hourA, hourB) => hourA - hourB)
+  const firstHour = sortedHours[0] ?? 8
+  const lastHour = sortedHours[sortedHours.length - 1] ?? 19
+
+  return Array.from({ length: lastHour - firstHour + 1 }, (_, index) =>
+    formatDashboardAgendaHour(firstHour + index)
+  )
+}
+
+export function buildDashboardAgendaBookingCountsByDate(
+  columns: DashboardAgendaWeekColumn[]
+): Record<string, number> {
+  const counts: Record<string, number> = {}
+
+  columns.forEach((column) => {
+    const bookingCount = column.items.filter((item) => item.kind === 'booking').length
+    if (bookingCount > 0) counts[column.dateKey] = bookingCount
+  })
+
+  return counts
+}
+
+export function getMobileAgendaDayOffsetClass(time: string): string {
+  return MOBILE_AGENDA_DAY_OFFSET_CLASSES[getAgendaQuarterMinute(time)] ?? 'top-0'
+}
+
+export function getMobileAgendaWeekOffsetClass(time: string): string {
+  return MOBILE_AGENDA_WEEK_OFFSET_CLASSES[getAgendaQuarterMinute(time)] ?? 'top-0'
+}
+
+export function getMobileAgendaDayDurationClass(time: string, endTime: string): string {
+  return getMobileAgendaDurationClass(
+    getAgendaDurationMinutes(time, endTime),
+    MOBILE_AGENDA_DAY_DURATION_CLASSES,
+    'min-h-[288px]'
+  )
+}
+
+export function getMobileAgendaWeekDurationClass(time: string, endTime: string): string {
+  return getMobileAgendaDurationClass(
+    getAgendaDurationMinutes(time, endTime),
+    MOBILE_AGENDA_WEEK_DURATION_CLASSES,
+    'min-h-[240px]'
+  )
 }
 
 export function buildDashboardAgendaWeekColumns(
@@ -300,10 +386,61 @@ function formatAgendaWeekday(date: Date): string {
 }
 
 function getAgendaItemHour(item: DashboardAgendaItem): string | null {
-  const [hour] = item.time.split(':')
-  if (!hour) return null
+  const hour = getAgendaTimeHourValue(item.time)
+  if (hour === null) return null
 
-  return `${hour.padStart(2, '0')}:00`
+  return formatDashboardAgendaHour(hour)
+}
+
+function getAgendaTimeHourValue(time: string): number | null {
+  const minutes = getAgendaTimeTotalMinutes(time)
+  if (minutes === null) return null
+
+  return Math.floor(minutes / 60)
+}
+
+function getAgendaTimeTotalMinutes(time: string): number | null {
+  const [hourPart, minutePart] = time.split(':')
+  const hour = Number(hourPart)
+  const minute = Number(minutePart)
+
+  if (!Number.isInteger(hour) || !Number.isInteger(minute)) return null
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null
+
+  return hour * 60 + minute
+}
+
+function formatDashboardAgendaHour(hour: number): string {
+  return `${String(hour).padStart(2, '0')}:00`
+}
+
+function getAgendaQuarterMinute(time: string): number {
+  const minutes = getAgendaTimeTotalMinutes(time)
+  if (minutes === null) return 0
+
+  return Math.min(45, Math.floor((minutes % 60) / 15) * 15)
+}
+
+function getAgendaDurationMinutes(time: string, endTime: string): number {
+  const startMinutes = getAgendaTimeTotalMinutes(time)
+  const endMinutes = getAgendaTimeTotalMinutes(endTime)
+
+  if (startMinutes === null || endMinutes === null || endMinutes <= startMinutes) {
+    return 30
+  }
+
+  return endMinutes - startMinutes
+}
+
+function getMobileAgendaDurationClass(
+  durationMinutes: number,
+  durationClasses: { maxMinutes: number; className: string }[],
+  fallbackClassName: string
+): string {
+  return (
+    durationClasses.find((durationClass) => durationMinutes <= durationClass.maxMinutes)
+      ?.className ?? fallbackClassName
+  )
 }
 
 export function formatSalonDateKey(date: Date): string {
