@@ -1,7 +1,12 @@
 import { getBookingsByDateRange, getBookingStats } from '@/features/booking/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import type { BookingWithService } from '@/types/booking'
-import type { AgendaViewMode, DashboardBookingWithCreatedAt, DashboardData } from '@/types/dashboard'
+import type {
+  AgendaViewMode,
+  DashboardBookingWithCreatedAt,
+  DashboardData,
+  DashboardRecentBooking,
+} from '@/types/dashboard'
 import {
   buildDashboardAgendaDays,
   buildDashboardAgendaMobileWeekColumns,
@@ -56,6 +61,34 @@ export async function getDashboardData(
     agendaMobileWeekColumns: buildDashboardAgendaMobileWeekColumns(weekBookings, referenceDate),
     recentBookings: mapBookingsToRecentBookings(recentBookings, referenceDate),
   }
+}
+
+export async function getDashboardReservations(): Promise<DashboardRecentBooking[]> {
+  const supabase = await createServerClient()
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, created_at, service:services(name, image_url, duration_minutes, price_cents)')
+    .order('starts_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+
+  const bookings: DashboardBookingWithCreatedAt[] = (data ?? []).map((row) => ({
+    id: row.id,
+    client_name: row.client_name,
+    client_email: row.client_email,
+    client_phone: row.client_phone ?? undefined,
+    starts_at: row.starts_at,
+    ends_at: row.ends_at,
+    status: row.status as BookingWithService['status'],
+    cancel_token: row.cancel_token,
+    created_at: row.created_at,
+    service: Array.isArray(row.service)
+      ? row.service[0]
+      : (row.service as BookingWithService['service']),
+  }))
+
+  return mapBookingsToRecentBookings(bookings, new Date())
 }
 
 function parseDateKey(dateKey: string): Date {

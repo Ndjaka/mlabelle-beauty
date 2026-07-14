@@ -9,6 +9,7 @@ interface CancelBookingModalProps {
   clientName: string
   serviceName: string
   onClose: () => void
+  onCancelled?: () => void
 }
 
 export function CancelBookingModal({
@@ -16,6 +17,7 @@ export function CancelBookingModal({
   clientName,
   serviceName,
   onClose,
+  onCancelled,
 }: CancelBookingModalProps) {
   const router = useRouter()
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -35,6 +37,7 @@ export function CancelBookingModal({
       if (result.success) {
         router.refresh()
         onClose()
+        onCancelled?.()
       } else {
         setError(result.error ?? 'Une erreur est survenue.')
       }

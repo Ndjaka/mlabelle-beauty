@@ -11,7 +11,7 @@ type DashboardNavKey =
 const dashboardNavItems: Array<Omit<DashboardNavItem, 'active'> & { key: DashboardNavKey }> = [
   { key: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
   { key: 'agenda', label: 'Agenda', href: '/agenda', icon: 'calendar_month' },
-  { key: 'bookings', label: 'Réservations', href: '/dashboard#recent-bookings', icon: 'event_available' },
+  { key: 'bookings', label: 'Réservations', href: '/reservations', icon: 'event_available' },
   { key: 'services', label: 'Prestations', href: '/services', icon: 'content_cut' },
   { key: 'schedule', label: 'Horaires', href: '/schedule', icon: 'schedule' },
   { key: 'portfolio', label: 'Portfolio', href: '/dashboard#quick-actions', icon: 'photo_library' },

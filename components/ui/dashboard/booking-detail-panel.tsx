@@ -17,6 +17,7 @@ interface BookingDetailPanelProps {
 export function BookingDetailPanel({ booking, isOpen, onClose }: BookingDetailPanelProps) {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const canCancelBooking = booking.status !== 'Annulé'
   
   // Prevent body scroll when panel is open
   useEffect(() => {
@@ -106,12 +107,18 @@ export function BookingDetailPanel({ booking, isOpen, onClose }: BookingDetailPa
             onClick={() => setIsConfirmModalOpen(true)}
             status={booking.status}
           />
-          <button
-            onClick={() => setIsCancelModalOpen(true)}
-            className="w-full border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm font-semibold uppercase transition-colors hover:bg-red-100"
-          >
-            Annuler ce rendez-vous
-          </button>
+          {canCancelBooking ? (
+            <button
+              onClick={() => setIsCancelModalOpen(true)}
+              className="w-full border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold uppercase text-red-700 transition-colors hover:bg-red-100"
+            >
+              Annuler ce rendez-vous
+            </button>
+          ) : (
+            <p className="border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-foreground/65">
+              Ce rendez-vous est déjà annulé.
+            </p>
+          )}
         </div>
       </div>
 
@@ -122,6 +129,7 @@ export function BookingDetailPanel({ booking, isOpen, onClose }: BookingDetailPa
           clientName={booking.client}
           serviceName={booking.service}
           onClose={() => setIsCancelModalOpen(false)}
+          onCancelled={onClose}
         />
       )}
 
