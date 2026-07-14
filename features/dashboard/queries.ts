@@ -4,6 +4,7 @@ import type { BookingWithService } from '@/types/booking'
 import type { AgendaViewMode, DashboardBookingWithCreatedAt, DashboardData } from '@/types/dashboard'
 import {
   buildDashboardAgendaDays,
+  buildDashboardAgendaMobileWeekColumns,
   buildDashboardAgendaMonth,
   buildDashboardAgendaSummary,
   buildDashboardAgendaWeekColumns,
@@ -11,6 +12,7 @@ import {
   formatDashboardDateLabel,
   formatSalonDateKey,
   getCurrentWeekSalonStart,
+  getMobileAgendaWeekSalonRange,
   getTodaySalonRange,
   mapBookingsToAgendaItems,
   mapBookingsToRecentBookings,
@@ -30,12 +32,14 @@ export async function getDashboardData(
   const referenceDate = dateKey ? parseDateKey(dateKey) : new Date()
   const todayRange = getTodaySalonRange(referenceDate)
   const weekStart = getCurrentWeekSalonStart(referenceDate)
-  const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+  const mobileWeekRange = getMobileAgendaWeekSalonRange(referenceDate)
 
   const [stats, todayBookings, weekBookings, recentBookings] = await Promise.all([
     getBookingStats(),
     getBookingsByDateRange(todayRange.start, todayRange.end),
-    view === 'week' ? getBookingsByDateRange(weekStart, weekEnd) : Promise.resolve([]),
+    view === 'week'
+      ? getBookingsByDateRange(mobileWeekRange.start, mobileWeekRange.end)
+      : Promise.resolve([]),
     getRecentDashboardBookings(weekStart),
   ])
 
@@ -49,6 +53,7 @@ export async function getDashboardData(
     agendaDays: buildDashboardAgendaDays(referenceDate),
     agendaItems: mapBookingsToAgendaItems(todayBookings),
     agendaWeekColumns: buildDashboardAgendaWeekColumns(weekBookings, referenceDate),
+    agendaMobileWeekColumns: buildDashboardAgendaMobileWeekColumns(weekBookings, referenceDate),
     recentBookings: mapBookingsToRecentBookings(recentBookings, referenceDate),
   }
 }

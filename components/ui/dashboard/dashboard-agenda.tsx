@@ -38,6 +38,7 @@ type DashboardAgendaProps = {
   month: DashboardAgendaMonth
   summary: DashboardAgendaSummary
   weekColumns: DashboardAgendaWeekColumn[]
+  mobileWeekColumns: DashboardAgendaWeekColumn[]
   dateLabel: string
   selectedDateKey: string
   view: AgendaViewMode
@@ -48,13 +49,15 @@ export function DashboardAgenda({
   month,
   summary,
   weekColumns,
+  mobileWeekColumns,
   dateLabel,
   selectedDateKey,
   view,
 }: DashboardAgendaProps) {
   const router = useRouter()
   const rows = buildDashboardAgendaHourRows(items)
-  const bookingCountsByDate = buildDashboardAgendaBookingCountsByDate(weekColumns)
+  const bookingCountColumns = view === 'week' ? mobileWeekColumns : weekColumns
+  const bookingCountsByDate = buildDashboardAgendaBookingCountsByDate(bookingCountColumns)
   const [selectedBooking, setSelectedBooking] = useState<DashboardRecentBooking | null>(null)
   const navigateToDate = useCallback(
     (dateKey: string, targetView: AgendaViewMode = view) => {
@@ -116,7 +119,7 @@ export function DashboardAgenda({
           ) : (
             <>
               <AgendaMobileWeekGrid
-                columns={weekColumns}
+                columns={mobileWeekColumns}
                 selectedDateKey={selectedDateKey}
                 onDayClick={handleDayClick}
                 onBookingClick={handleBookingClick}

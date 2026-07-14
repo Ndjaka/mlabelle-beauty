@@ -10,7 +10,8 @@ import {
 } from '@/features/dashboard/utils'
 import type { DashboardAgendaItem, DashboardAgendaWeekColumn } from '@/types/dashboard'
 
-const mobileWeekGridClassName = 'grid-cols-[56px_repeat(7,minmax(120px,120px))]'
+const mobileWeekHourColumnClassName = 'w-14 shrink-0'
+const mobileWeekDayColumnClassName = 'w-[120px] shrink-0'
 
 type AgendaMobileWeekGridProps = {
   columns: DashboardAgendaWeekColumn[]
@@ -41,14 +42,14 @@ export function AgendaMobileWeekGrid({
       className="overflow-hidden border border-outline-variant bg-background md:hidden"
     >
       <div ref={scrollRef} className="overflow-x-auto">
-        <div className="min-w-[896px]">
-          <div
-            className={cn(
-              'grid border-b border-outline-variant bg-surface-container-low',
-              mobileWeekGridClassName
-            )}
-          >
-            <div className="sticky left-0 z-30 border-r border-outline-variant bg-surface-container-low px-2 py-3 text-[10px] font-semibold uppercase text-foreground/45">
+        <div className="w-max min-w-full">
+          <div className="flex border-b border-outline-variant bg-surface-container-low">
+            <div
+              className={cn(
+                'sticky left-0 z-30 border-r border-outline-variant bg-surface-container-low px-2 py-3 text-[10px] font-semibold uppercase text-foreground/45',
+                mobileWeekHourColumnClassName
+              )}
+            >
               Heure
             </div>
             {columns.map((column) => {
@@ -62,6 +63,7 @@ export function AgendaMobileWeekGrid({
                   className={cn(
                     'min-w-0 border-r border-outline-variant px-2 py-2 text-center transition-colors last:border-r-0',
                     'hover:bg-primary/40',
+                    mobileWeekDayColumnClassName,
                     column.dateKey === selectedDateKey && 'bg-tertiary text-white hover:bg-tertiary'
                   )}
                 >
@@ -86,8 +88,13 @@ export function AgendaMobileWeekGrid({
           </div>
           <div className="pb-20">
             {visibleHours.map((hour) => (
-              <div key={hour} className={cn('grid h-20', mobileWeekGridClassName)}>
-                <div className="sticky left-0 z-20 border-r border-t border-outline-variant bg-background px-2 pt-3 text-[11px] font-semibold text-foreground/50">
+              <div key={hour} className="flex h-20">
+                <div
+                  className={cn(
+                    'sticky left-0 z-20 border-r border-t border-outline-variant bg-background px-2 pt-3 text-[11px] font-semibold text-foreground/50',
+                    mobileWeekHourColumnClassName
+                  )}
+                >
                   {hour}
                 </div>
                 {columns.map((column) => (
@@ -96,6 +103,7 @@ export function AgendaMobileWeekGrid({
                     column={column}
                     hour={hour}
                     selected={column.dateKey === selectedDateKey}
+                    className={mobileWeekDayColumnClassName}
                     onBookingClick={onBookingClick}
                   />
                 ))}

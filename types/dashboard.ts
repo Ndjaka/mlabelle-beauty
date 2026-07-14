@@ -113,5 +113,6 @@ export type DashboardData = {
   agendaDays: DashboardAgendaDay[]
   agendaItems: DashboardAgendaItem[]
   agendaWeekColumns: DashboardAgendaWeekColumn[]
+  agendaMobileWeekColumns: DashboardAgendaWeekColumn[]
   recentBookings: DashboardRecentBooking[]
 }

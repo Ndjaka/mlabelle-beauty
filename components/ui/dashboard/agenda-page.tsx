@@ -39,6 +39,7 @@ export function AgendaPage({ data }: AgendaPageProps) {
           month={data.agendaMonth}
           summary={data.agendaSummary}
           weekColumns={data.agendaWeekColumns}
+          mobileWeekColumns={data.agendaMobileWeekColumns}
           dateLabel={data.dateLabel}
           selectedDateKey={data.selectedDateKey}
           view={data.view}

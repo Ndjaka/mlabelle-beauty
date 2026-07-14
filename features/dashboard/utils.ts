@@ -60,6 +60,10 @@ const MOBILE_AGENDA_WEEK_DURATION_CLASSES = [
   { maxMinutes: 150, className: 'min-h-[200px]' },
 ]
 const MOBILE_AGENDA_WEEK_DAY_COLUMN_WIDTH = 120
+const DASHBOARD_AGENDA_WEEK_DAY_COUNT = 7
+const MOBILE_AGENDA_WEEK_DAY_COUNT = 21
+const MOBILE_AGENDA_WEEK_PREVIOUS_DAYS = 7
+const MOBILE_AGENDA_WEEK_FOLLOWING_DAYS = 14
 
 export function buildDashboardMetrics(
   stats: BookingStats,
@@ -275,18 +279,37 @@ export function buildDashboardAgendaWeekColumns(
   weekBookings: BookingWithService[],
   referenceDate: Date
 ): DashboardAgendaWeekColumn[] {
-  const parts = getSalonDateParts(referenceDate)
-  const activeDayIndex = (parts.weekday + 6) % 7
-  const mondayDay = parts.day - activeDayIndex
+  return buildDashboardAgendaColumns(
+    weekBookings,
+    getCurrentWeekSalonStart(referenceDate),
+    DASHBOARD_AGENDA_WEEK_DAY_COUNT
+  )
+}
 
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index, 12, 0, 0)
+export function buildDashboardAgendaMobileWeekColumns(
+  weekBookings: BookingWithService[],
+  referenceDate: Date
+): DashboardAgendaWeekColumn[] {
+  const { start } = getMobileAgendaWeekSalonRange(referenceDate)
+
+  return buildDashboardAgendaColumns(weekBookings, start, MOBILE_AGENDA_WEEK_DAY_COUNT)
+}
+
+function buildDashboardAgendaColumns(
+  bookings: BookingWithService[],
+  startDate: Date,
+  dayCount: number
+): DashboardAgendaWeekColumn[] {
+  const parts = getSalonDateParts(startDate)
+
+  return Array.from({ length: dayCount }, (_, index) => {
+    const date = zonedDateTimeToUtc(parts.year, parts.month, parts.day + index, 12, 0, 0)
     const dateKey = formatSalonDateKey(date)
     const dayLabel = formatAgendaWeekday(date)
-    const dayStart = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index, 0, 0, 0)
-    const dayEnd = zonedDateTimeToUtc(parts.year, parts.month, mondayDay + index + 1, 0, 0, 0)
+    const dayStart = zonedDateTimeToUtc(parts.year, parts.month, parts.day + index, 0, 0, 0)
+    const dayEnd = zonedDateTimeToUtc(parts.year, parts.month, parts.day + index + 1, 0, 0, 0)
 
-    const dayBookings = weekBookings.filter((booking) => {
+    const dayBookings = bookings.filter((booking) => {
       const startsAt = new Date(booking.starts_at).getTime()
       return startsAt >= dayStart.getTime() && startsAt < dayEnd.getTime()
     })
@@ -334,6 +357,24 @@ export function getCurrentWeekSalonStart(referenceDate: Date): Date {
   const mondayDay = parts.day - ((parts.weekday + 6) % 7)
 
   return zonedDateTimeToUtc(parts.year, parts.month, mondayDay, 0, 0, 0)
+}
+
+export function getMobileAgendaWeekSalonRange(referenceDate: Date): {
+  start: Date
+  end: Date
+} {
+  const weekStart = getCurrentWeekSalonStart(referenceDate)
+
+  return {
+    start: addSalonDays(weekStart, -MOBILE_AGENDA_WEEK_PREVIOUS_DAYS),
+    end: addSalonDays(weekStart, MOBILE_AGENDA_WEEK_FOLLOWING_DAYS),
+  }
+}
+
+function addSalonDays(referenceDate: Date, days: number): Date {
+  const parts = getSalonDateParts(referenceDate)
+
+  return zonedDateTimeToUtc(parts.year, parts.month, parts.day + days, 0, 0, 0)
 }
 
 export function formatDashboardDateLabel(date: Date): string {

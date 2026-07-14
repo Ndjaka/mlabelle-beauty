@@ -12,6 +12,7 @@ type AgendaMobileWeekCellProps = {
   column: DashboardAgendaWeekColumn
   hour: string
   selected: boolean
+  className?: string
   onBookingClick?: (booking: DashboardAgendaItem) => void
 }
 
@@ -19,6 +20,7 @@ export function AgendaMobileWeekCell({
   column,
   hour,
   selected,
+  className,
   onBookingClick,
 }: AgendaMobileWeekCellProps) {
   const hourItems = column.items.filter((item) => {
@@ -29,8 +31,9 @@ export function AgendaMobileWeekCell({
   return (
     <div
       className={cn(
-        'relative border-r border-t border-outline-variant last:border-r-0',
-        selected && 'bg-tertiary/5'
+        'relative h-full border-r border-t border-outline-variant last:border-r-0',
+        selected && 'bg-tertiary/5',
+        className
       )}
     >
       {hourItems.map((item, index) => (

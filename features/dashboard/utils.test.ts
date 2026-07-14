@@ -3,13 +3,17 @@ import {
   buildDashboardAgendaDays,
   buildDashboardAgendaBookingCountsByDate,
   buildDashboardAgendaHourRows,
+  buildDashboardAgendaMobileWeekColumns,
   buildDashboardAgendaMonth,
   buildDashboardAgendaSummary,
   buildDashboardAgendaVisibleHours,
+  buildDashboardAgendaWeekColumns,
   buildDashboardMetrics,
   formatDashboardDateLabel,
   formatDashboardPrice,
+  formatSalonDateKey,
   getCurrentWeekSalonStart,
+  getMobileAgendaWeekSalonRange,
   getMobileAgendaDayDurationClass,
   getMobileAgendaDayOffsetClass,
   getMobileAgendaWeekSelectedScrollLeft,
@@ -134,6 +138,43 @@ describe('dashboard utils', () => {
       { dateKey: '2026-06-13', weekdayLabel: 'Sam', dayNumber: '13', active: false },
       { dateKey: '2026-06-14', weekdayLabel: 'Dim', dayNumber: '14', active: false },
     ])
+  })
+
+  it('builds a wider mobile week agenda around the selected week', () => {
+    const range = getMobileAgendaWeekSalonRange(REFERENCE_DATE)
+    const columns = buildDashboardAgendaMobileWeekColumns([], REFERENCE_DATE)
+
+    expect(formatSalonDateKey(range.start)).toBe('2026-06-01')
+    expect(formatSalonDateKey(range.end)).toBe('2026-06-22')
+    expect(columns).toHaveLength(21)
+    expect(columns[0]?.dateKey).toBe('2026-06-01')
+    expect(columns[7]?.dateKey).toBe('2026-06-08')
+    expect(columns[9]?.dateKey).toBe('2026-06-10')
+    expect(columns[20]?.dateKey).toBe('2026-06-21')
+  })
+
+  it('keeps desktop week columns at seven days while mobile can show nearby weeks', () => {
+    const nextWeekBooking: BookingWithService = {
+      id: 'next-week-booking',
+      client_name: 'Lina Moreau',
+      client_email: 'lina@example.com',
+      starts_at: '2026-06-16T07:00:00.000Z',
+      ends_at: '2026-06-16T07:45:00.000Z',
+      status: 'confirmed',
+      cancel_token: 'next-week-token',
+      service: {
+        name: 'Brushing',
+        duration_minutes: 45,
+        price_cents: 3500,
+      },
+    }
+
+    const desktopColumns = buildDashboardAgendaWeekColumns([nextWeekBooking], REFERENCE_DATE)
+    const mobileColumns = buildDashboardAgendaMobileWeekColumns([nextWeekBooking], REFERENCE_DATE)
+
+    expect(desktopColumns).toHaveLength(7)
+    expect(desktopColumns.find((column) => column.dateKey === '2026-06-16')).toBeUndefined()
+    expect(mobileColumns.find((column) => column.dateKey === '2026-06-16')?.items).toHaveLength(1)
   })
 
   it('builds a month calendar grid around the active day', () => {
