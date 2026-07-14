@@ -10,6 +10,8 @@ import {
 } from '@/features/dashboard/utils'
 import type { DashboardAgendaItem, DashboardAgendaWeekColumn } from '@/types/dashboard'
 
+const mobileWeekGridClassName = 'grid-cols-[56px_repeat(7,minmax(120px,120px))]'
+
 type AgendaMobileWeekGridProps = {
   columns: DashboardAgendaWeekColumn[]
   selectedDateKey: string
@@ -30,63 +32,72 @@ export function AgendaMobileWeekGrid({
     <div
       role="region"
       aria-label="Planning mobile de la semaine"
-      className="border border-outline-variant bg-background md:hidden"
+      className="overflow-hidden border border-outline-variant bg-background md:hidden"
     >
-      <div className="sticky top-[86px] z-20 grid grid-cols-[44px_repeat(7,minmax(0,1fr))] border-b border-outline-variant bg-surface-container-low">
-        <div className="border-r border-outline-variant px-1 py-3 text-[10px] font-semibold uppercase text-foreground/45">
-          Heure
-        </div>
-        {columns.map((column) => {
-          const bookingCount = bookingCountsByDate[column.dateKey] ?? 0
-
-          return (
-            <button
-              key={column.dateKey}
-              type="button"
-              onClick={() => onDayClick(column.dateKey)}
-              className={cn(
-                'min-w-0 border-r border-outline-variant px-1 py-2 text-center transition-colors last:border-r-0',
-                'hover:bg-primary/40',
-                column.dateKey === selectedDateKey && 'bg-tertiary text-white hover:bg-tertiary'
-              )}
-            >
-              <span className="block truncate text-[10px] font-semibold uppercase leading-none">
-                {column.dayLabel}
-              </span>
-              <span className="mt-1 block font-serif text-lg leading-none">
-                {column.dateKey.slice(8)}
-              </span>
-              {bookingCount > 0 && (
-                <span
-                  aria-label={`${bookingCount} rendez-vous`}
-                  className={cn(
-                    'mx-auto mt-1 block h-1.5 w-1.5 rounded-full',
-                    column.dateKey === selectedDateKey ? 'bg-white/80' : 'bg-secondary'
-                  )}
-                />
-              )}
-            </button>
-          )
-        })}
-      </div>
-
-      <div className="pb-20">
-        {visibleHours.map((hour) => (
-          <div key={hour} className="grid h-20 grid-cols-[44px_repeat(7,minmax(0,1fr))]">
-            <div className="border-r border-t border-outline-variant px-1.5 pt-3 text-[11px] font-semibold text-foreground/50">
-              {hour}
+      <p className="border-b border-outline-variant px-3 py-2 text-[11px] text-foreground/50">Glissez horizontalement pour parcourir la semaine.</p>
+      <div className="overflow-x-auto">
+        <div className="min-w-[896px]">
+          <div
+            className={cn(
+              'sticky top-[86px] z-20 grid border-b border-outline-variant bg-surface-container-low',
+              mobileWeekGridClassName
+            )}
+          >
+            <div className="sticky left-0 z-30 border-r border-outline-variant bg-surface-container-low px-2 py-3 text-[10px] font-semibold uppercase text-foreground/45">
+              Heure
             </div>
-            {columns.map((column) => (
-              <AgendaMobileWeekCell
-                key={`${column.dateKey}-${hour}`}
-                column={column}
-                hour={hour}
-                selected={column.dateKey === selectedDateKey}
-                onBookingClick={onBookingClick}
-              />
+            {columns.map((column) => {
+              const bookingCount = bookingCountsByDate[column.dateKey] ?? 0
+
+              return (
+                <button
+                  key={column.dateKey}
+                  type="button"
+                  onClick={() => onDayClick(column.dateKey)}
+                  className={cn(
+                    'min-w-0 border-r border-outline-variant px-2 py-2 text-center transition-colors last:border-r-0',
+                    'hover:bg-primary/40',
+                    column.dateKey === selectedDateKey && 'bg-tertiary text-white hover:bg-tertiary'
+                  )}
+                >
+                  <span className="block truncate text-[10px] font-semibold uppercase leading-none">
+                    {column.dayLabel}
+                  </span>
+                  <span className="mt-1 block font-serif text-lg leading-none">
+                    {column.dateKey.slice(8)}
+                  </span>
+                  {bookingCount > 0 && (
+                    <span
+                      aria-label={`${bookingCount} rendez-vous`}
+                      className={cn(
+                        'mx-auto mt-1 block h-1.5 w-1.5 rounded-full',
+                        column.dateKey === selectedDateKey ? 'bg-white/80' : 'bg-secondary'
+                      )}
+                    />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+          <div className="pb-20">
+            {visibleHours.map((hour) => (
+              <div key={hour} className={cn('grid h-20', mobileWeekGridClassName)}>
+                <div className="sticky left-0 z-20 border-r border-t border-outline-variant bg-background px-2 pt-3 text-[11px] font-semibold text-foreground/50">
+                  {hour}
+                </div>
+                {columns.map((column) => (
+                  <AgendaMobileWeekCell
+                    key={`${column.dateKey}-${hour}`}
+                    column={column}
+                    hour={hour}
+                    selected={column.dateKey === selectedDateKey}
+                    onBookingClick={onBookingClick}
+                  />
+                ))}
+              </div>
             ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   )
