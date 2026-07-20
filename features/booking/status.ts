@@ -1,6 +1,7 @@
 import type { BookingStatus } from '@/types/booking';
 
 export const CLIENT_CREATED_BOOKING_STATUS: BookingStatus = 'pending';
+export const ADMIN_CREATED_BOOKING_STATUS: BookingStatus = 'confirmed';
 
 export const BOOKING_STATUSES_BLOCKING_AVAILABILITY: BookingStatus[] = [
   'pending',

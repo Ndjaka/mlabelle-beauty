@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { AdminCreateBookingButton } from '@/components/ui/dashboard/admin-booking/admin-create-booking-button'
 import { DashboardAgenda } from '@/components/ui/dashboard/dashboard-agenda'
 import {
   getDashboardMobileNavItems,
@@ -6,12 +7,14 @@ import {
 } from '@/components/ui/dashboard/dashboard-navigation'
 import { DashboardShell } from '@/components/ui/dashboard/dashboard-shell'
 import type { DashboardData } from '@/types/dashboard'
+import type { Service } from '@/types/service'
 
 type AgendaPageProps = {
   data: DashboardData
+  services: Service[]
 }
 
-export function AgendaPage({ data }: AgendaPageProps) {
+export function AgendaPage({ data, services }: AgendaPageProps) {
   const navItems = getDashboardNavItems('agenda')
   const mobileNavItems = getDashboardMobileNavItems('agenda')
 
@@ -28,9 +31,15 @@ export function AgendaPage({ data }: AgendaPageProps) {
               Vue complète des rendez-vous, avec repères jour/semaine et planning horaire.
             </p>
           </div>
-          <Button href="/dashboard" variant="outline" className="w-full md:w-auto">
-            Retour dashboard
-          </Button>
+          <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
+            <AdminCreateBookingButton
+              services={services}
+              initialDateKey={data.selectedDateKey}
+            />
+            <Button href="/dashboard" variant="outline" className="w-full md:w-auto">
+              Retour dashboard
+            </Button>
+          </div>
         </section>
 
         <DashboardAgenda

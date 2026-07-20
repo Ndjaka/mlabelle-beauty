@@ -38,6 +38,23 @@ export async function sendBookingConfirmation(data: BookingEmailData): Promise<v
   });
 }
 
+export async function sendAdminCreatedBookingConfirmation(data: BookingEmailData): Promise<void> {
+  const confirmedAppointmentHtml =
+    '<strong style="font-weight:700; color:#1A1A1A;">Votre rendez-vous est confirmé.</strong>';
+
+  await sendBookingEmail({
+    data,
+    subject: CONFIRMATION_SUBJECT,
+    intro: 'Votre rendez-vous est confirmé.',
+    body: 'Votre rendez-vous chez Mlabelle Beauty a été ajouté et confirmé par le salon.',
+    paymentNotice: 'Paiement sur place.',
+    templateOptions: {
+      trustedBodyHtml: `${confirmedAppointmentHtml} Le salon a ajouté votre rendez-vous à son agenda.`,
+      trustedPaymentNoticeHtml: 'Paiement sur place.',
+    },
+  });
+}
+
 export async function sendBookingRequestReceived(data: BookingEmailData): Promise<void> {
   const depositHighlightHtml = `<strong style="font-weight:700; color:#1A1A1A;">${BOOKING_DEPOSIT_LABEL}</strong>`;
 

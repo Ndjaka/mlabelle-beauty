@@ -3,7 +3,10 @@ import { createServerClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import type { Database } from '@/lib/supabase/types';
 import type { BookingWithService, ClientReminderKind, CreateBookingInput } from '@/types/booking';
-import { CLIENT_CREATED_BOOKING_STATUS } from '@/features/booking/status';
+import {
+  ADMIN_CREATED_BOOKING_STATUS,
+  CLIENT_CREATED_BOOKING_STATUS,
+} from '@/features/booking/status';
 import { getClientReminderSentColumn } from '@/features/booking/utils';
 
 type BookingUpdate = Database['public']['Tables']['bookings']['Update'];
@@ -31,6 +34,43 @@ export async function createBooking(
       starts_at: data.starts_at.toISOString(),
       ends_at: endsAt.toISOString(),
       status: CLIENT_CREATED_BOOKING_STATUS,
+    })
+    .select('id, cancel_token')
+    .single();
+
+  if (error) {
+    if (error.code === '23P01') {
+      throw new Error('Ce créneau n\'est plus disponible.');
+    }
+
+    throw new Error(error.message);
+  }
+  if (!booking) throw new Error('Booking creation failed: no data returned');
+
+  return { id: booking.id, cancel_token: booking.cancel_token };
+}
+
+/**
+ * Creates a confirmed booking from the trusted admin dashboard.
+ * Computes ends_at from starts_at + serviceDurationMinutes.
+ */
+export async function createAdminBooking(
+  data: CreateBookingInput,
+  serviceDurationMinutes: number
+): Promise<{ id: string; cancel_token: string }> {
+  const supabase = await createServerClient();
+  const endsAt = new Date(data.starts_at.getTime() + serviceDurationMinutes * 60 * 1000);
+
+  const { data: booking, error } = await supabase
+    .from('bookings')
+    .insert({
+      service_id: data.service_id,
+      client_name: data.client_name,
+      client_email: data.client_email,
+      client_phone: data.client_phone ?? null,
+      starts_at: data.starts_at.toISOString(),
+      ends_at: endsAt.toISOString(),
+      status: ADMIN_CREATED_BOOKING_STATUS,
     })
     .select('id, cancel_token')
     .single();

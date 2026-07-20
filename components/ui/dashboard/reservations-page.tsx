@@ -2,7 +2,6 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
-import { Button } from '@/components/ui/button'
 import { BookingDetailPanel } from '@/components/ui/dashboard/booking-detail-panel'
 import {
   getDashboardMobileNavItems,
@@ -12,9 +11,11 @@ import { DashboardShell } from '@/components/ui/dashboard/dashboard-shell'
 import { ReservationFilters } from '@/components/ui/dashboard/reservations/reservation-filters'
 import { ReservationList } from '@/components/ui/dashboard/reservations/reservation-list'
 import { ReservationPagination } from '@/components/ui/dashboard/reservations/reservation-pagination'
+import { ReservationsPageHeader } from '@/components/ui/dashboard/reservations/reservations-page-header'
 import type { DashboardReservationStatusFilter } from '@/features/dashboard/reservation-filters'
 import { formatDashboardDateLabel } from '@/features/dashboard/utils'
 import type { DashboardRecentBooking } from '@/types/dashboard'
+import type { Service } from '@/types/service'
 
 type ReservationsPageProps = {
   reservations: DashboardRecentBooking[]
@@ -22,6 +23,8 @@ type ReservationsPageProps = {
   currentPage: number
   currentSearch: string
   currentStatus: DashboardReservationStatusFilter
+  services: Service[]
+  initialDateKey: string
 }
 
 const ITEMS_PER_PAGE = 10
@@ -33,6 +36,8 @@ export function ReservationsPage({
   currentPage,
   currentSearch,
   currentStatus,
+  services,
+  initialDateKey,
 }: ReservationsPageProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -78,20 +83,7 @@ export function ReservationsPage({
       mobileNavItems={getDashboardMobileNavItems('bookings')}
     >
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 py-6 md:px-8 lg:px-10 lg:py-8">
-        <section className="flex flex-col gap-5 border-b border-outline-variant pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="label-caps text-secondary">Suivi admin</p>
-            <h1 className="mt-3 font-serif text-4xl leading-tight text-foreground md:text-5xl">
-              Réservations
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground/65 md:text-base">
-              Retrouvez toutes les demandes, les rendez-vous confirmés et les annulations du salon.
-            </p>
-          </div>
-          <Button href="/agenda" variant="outline" className="w-full md:w-auto">
-            Voir l’agenda
-          </Button>
-        </section>
+        <ReservationsPageHeader services={services} initialDateKey={initialDateKey} />
 
         <section className="space-y-4">
           <ReservationFilters

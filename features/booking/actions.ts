@@ -3,11 +3,20 @@
 
 import type { CreateBookingInput, BookingResult, BookingWithService } from '@/types/booking';
 import type { ActionResult } from '@/types/action';
+import { getCurrentAuthUser } from '@/features/auth/queries';
+import { isAdminUser } from '@/features/auth/utils';
+import { validateAdminBookingInput } from '@/features/booking/admin-booking';
 import { getActiveServices, getActiveServiceById, getBookingById } from '@/features/booking/queries';
 import { getScheduleRule, getBookingsForDate, getDaysOff } from '@/features/booking/queries';
 import { revalidatePath } from 'next/cache';
-import { createBooking, updateBookingStatus, cancelBookingByToken as cancelBookingByTokenMutation } from '@/features/booking/mutations';
 import {
+  createAdminBooking,
+  createBooking,
+  updateBookingStatus,
+  cancelBookingByToken as cancelBookingByTokenMutation,
+} from '@/features/booking/mutations';
+import {
+  sendAdminCreatedBookingConfirmation,
   sendBookingCancellation,
   sendBookingConfirmation,
   sendBookingRequestReceived,
@@ -217,6 +226,86 @@ export async function cancelBookingByAdmin(bookingId: string): Promise<ActionRes
 }
 
 /**
+ * Creates a confirmed booking from the protected admin dashboard.
+ * Admin bookings still re-check availability server-side before insertion.
+ */
+export async function createBookingByAdmin(data: CreateBookingInput): Promise<BookingResult> {
+  const user = await getCurrentAuthUser();
+  if (!isAdminUser(user)) {
+    return { success: false, error: 'Accès non autorisé.' };
+  }
+
+  const validation = validateAdminBookingInput(data);
+  if (!validation.success) {
+    return { success: false, error: validation.error };
+  }
+
+  const service = await getActiveServiceById(data.service_id);
+  if (!service) {
+    return { success: false, error: 'Prestation introuvable ou inactive.' };
+  }
+
+  const dayOfWeek = data.starts_at.getDay();
+  const [scheduleRule, existingBookings, daysOff] = await Promise.all([
+    getScheduleRule(dayOfWeek),
+    getBookingsForDate(data.starts_at),
+    getDaysOff(),
+  ]);
+  const availableSlots = getAvailableSlots(
+    data.starts_at,
+    scheduleRule,
+    existingBookings,
+    service.duration_minutes,
+    daysOff
+  );
+  const requestedTime = formatBookingTime(data.starts_at);
+
+  if (!availableSlots.includes(requestedTime)) {
+    return { success: false, error: 'Ce créneau n\'est plus disponible.' };
+  }
+
+  try {
+    const result = await createAdminBooking(data, service.duration_minutes);
+    const formattedDate = format(data.starts_at, 'EEEE d MMMM yyyy', { locale: fr });
+    const duration = formatDuration(service.duration_minutes);
+    const price = formatPrice(service.price_cents);
+
+    try {
+      await sendAdminCreatedBookingConfirmation({
+        clientName: data.client_name,
+        clientEmail: data.client_email,
+        clientPhone: data.client_phone,
+        serviceName: service.name,
+        date: formattedDate,
+        slot: requestedTime,
+        duration,
+        price,
+        cancelToken: result.cancel_token,
+      });
+    } catch (emailError) {
+      console.error('Failed to send admin-created booking confirmation email', emailError);
+    }
+
+    revalidatePath('/dashboard');
+    revalidatePath('/agenda');
+    revalidatePath('/reservations');
+
+    return {
+      success: true,
+      bookingId: result.id,
+      cancelToken: result.cancel_token,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erreur inconnue';
+    if (message === 'Ce créneau n\'est plus disponible.') {
+      return { success: false, error: message };
+    }
+
+    return { success: false, error: `Impossible de créer la réservation : ${message}` };
+  }
+}
+
+/**
  * Recovers available slots for a given date, structured into morning and afternoon.
  */
 export async function getSlotsForDate(
@@ -286,4 +375,8 @@ export async function cancelBookingByToken(
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
     return { success: false, error: message };
   }
+}
+
+function formatBookingTime(date: Date): string {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
