@@ -1,7 +1,6 @@
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { ServiceImage } from '@/components/ui/service-image'
+import { formatSalonDateShort } from '@/features/booking/salon-time'
 
 interface BookingConfirmationStickySummaryProps {
   date: Date
@@ -48,7 +47,7 @@ export function BookingConfirmationStickySummary({
             Rendez-vous
           </p>
           <p className="mt-1 truncate font-body-md text-[13px] font-semibold capitalize text-on-background">
-            {format(date, 'EEE d MMM', { locale: fr })} · {time}
+            {formatSalonDateShort(date)} · {time}
           </p>
         </div>
       </div>

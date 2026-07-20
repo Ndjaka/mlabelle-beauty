@@ -1,7 +1,6 @@
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { markClientReminderSent } from '@/features/booking/mutations';
 import { getConfirmedBookingsDueForClientReminder } from '@/features/booking/queries';
+import { formatSalonDateLong, formatSalonTime } from '@/features/booking/salon-time';
 import {
   formatDuration,
   formatPrice,
@@ -74,8 +73,8 @@ function buildBookingEmailData(booking: BookingWithService): BookingEmailData {
     clientEmail: booking.client_email,
     clientPhone: booking.client_phone,
     serviceName: booking.service.name,
-    date: format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }),
-    slot: `${String(startsAt.getHours()).padStart(2, '0')}:${String(startsAt.getMinutes()).padStart(2, '0')}`,
+    date: formatSalonDateLong(startsAt),
+    slot: formatSalonTime(startsAt),
     duration: formatDuration(booking.service.duration_minutes),
     price: formatPrice(booking.service.price_cents),
     cancelToken: booking.cancel_token,

@@ -2,8 +2,7 @@
 // DNA: Booking - Cancellation (Desktop + Mobile) — Stitch ID 5165bd983f9f440cab1f8d1c11f4c592 / c6e8cc4ca08d4673bb91a932ffc0ce3c
 
 import { Button } from '@/components/ui/button';
-import { format, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { formatSalonDateLong, formatSalonTime } from '@/features/booking/salon-time';
 import type { BookingWithService } from '@/types/booking';
 
 interface CancellationSuccessProps {
@@ -11,9 +10,9 @@ interface CancellationSuccessProps {
 }
 
 export function CancellationSuccess({ booking }: CancellationSuccessProps) {
-  const startsAt = parseISO(booking.starts_at);
-  const dateLabel = format(startsAt, 'EEEE d MMMM yyyy', { locale: fr });
-  const timeLabel = format(startsAt, 'HH:mm');
+  const startsAt = new Date(booking.starts_at);
+  const dateLabel = formatSalonDateLong(startsAt);
+  const timeLabel = formatSalonTime(startsAt);
   const duration = booking.service.duration_minutes;
 
   return (

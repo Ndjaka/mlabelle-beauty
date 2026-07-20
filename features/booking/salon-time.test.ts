@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   buildSalonDateTimeFromSlot,
   formatSalonDateKey,
+  formatSalonDateLong,
+  formatSalonDateShort,
   formatSalonTime,
   getSalonDayRange,
   parseSalonDateKey,
@@ -13,7 +15,17 @@ describe('salon time helpers', () => {
 
     expect(date?.toISOString()).toBe('2026-07-14T07:00:00.000Z')
     expect(date ? formatSalonDateKey(date) : null).toBe('2026-07-14')
+    expect(date ? formatSalonDateLong(date) : null).toBe('Mardi 14 juillet 2026')
+    expect(date ? formatSalonDateShort(date) : null).toBe('mar. 14 juil.')
     expect(date ? formatSalonTime(date) : null).toBe('09:00')
+  })
+
+  it('formats a stored UTC booking with the salon local time', () => {
+    const date = new Date('2026-07-21T13:45:00.000Z')
+
+    expect(formatSalonDateLong(date)).toBe('Mardi 21 juillet 2026')
+    expect(formatSalonDateShort(date)).toBe('mar. 21 juil.')
+    expect(formatSalonTime(date)).toBe('15:45')
   })
 
   it('builds a winter appointment in Europe/Paris time', () => {

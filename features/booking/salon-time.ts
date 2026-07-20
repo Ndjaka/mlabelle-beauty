@@ -53,6 +53,27 @@ export function formatSalonTime(date: Date): string {
   return `${values.hour}:${values.minute}`
 }
 
+export function formatSalonDateLong(date: Date): string {
+  return capitalizeFirst(
+    new Intl.DateTimeFormat('fr-FR', {
+      timeZone: SALON_TIME_ZONE,
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(date)
+  )
+}
+
+export function formatSalonDateShort(date: Date): string {
+  return new Intl.DateTimeFormat('fr-FR', {
+    timeZone: SALON_TIME_ZONE,
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  }).format(date)
+}
+
 export function getSalonDayOfWeek(date: Date): number {
   return getSalonDateParts(date).weekday
 }
@@ -171,4 +192,8 @@ function getTimeZoneOffsetMs(date: Date): number {
   )
 
   return zonedTimeAsUtc - date.getTime()
+}
+
+function capitalizeFirst(value: string): string {
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`
 }

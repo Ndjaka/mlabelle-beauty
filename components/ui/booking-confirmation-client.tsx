@@ -1,7 +1,6 @@
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import type { BookingWithService } from '@/types/booking'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
+import { formatSalonDateLong, formatSalonTime } from '@/features/booking/salon-time'
 import { formatDuration, formatPrice } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 import { BookingConfirmationCard } from '@/components/ui/booking/BookingConfirmationCard'
@@ -24,8 +23,8 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
       : 'Réservation annulée'
   const statusLabel = isPending ? 'En attente' : isConfirmed ? 'Confirmé' : 'Annulé'
   const reference = booking.id.slice(0, 8).toUpperCase()
-  const dateStr = capitalizeFirst(format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }))
-  const timeStr = format(startsAt, 'HH:mm')
+  const dateStr = formatSalonDateLong(startsAt)
+  const timeStr = formatSalonTime(startsAt)
   const durationStr = formatDuration(booking.service.duration_minutes)
   const priceStr = formatPrice(booking.service.price_cents)
   const description = isPending
@@ -97,8 +96,4 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
       />
     </div>
   )
-}
-
-function capitalizeFirst(value: string) {
-  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`
 }

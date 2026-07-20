@@ -23,7 +23,12 @@ import {
   sendHairdresserBookingRequestReceived,
 } from '@/features/notifications/email';
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit';
-import { formatSalonTime, getSalonDayOfWeek, parseSalonDateKey } from '@/features/booking/salon-time';
+import {
+  formatSalonDateLong,
+  formatSalonTime,
+  getSalonDayOfWeek,
+  parseSalonDateKey,
+} from '@/features/booking/salon-time';
 import {
   BOOKING_SLOT_UNAVAILABLE_ERROR,
   getAvailableSlots,
@@ -31,8 +36,6 @@ import {
   formatDuration,
   formatPrice,
 } from '@/features/booking/utils';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -92,7 +95,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
   // 4. Create booking
   try {
     const result = await createBooking(data, service.duration_minutes);
-    const formattedDate = format(data.starts_at, 'EEEE d MMMM yyyy', { locale: fr });
+    const formattedDate = formatSalonDateLong(data.starts_at);
     const duration = formatDuration(service.duration_minutes);
     const price = formatPrice(service.price_cents);
 
@@ -171,8 +174,8 @@ export async function confirmBookingByAdmin(bookingId: string): Promise<ActionRe
         clientName: booking.client_name,
         clientEmail: booking.client_email,
         serviceName: booking.service.name,
-        date: format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }),
-        slot: `${String(startsAt.getHours()).padStart(2, '0')}:${String(startsAt.getMinutes()).padStart(2, '0')}`,
+        date: formatSalonDateLong(startsAt),
+        slot: formatSalonTime(startsAt),
         duration: formatDuration(booking.service.duration_minutes),
         price: formatPrice(booking.service.price_cents),
         cancelToken: booking.cancel_token,
@@ -214,8 +217,8 @@ export async function cancelBookingByAdmin(bookingId: string): Promise<ActionRes
         clientName: booking.client_name,
         clientEmail: booking.client_email,
         serviceName: booking.service.name,
-        date: format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }),
-        slot: `${String(startsAt.getHours()).padStart(2, '0')}:${String(startsAt.getMinutes()).padStart(2, '0')}`,
+        date: formatSalonDateLong(startsAt),
+        slot: formatSalonTime(startsAt),
         duration: formatDuration(booking.service.duration_minutes),
         price: formatPrice(booking.service.price_cents),
         cancelToken: booking.cancel_token,
@@ -273,7 +276,7 @@ export async function createBookingByAdmin(data: CreateBookingInput): Promise<Bo
 
   try {
     const result = await createAdminBooking(data, service.duration_minutes);
-    const formattedDate = format(data.starts_at, 'EEEE d MMMM yyyy', { locale: fr });
+    const formattedDate = formatSalonDateLong(data.starts_at);
     const duration = formatDuration(service.duration_minutes);
     const price = formatPrice(service.price_cents);
 
@@ -367,8 +370,8 @@ export async function cancelBookingByToken(
         clientName: booking.client_name,
         clientEmail: booking.client_email,
         serviceName: booking.service.name,
-        date: format(startsAt, 'EEEE d MMMM yyyy', { locale: fr }),
-        slot: `${String(startsAt.getHours()).padStart(2, '0')}:${String(startsAt.getMinutes()).padStart(2, '0')}`,
+        date: formatSalonDateLong(startsAt),
+        slot: formatSalonTime(startsAt),
         duration: formatDuration(booking.service.duration_minutes),
         price: formatPrice(booking.service.price_cents),
         cancelToken: booking.cancel_token,
