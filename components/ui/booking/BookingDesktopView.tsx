@@ -8,6 +8,7 @@ import { SummaryCard } from '@/components/ui/booking/SummaryCard'
 import { TimeSlotGrid } from '@/components/ui/booking/TimeSlotGrid'
 import { BookingProgressPills } from '@/components/ui/booking/booking-progress-pills'
 import { SlotLoadingState } from '@/components/ui/booking/slot-loading-state'
+import { SlotAvailabilityNotice } from '@/components/ui/booking/slot-availability-notice'
 
 interface BookingDesktopViewProps {
   allSlotsCount: number
@@ -20,6 +21,7 @@ interface BookingDesktopViewProps {
   selectedDate: Date
   selectedSlot: string | null
   service: Service
+  slotNotice: string | null
   slots: { morning: string[]; afternoon: string[] }
   today: Date
 }
@@ -35,6 +37,7 @@ export function BookingDesktopView({
   selectedDate,
   selectedSlot,
   service,
+  slotNotice,
   slots,
   today,
 }: BookingDesktopViewProps) {
@@ -88,6 +91,7 @@ export function BookingDesktopView({
                     <SlotLoadingState variant="desktop" />
                   ) : (
                     <>
+                      <SlotAvailabilityNotice message={slotNotice} />
                       <TimeSlotGrid
                         title="Matin"
                         slots={slots.morning}

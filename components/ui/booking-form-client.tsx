@@ -4,7 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Service } from '@/types/service'
 import { bookAppointment } from '@/features/booking/actions'
-import { buildBookingConfirmationPath } from '@/features/booking/utils'
+import { buildSalonDateTimeFromSlot, formatSalonDateKey } from '@/features/booking/salon-time'
+import {
+  buildBookingConfirmationPath,
+  buildBookingUnavailableSlotPath,
+  isBookingSlotUnavailableError,
+} from '@/features/booking/utils'
 import { BookingFormHeader } from '@/components/ui/booking/BookingFormHeader'
 import { BookingFormSummary } from '@/components/ui/booking/BookingFormSummary'
 import { BookingFormStickySummary } from '@/components/ui/booking/BookingFormStickySummary'
@@ -38,9 +43,12 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
     setError(null)
 
     try {
-      const [hours, minutes] = slot.split(':').map(Number)
-      const startsAt = new Date(date)
-      startsAt.setHours(hours, minutes, 0, 0)
+      const dateKey = formatSalonDateKey(date)
+      const startsAt = buildSalonDateTimeFromSlot(dateKey, slot)
+      if (!startsAt) {
+        setError('Le créneau sélectionné est invalide.')
+        return
+      }
 
       const result = await bookAppointment({
         service_id: service.id,
@@ -57,6 +65,11 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
 
       if (result.success) {
         setError('La réservation a été créée, mais le lien de confirmation est incomplet.')
+        return
+      }
+
+      if (isBookingSlotUnavailableError(result.error)) {
+        router.replace(buildBookingUnavailableSlotPath(dateKey, service.id, slot))
         return
       }
 

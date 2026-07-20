@@ -3,6 +3,7 @@ import {
   buildAdminBookingStartsAt,
   validateAdminBookingInput,
 } from '@/features/booking/admin-booking'
+import { formatSalonDateKey, formatSalonTime } from '@/features/booking/salon-time'
 import type { CreateBookingInput } from '@/types/booking'
 
 const FUTURE_DATE = new Date('2026-07-20T09:00:00')
@@ -23,11 +24,8 @@ describe('admin booking helpers', () => {
   it('builds the selected appointment date from a date key and slot', () => {
     const startsAt = buildAdminBookingStartsAt('2026-07-20', '14:15')
 
-    expect(startsAt?.getFullYear()).toBe(2026)
-    expect(startsAt?.getMonth()).toBe(6)
-    expect(startsAt?.getDate()).toBe(20)
-    expect(startsAt?.getHours()).toBe(14)
-    expect(startsAt?.getMinutes()).toBe(15)
+    expect(startsAt ? formatSalonDateKey(startsAt) : null).toBe('2026-07-20')
+    expect(startsAt ? formatSalonTime(startsAt) : null).toBe('14:15')
   })
 
   it('rejects invalid date keys or slots', () => {

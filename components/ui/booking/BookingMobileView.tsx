@@ -6,6 +6,7 @@ import { MobileStickyRecap } from '@/components/ui/booking/MobileStickyRecap'
 import { TimeSlotGrid } from '@/components/ui/booking/TimeSlotGrid'
 import { BookingProgressPills } from '@/components/ui/booking/booking-progress-pills'
 import { SlotLoadingState } from '@/components/ui/booking/slot-loading-state'
+import { SlotAvailabilityNotice } from '@/components/ui/booking/slot-availability-notice'
 
 interface BookingMobileViewProps {
   allSlotsCount: number
@@ -18,6 +19,7 @@ interface BookingMobileViewProps {
   selectedDate: Date
   selectedSlot: string | null
   service: Service
+  slotNotice: string | null
   slots: { morning: string[]; afternoon: string[] }
   today: Date
 }
@@ -33,6 +35,7 @@ export function BookingMobileView({
   selectedDate,
   selectedSlot,
   service,
+  slotNotice,
   slots,
   today,
 }: BookingMobileViewProps) {
@@ -62,6 +65,7 @@ export function BookingMobileView({
           <SlotLoadingState variant="mobile" />
         ) : (
           <>
+            <SlotAvailabilityNotice message={slotNotice} />
             <TimeSlotGrid
               title="Matin"
               slots={slots.morning}

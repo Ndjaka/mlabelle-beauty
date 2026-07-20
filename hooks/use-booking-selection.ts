@@ -5,13 +5,14 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import {
   eachDayOfInterval,
   endOfMonth,
-  format,
   isBefore,
   isSameDay,
   startOfDay,
   startOfMonth,
 } from 'date-fns'
 import { getSlotsForDate } from '@/features/booking/actions'
+import { formatSalonDateKey } from '@/features/booking/salon-time'
+import { BOOKING_SLOT_UNAVAILABLE_MESSAGE } from '@/features/booking/utils'
 
 interface UseBookingSelectionOptions {
   availableSlots: string[]
@@ -26,7 +27,7 @@ function buildBookingUrl(date: Date, serviceId: string, slot?: string | null) {
   const params = new URLSearchParams({ service_id: serviceId })
   if (slot) params.set('slot', slot)
 
-  return `/booking/${format(date, 'yyyy-MM-dd')}?${params.toString()}`
+  return `/booking/${formatSalonDateKey(date)}?${params.toString()}`
 }
 
 function readDateFromBookingPath(pathname: string) {
@@ -58,12 +59,16 @@ export function useBookingSelection({
 
   const initialSelectedDate = readDateFromBookingPath(pathname) ?? initialDate
   const initialSlot = searchParams.get('slot')
+  const unavailableSlot = searchParams.get('unavailable_slot')
   const dateRequestIdRef = useRef(0)
   const [selectedDate, setSelectedDate] = useState(initialSelectedDate)
   const [selectedSlot, setSelectedSlot] = useState(
     initialSlot && availableSlots.includes(initialSlot) ? initialSlot : null
   )
   const [isLoadingSlots, setIsLoadingSlots] = useState(false)
+  const [slotNotice, setSlotNotice] = useState(
+    unavailableSlot ? BOOKING_SLOT_UNAVAILABLE_MESSAGE : null
+  )
   const [currentMonth, setCurrentMonth] = useState(
     readMonthParam(searchParams.get('month')) ?? startOfMonth(initialSelectedDate)
   )
@@ -79,13 +84,14 @@ export function useBookingSelection({
   function handleMonthChange(month: Date) {
     const nextMonth = startOfMonth(month)
     const params = new URLSearchParams({ service_id: serviceId })
-    params.set('month', format(nextMonth, 'yyyy-MM'))
+    params.set('month', formatSalonDateKey(nextMonth).slice(0, 7))
     if (selectedSlot) params.set('slot', selectedSlot)
     setCurrentMonth(nextMonth)
+    setSlotNotice(null)
     window.history.replaceState(
       null,
       '',
-      `/booking/${format(selectedDate, 'yyyy-MM-dd')}?${params.toString()}`
+      `/booking/${formatSalonDateKey(selectedDate)}?${params.toString()}`
     )
   }
 
@@ -98,13 +104,14 @@ export function useBookingSelection({
 
     setSelectedDate(date)
     setSelectedSlot(null)
+    setSlotNotice(null)
     setCurrentMonth(startOfMonth(date))
     setIsLoadingSlots(true)
     onSlotsChange(EMPTY_SLOTS)
     window.history.replaceState(null, '', buildBookingUrl(date, serviceId))
 
     try {
-      const nextSlots = await getSlotsForDate(format(date, 'yyyy-MM-dd'), serviceId)
+      const nextSlots = await getSlotsForDate(formatSalonDateKey(date), serviceId)
       if (dateRequestIdRef.current === requestId) {
         onSlotsChange(nextSlots)
         setIsLoadingSlots(false)
@@ -120,6 +127,7 @@ export function useBookingSelection({
 
   function handleSlotSelect(slot: string) {
     setSelectedSlot(slot)
+    setSlotNotice(null)
     window.history.replaceState(null, '', buildBookingUrl(selectedDate, serviceId, slot))
   }
 
@@ -132,6 +140,7 @@ export function useBookingSelection({
     monthDays,
     selectedDate,
     selectedSlot,
+    slotNotice,
     today,
   }
 }

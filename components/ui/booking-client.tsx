@@ -43,6 +43,7 @@ export function BookingClient({
         selectedDate={bookingSelection.selectedDate}
         selectedSlot={bookingSelection.selectedSlot}
         service={service}
+        slotNotice={bookingSelection.slotNotice}
         slots={slots}
         today={bookingSelection.today}
       />
@@ -58,6 +59,7 @@ export function BookingClient({
         selectedDate={bookingSelection.selectedDate}
         selectedSlot={bookingSelection.selectedSlot}
         service={service}
+        slotNotice={bookingSelection.slotNotice}
         slots={slots}
         today={bookingSelection.today}
       />

@@ -6,6 +6,7 @@ import {
   getDaysOff,
   getScheduleRule,
 } from '@/features/booking/queries';
+import { getSalonDayOfWeek, parseSalonDateKey } from '@/features/booking/salon-time';
 
 interface BookingSelectionData {
   service: Service;
@@ -66,7 +67,7 @@ async function getGroupedSlotsForService(
   date: Date,
   serviceDurationMinutes: number
 ): Promise<{ morning: string[]; afternoon: string[] }> {
-  const dayOfWeek = date.getDay();
+  const dayOfWeek = getSalonDayOfWeek(date);
   const [scheduleRule, bookings, daysOff] = await Promise.all([
     getScheduleRule(dayOfWeek),
     getBookingsForDate(date),
@@ -79,8 +80,7 @@ async function getGroupedSlotsForService(
 }
 
 function parseBookingDate(dateStr: string): Date | null {
-  const date = new Date(dateStr);
-  return isNaN(date.getTime()) ? null : date;
+  return parseSalonDateKey(dateStr);
 }
 
 function normalizeSelectedSlot(

@@ -13,6 +13,10 @@ import {
   BOOKING_STATUS_COUNTED_AS_REVENUE,
   BOOKING_STATUSES_BLOCKING_AVAILABILITY,
 } from '@/features/booking/status';
+import {
+  formatSalonDateKey,
+  getSalonDayRange,
+} from '@/features/booking/salon-time';
 import { getClientReminderSentColumn } from '@/features/booking/utils';
 
 /**
@@ -77,16 +81,13 @@ export async function getScheduleRule(dayOfWeek: number): Promise<ScheduleRule |
  */
 export async function getBookingsForDate(date: Date): Promise<TimeRange[]> {
   const supabase = createServiceRoleClient();
-
-  // Format date as ISO string for Supabase filtering
-  const dateStr = formatDateISO(date);
-  const nextDateStr = formatDateISO(new Date(date.getTime() + 24 * 60 * 60 * 1000));
+  const { start, end } = getSalonDayRange(date);
 
   const { data, error } = await supabase
     .from('bookings')
     .select('starts_at, ends_at')
-    .gte('starts_at', `${dateStr}T00:00:00`)
-    .lt('starts_at', `${nextDateStr}T00:00:00`)
+    .gte('starts_at', start.toISOString())
+    .lt('starts_at', end.toISOString())
     .in('status', BOOKING_STATUSES_BLOCKING_AVAILABILITY);
 
   if (error) throw new Error(error.message);
@@ -122,10 +123,7 @@ export async function getDaysOff(): Promise<DayOff[]> {
 // --- Internal helper ---
 
 function formatDateISO(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return formatSalonDateKey(date);
 }
 
 /**

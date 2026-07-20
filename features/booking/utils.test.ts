@@ -1,6 +1,7 @@
 // Tests for booking utility functions
 import { describe, it, expect } from 'vitest';
 import {
+  BOOKING_SLOT_UNAVAILABLE_ERROR,
   isDayOff,
   isOverlapping,
   parseTimeToDate,
@@ -14,11 +15,18 @@ import {
   groupSlotsByPeriod,
   buildBookingConfirmationPath,
   buildBookingFormPath,
+  buildBookingUnavailableSlotPath,
   getClientCancellationState,
   getClientReminderSentColumn,
   getClientReminderWindow,
+  isBookingSlotUnavailableError,
   CANCELLATION_PAST_APPOINTMENT_MESSAGE,
 } from './utils';
+import {
+  buildSalonDateTimeFromSlot,
+  formatSalonTime,
+  parseSalonDateKey,
+} from '@/features/booking/salon-time';
 import type { TimeRange } from '@/types/booking';
 import type { BookingWithService } from '@/types/booking';
 import type { DayOff, ScheduleRule } from '@/types/schedule';
@@ -42,10 +50,12 @@ describe('isDayOff', () => {
   });
 
   it("ignore l'heure (même date à des heures différentes = day off)", () => {
-    const morning = new Date('2025-08-15T06:00:00');
-    const evening = new Date('2025-08-15T23:59:59');
-    expect(isDayOff(morning, daysOff)).toBe(true);
-    expect(isDayOff(evening, daysOff)).toBe(true);
+    const morning = buildSalonDateTimeFromSlot('2025-08-15', '06:00');
+    const evening = buildSalonDateTimeFromSlot('2025-08-15', '23:45');
+    expect(morning).not.toBeNull();
+    expect(evening).not.toBeNull();
+    expect(isDayOff(morning as Date, daysOff)).toBe(true);
+    expect(isDayOff(evening as Date, daysOff)).toBe(true);
   });
 });
 
@@ -107,8 +117,7 @@ describe('parseTimeToDate', () => {
   it('combine une date et un horaire HH:MM en un objet Date', () => {
     const date = new Date('2025-08-01T00:00:00');
     const result = parseTimeToDate(date, '09:30');
-    expect(result.getHours()).toBe(9);
-    expect(result.getMinutes()).toBe(30);
+    expect(formatSalonTime(result)).toBe('09:30');
     expect(result.getSeconds()).toBe(0);
   });
 });
@@ -131,7 +140,7 @@ describe('generateTimeSlots', () => {
 // --- getAvailableSlots ---
 
 describe('getAvailableSlots', () => {
-  const date = new Date('2025-08-04T00:00:00'); // Monday
+  const date = parseSalonDateKey('2025-08-04') as Date; // Monday
   const scheduleRule: ScheduleRule = {
     id: '1',
     day_of_week: 1,
@@ -170,8 +179,8 @@ describe('getAvailableSlots', () => {
   it('exclut les creneaux qui chevauchent une reservation existante', () => {
     const existingBookings: TimeRange[] = [
       {
-        start: new Date('2025-08-04T09:00:00'),
-        end: new Date('2025-08-04T09:30:00'),
+        start: buildSalonDateTimeFromSlot('2025-08-04', '09:00') as Date,
+        end: buildSalonDateTimeFromSlot('2025-08-04', '09:30') as Date,
       },
     ];
     // Service de 15min: 09:00 et 09:15 overlappent la reservation 09:00-09:30
@@ -184,8 +193,8 @@ describe('getAvailableSlots', () => {
   it('autorise les creneaux back-to-back avec une reservation existante', () => {
     const existingBookings: TimeRange[] = [
       {
-        start: new Date('2025-08-04T09:00:00'),
-        end: new Date('2025-08-04T09:30:00'),
+        start: buildSalonDateTimeFromSlot('2025-08-04', '09:00') as Date,
+        end: buildSalonDateTimeFromSlot('2025-08-04', '09:30') as Date,
       },
     ];
     // Service de 30min, creneau 09:30 → finit a 10:00, pas d overlap avec 09:00-09:30
@@ -197,6 +206,22 @@ describe('getAvailableSlots', () => {
     // Service de 15min, pas de reservations, ouvert 09:00-10:00
     const slots = getAvailableSlots(date, scheduleRule, [], 15, []);
     expect(slots).toEqual(['09:00', '09:15', '09:30', '09:45']);
+  });
+
+  it('exclut toute la plage prise par une reservation plus longue', () => {
+    const existingBookings: TimeRange[] = [
+      {
+        start: buildSalonDateTimeFromSlot('2025-08-04', '09:00') as Date,
+        end: buildSalonDateTimeFromSlot('2025-08-04', '09:45') as Date,
+      },
+    ];
+
+    const slots = getAvailableSlots(date, scheduleRule, existingBookings, 15, []);
+
+    expect(slots).not.toContain('09:00');
+    expect(slots).not.toContain('09:15');
+    expect(slots).not.toContain('09:30');
+    expect(slots).toContain('09:45');
   });
 });
 
@@ -381,6 +406,21 @@ describe('buildBookingFormPath', () => {
     const result = buildBookingFormPath(date, 'service 123', '09:15');
 
     expect(result).toBe('/booking/2026-07-11/confirm?service_id=service+123&slot=09%3A15');
+  });
+});
+
+// --- unavailable booking slots ---
+
+describe('unavailable booking slot helpers', () => {
+  it('construit le lien de retour vers les créneaux avec le créneau indisponible', () => {
+    const result = buildBookingUnavailableSlotPath('2026-07-11', 'service-123', '09:00');
+
+    expect(result).toBe('/booking/2026-07-11?service_id=service-123&unavailable_slot=09%3A00');
+  });
+
+  it('identifie l erreur de créneau indisponible', () => {
+    expect(isBookingSlotUnavailableError(BOOKING_SLOT_UNAVAILABLE_ERROR)).toBe(true);
+    expect(isBookingSlotUnavailableError('Autre erreur')).toBe(false);
   });
 });
 

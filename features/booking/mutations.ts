@@ -7,7 +7,10 @@ import {
   ADMIN_CREATED_BOOKING_STATUS,
   CLIENT_CREATED_BOOKING_STATUS,
 } from '@/features/booking/status';
-import { getClientReminderSentColumn } from '@/features/booking/utils';
+import {
+  BOOKING_SLOT_UNAVAILABLE_ERROR,
+  getClientReminderSentColumn,
+} from '@/features/booking/utils';
 
 type BookingUpdate = Database['public']['Tables']['bookings']['Update'];
 
@@ -40,7 +43,7 @@ export async function createBooking(
 
   if (error) {
     if (error.code === '23P01') {
-      throw new Error('Ce créneau n\'est plus disponible.');
+      throw new Error(BOOKING_SLOT_UNAVAILABLE_ERROR);
     }
 
     throw new Error(error.message);
@@ -77,7 +80,7 @@ export async function createAdminBooking(
 
   if (error) {
     if (error.code === '23P01') {
-      throw new Error('Ce créneau n\'est plus disponible.');
+      throw new Error(BOOKING_SLOT_UNAVAILABLE_ERROR);
     }
 
     throw new Error(error.message);

@@ -5,12 +5,20 @@ import type { TimeRange } from '@/types/booking';
 import type { BookingWithService } from '@/types/booking';
 import type { ClientReminderKind } from '@/types/booking';
 import type { DayOff, ScheduleRule } from '@/types/schedule';
+import {
+  buildSalonDateTimeFromSlot,
+  formatSalonDateKey,
+} from '@/features/booking/salon-time';
 
 export const SLOT_INTERVAL_MINUTES = 15;
 export const MAX_ADVANCE_BOOKING_DAYS = 60;
 export const CLIENT_REMINDER_CRON_INTERVAL_MINUTES = 15;
 export const CANCELLATION_PAST_APPOINTMENT_MESSAGE =
   'Impossible d\'annuler un rendez-vous passé.';
+export const BOOKING_SLOT_UNAVAILABLE_MESSAGE =
+  'Ce créneau vient d’être réservé. Choisissez un autre horaire.';
+export const BOOKING_SLOT_UNAVAILABLE_ERROR =
+  'Ce créneau n\'est plus disponible.';
 
 const DAY_BEFORE_REMINDER_LEAD_MINUTES = 24 * 60;
 const TWO_HOURS_REMINDER_LEAD_MINUTES = 2 * 60;
@@ -29,7 +37,7 @@ export type ClientCancellationState =
  * Compares only the date part (ignores time).
  */
 export function isDayOff(date: Date, daysOff: DayOff[]): boolean {
-  const dateStr = formatDateToISO(date);
+  const dateStr = formatSalonDateKey(date);
   return daysOff.some((dayOff) => dayOff.date === dateStr);
 }
 
@@ -45,10 +53,7 @@ export function isOverlapping(a: TimeRange, b: TimeRange): boolean {
  * Combines a date and a "HH:MM" time string into a Date object.
  */
 export function parseTimeToDate(date: Date, time: string): Date {
-  const [hours, minutes] = time.split(':').map(Number);
-  const result = new Date(date);
-  result.setHours(hours, minutes, 0, 0);
-  return result;
+  return buildSalonDateTimeFromSlot(formatSalonDateKey(date), time) ?? new Date(Number.NaN);
 }
 
 /**
@@ -226,7 +231,24 @@ export function buildBookingFormPath(date: Date, serviceId: string, slot: string
     slot,
   });
 
-  return `/booking/${formatDateToISO(date)}/confirm?${params.toString()}`;
+  return `/booking/${formatSalonDateKey(date)}/confirm?${params.toString()}`;
+}
+
+export function buildBookingUnavailableSlotPath(
+  dateKey: string,
+  serviceId: string,
+  slot: string
+): string {
+  const params = new URLSearchParams({
+    service_id: serviceId,
+    unavailable_slot: slot,
+  });
+
+  return `/booking/${dateKey}?${params.toString()}`;
+}
+
+export function isBookingSlotUnavailableError(error: string | undefined): boolean {
+  return error === BOOKING_SLOT_UNAVAILABLE_ERROR;
 }
 
 export function getClientCancellationState(
@@ -282,11 +304,4 @@ function floorDateToInterval(date: Date, intervalMinutes: number): Date {
 
   result.setMinutes(flooredMinutes, 0, 0);
   return result;
-}
-
-function formatDateToISO(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
 }

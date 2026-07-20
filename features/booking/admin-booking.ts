@@ -1,40 +1,13 @@
 import type { CreateBookingInput } from '@/types/booking'
+import { buildSalonDateTimeFromSlot } from '@/features/booking/salon-time'
 
 type AdminBookingValidationResult =
   | { success: true }
   | { success: false; error: string }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const SLOT_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/
-const DATE_KEY_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/
-
 export function buildAdminBookingStartsAt(dateKey: string, slot: string): Date | null {
-  const dateMatch = DATE_KEY_REGEX.exec(dateKey)
-  const slotMatch = SLOT_REGEX.exec(slot)
-  if (!dateMatch || !slotMatch) return null
-
-  const year = Number(dateMatch[1])
-  const monthIndex = Number(dateMatch[2]) - 1
-  const day = Number(dateMatch[3])
-  const date = new Date(
-    year,
-    monthIndex,
-    day,
-    Number(slotMatch[1]),
-    Number(slotMatch[2]),
-    0,
-    0
-  )
-
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== monthIndex ||
-    date.getDate() !== day
-  ) {
-    return null
-  }
-
-  return date
+  return buildSalonDateTimeFromSlot(dateKey, slot)
 }
 
 export function validateAdminBookingInput(

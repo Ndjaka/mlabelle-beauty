@@ -23,7 +23,14 @@ import {
   sendHairdresserBookingRequestReceived,
 } from '@/features/notifications/email';
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit';
-import { getAvailableSlots, groupSlotsByPeriod, formatDuration, formatPrice } from '@/features/booking/utils';
+import { formatSalonTime, getSalonDayOfWeek, parseSalonDateKey } from '@/features/booking/salon-time';
+import {
+  BOOKING_SLOT_UNAVAILABLE_ERROR,
+  getAvailableSlots,
+  groupSlotsByPeriod,
+  formatDuration,
+  formatPrice,
+} from '@/features/booking/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -60,7 +67,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
   }
 
   // 3. Re-verify availability server-side (race condition protection)
-  const dayOfWeek = data.starts_at.getDay();
+  const dayOfWeek = getSalonDayOfWeek(data.starts_at);
   const [scheduleRule, existingBookings, daysOff] = await Promise.all([
     getScheduleRule(dayOfWeek),
     getBookingsForDate(data.starts_at),
@@ -76,10 +83,10 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
   );
 
   // Check that the requested slot is available
-  const requestedTime = `${String(data.starts_at.getHours()).padStart(2, '0')}:${String(data.starts_at.getMinutes()).padStart(2, '0')}`;
+  const requestedTime = formatSalonTime(data.starts_at);
 
   if (!availableSlots.includes(requestedTime)) {
-    return { success: false, error: 'Ce créneau n\'est plus disponible.' };
+    return { success: false, error: BOOKING_SLOT_UNAVAILABLE_ERROR };
   }
 
   // 4. Create booking
@@ -128,7 +135,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
-    if (message === 'Ce créneau n\'est plus disponible.') {
+    if (message === BOOKING_SLOT_UNAVAILABLE_ERROR) {
       return { success: false, error: message };
     }
 
@@ -245,7 +252,7 @@ export async function createBookingByAdmin(data: CreateBookingInput): Promise<Bo
     return { success: false, error: 'Prestation introuvable ou inactive.' };
   }
 
-  const dayOfWeek = data.starts_at.getDay();
+  const dayOfWeek = getSalonDayOfWeek(data.starts_at);
   const [scheduleRule, existingBookings, daysOff] = await Promise.all([
     getScheduleRule(dayOfWeek),
     getBookingsForDate(data.starts_at),
@@ -261,7 +268,7 @@ export async function createBookingByAdmin(data: CreateBookingInput): Promise<Bo
   const requestedTime = formatBookingTime(data.starts_at);
 
   if (!availableSlots.includes(requestedTime)) {
-    return { success: false, error: 'Ce créneau n\'est plus disponible.' };
+    return { success: false, error: BOOKING_SLOT_UNAVAILABLE_ERROR };
   }
 
   try {
@@ -297,7 +304,7 @@ export async function createBookingByAdmin(data: CreateBookingInput): Promise<Bo
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Erreur inconnue';
-    if (message === 'Ce créneau n\'est plus disponible.') {
+    if (message === BOOKING_SLOT_UNAVAILABLE_ERROR) {
       return { success: false, error: message };
     }
 
@@ -312,8 +319,8 @@ export async function getSlotsForDate(
   dateStr: string,
   serviceId: string
 ): Promise<{ morning: string[], afternoon: string[] }> {
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) {
+  const date = parseSalonDateKey(dateStr);
+  if (!date) {
     return { morning: [], afternoon: [] };
   }
 
@@ -322,7 +329,7 @@ export async function getSlotsForDate(
     return { morning: [], afternoon: [] };
   }
 
-  const dayOfWeek = date.getDay();
+  const dayOfWeek = getSalonDayOfWeek(date);
   const [scheduleRule, existingBookings, daysOff] = await Promise.all([
     getScheduleRule(dayOfWeek),
     getBookingsForDate(date),
@@ -378,5 +385,5 @@ export async function cancelBookingByToken(
 }
 
 function formatBookingTime(date: Date): string {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return formatSalonTime(date);
 }

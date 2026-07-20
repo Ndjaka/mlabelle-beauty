@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { BookingFormClient } from '@/components/ui/booking-form-client'
 import { getBookingFormData } from '@/features/booking/page-data'
+import { buildBookingUnavailableSlotPath } from '@/features/booking/utils'
 
 interface ConfirmPageProps {
   params: Promise<{
@@ -30,7 +31,7 @@ export default async function ConfirmPage({
   })
 
   if (!bookingData) {
-    notFound()
+    redirect(buildBookingUnavailableSlotPath(date, service_id, slot))
   }
 
   return (
