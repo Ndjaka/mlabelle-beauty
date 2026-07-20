@@ -18,7 +18,7 @@ export function DashboardShell({
 }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <DashboardMobileHeader dateLabel={dateLabel} />
+      <DashboardMobileHeader dateLabel={dateLabel} items={navItems} />
       <div className="flex">
         <DashboardSidebar items={navItems} />
         <main className="w-full pb-24 lg:pb-0">{children}</main>

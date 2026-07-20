@@ -38,7 +38,7 @@ export function SchedulePage({ rules, daysOff }: SchedulePageProps) {
 
         <div className="grid gap-10 xl:grid-cols-2">
           {/* Section Horaires */}
-          <section className="space-y-5">
+          <section id="opening-hours" className="scroll-mt-28 space-y-5">
             <h2 className="font-serif text-2xl text-foreground">Horaires d&apos;ouverture</h2>
             <div className="border border-outline-variant bg-surface-container-low p-5 md:p-6">
               <ScheduleWeek rules={rules} />
@@ -46,7 +46,7 @@ export function SchedulePage({ rules, daysOff }: SchedulePageProps) {
           </section>
 
           {/* Section Congés */}
-          <section className="space-y-5">
+          <section id="days-off" className="scroll-mt-28 space-y-5">
             <h2 className="font-serif text-2xl text-foreground">Fermetures exceptionnelles</h2>
             <div className="flex flex-col gap-5 border border-outline-variant bg-surface-container-low p-5 md:p-6">
               <AddDayOffForm />

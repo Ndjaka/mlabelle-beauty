@@ -1,11 +1,14 @@
 import Link from 'next/link'
+import { DashboardMobileMenu } from '@/components/ui/dashboard/dashboard-mobile-menu'
 import { Logo } from '@/components/ui/logo'
+import type { DashboardNavItem } from '@/types/dashboard'
 
 type DashboardMobileHeaderProps = {
   dateLabel: string
+  items: DashboardNavItem[]
 }
 
-export function DashboardMobileHeader({ dateLabel }: DashboardMobileHeaderProps) {
+export function DashboardMobileHeader({ dateLabel, items }: DashboardMobileHeaderProps) {
   return (
     <header className="sticky top-0 z-30 h-[86px] border-b border-outline-variant bg-background/95 px-5 backdrop-blur lg:hidden">
       <div className="flex h-full items-center justify-between gap-4">
@@ -15,15 +18,7 @@ export function DashboardMobileHeader({ dateLabel }: DashboardMobileHeaderProps)
           </Link>
           <p className="mt-1 text-xs text-foreground/55">{dateLabel}</p>
         </div>
-        <button
-          type="button"
-          className="flex size-11 items-center justify-center border border-outline-variant bg-surface-container-low text-foreground"
-          aria-label="Ouvrir le menu"
-        >
-          <span className="material-symbols-outlined text-[22px]" aria-hidden="true">
-            menu
-          </span>
-        </button>
+        <DashboardMobileMenu items={items} />
       </div>
     </header>
   )

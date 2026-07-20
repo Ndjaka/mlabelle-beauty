@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { DashboardAgendaPreview } from '@/components/ui/dashboard/dashboard-agenda-preview'
 import {
+  dashboardQuickActions,
   getDashboardMobileNavItems,
   getDashboardNavItems,
 } from '@/components/ui/dashboard/dashboard-navigation'
@@ -8,17 +9,7 @@ import { DashboardQuickActions } from '@/components/ui/dashboard/dashboard-quick
 import { DashboardRecentBookings } from '@/components/ui/dashboard/dashboard-recent-bookings'
 import { DashboardShell } from '@/components/ui/dashboard/dashboard-shell'
 import { DashboardStats } from '@/components/ui/dashboard/dashboard-stats'
-import type {
-  DashboardData,
-  DashboardQuickAction,
-} from '@/types/dashboard'
-
-const quickActions: DashboardQuickAction[] = [
-  { label: 'Prestations', description: 'Prix, durées et descriptions.', href: '#quick-actions', icon: 'content_cut' },
-  { label: 'Horaires', description: 'Créneaux ouverts à la réservation.', href: '#quick-actions', icon: 'schedule' },
-  { label: 'Jour off', description: 'Bloquer une journée indisponible.', href: '#quick-actions', icon: 'event_busy' },
-  { label: 'Portfolio', description: 'Photos visibles par les clientes.', href: '#quick-actions', icon: 'photo_library' },
-]
+import type { DashboardData } from '@/types/dashboard'
 
 type DashboardPreviewProps = {
   data: DashboardData
@@ -56,7 +47,7 @@ export function DashboardPreview({ data }: DashboardPreviewProps) {
         </div>
 
         <div id="quick-actions">
-          <DashboardQuickActions actions={quickActions} />
+          <DashboardQuickActions actions={dashboardQuickActions} />
         </div>
       </div>
     </DashboardShell>

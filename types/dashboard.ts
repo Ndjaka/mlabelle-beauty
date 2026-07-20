@@ -92,8 +92,9 @@ export type PaginatedDashboardReservations = {
 export type DashboardQuickAction = {
   label: string
   description: string
-  href: string
+  href?: string
   icon: string
+  badge?: string
 }
 
 export type DashboardBookingWithCreatedAt = BookingWithService & {

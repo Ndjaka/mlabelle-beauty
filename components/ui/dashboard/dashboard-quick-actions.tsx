@@ -14,19 +14,41 @@ export function DashboardQuickActions({ actions }: DashboardQuickActionsProps) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {actions.map((action) => (
-          <Link
-            key={action.label}
-            href={action.href}
-            className="group border border-outline-variant bg-background p-4 transition-colors hover:border-secondary"
-          >
-            <span className="material-symbols-outlined text-[24px] text-secondary" aria-hidden="true">
-              {action.icon}
-            </span>
-            <h3 className="mt-4 font-semibold text-foreground">{action.label}</h3>
-            <p className="mt-2 text-sm leading-6 text-foreground/60">{action.description}</p>
-          </Link>
-        ))}
+        {actions.map((action) => {
+          const content = (
+            <>
+              <div className="flex items-start justify-between gap-3">
+                <span className="material-symbols-outlined text-[24px] text-secondary" aria-hidden="true">
+                  {action.icon}
+                </span>
+                {action.badge ? (
+                  <span className="label-caps border border-outline-variant px-2 py-1 text-[10px] text-foreground/50">
+                    {action.badge}
+                  </span>
+                ) : null}
+              </div>
+              <h3 className="mt-4 font-semibold text-foreground">{action.label}</h3>
+              <p className="mt-2 text-sm leading-6 text-foreground/60">{action.description}</p>
+            </>
+          )
+
+          return action.href ? (
+            <Link
+              key={action.label}
+              href={action.href}
+              className="group border border-outline-variant bg-background p-4 transition-colors hover:border-secondary"
+            >
+              {content}
+            </Link>
+          ) : (
+            <article
+              key={action.label}
+              className="border border-outline-variant bg-background/60 p-4"
+            >
+              {content}
+            </article>
+          )
+        })}
       </div>
     </section>
   )
