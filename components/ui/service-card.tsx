@@ -1,6 +1,7 @@
 import { formatPrice, formatDuration } from "@/features/booking/utils";
 import type { Service } from "@/types/service";
 import { Button } from "@/components/ui/button";
+import { ServiceDescription } from "@/components/ui/service-description";
 import { ServiceImage } from "@/components/ui/service-image";
 
 interface ServiceCardProps {
@@ -12,8 +13,8 @@ export function ServiceCard({ service, today }: ServiceCardProps) {
   const description = service.description?.trim();
 
   return (
-    <article className="group flex h-[164px] overflow-hidden border border-secondary/10 bg-white shadow-[0_14px_34px_rgba(30,27,21,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/25 hover:shadow-[0_20px_42px_rgba(30,27,21,0.09)] sm:h-[176px] xl:h-[190px]">
-      <div className="h-full w-[36%] min-w-[118px] max-w-[152px] sm:min-w-[142px] xl:w-[42%] xl:min-w-[176px] xl:max-w-[205px]">
+    <article className="group flex min-h-[180px] overflow-hidden border border-secondary/10 bg-white shadow-[0_14px_34px_rgba(30,27,21,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/25 hover:shadow-[0_20px_42px_rgba(30,27,21,0.09)] sm:min-h-[196px] xl:min-h-[210px]">
+      <div className="w-[36%] min-w-[118px] max-w-[152px] self-stretch sm:min-w-[142px] xl:w-[42%] xl:min-w-[176px] xl:max-w-[205px]">
         <ServiceImage
           imageUrl={service.image_url}
           label={service.name}
@@ -27,11 +28,7 @@ export function ServiceCard({ service, today }: ServiceCardProps) {
             {service.name}
           </h3>
 
-          {description && (
-            <p className="mt-1.5 line-clamp-2 font-sans text-[12px] leading-5 text-foreground/65 sm:text-[13px] xl:text-[14px] xl:leading-6">
-              {description}
-            </p>
-          )}
+          {description && <ServiceDescription description={description} />}
         </div>
 
         <div className="mt-auto border-t border-secondary/15 pt-2.5 sm:pt-3">
