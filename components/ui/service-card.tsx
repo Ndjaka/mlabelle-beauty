@@ -24,7 +24,7 @@ export function ServiceCard({ service, today }: ServiceCardProps) {
       </div>
       <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5 xl:p-6">
         <div className="min-w-0">
-          <h3 className="line-clamp-1 font-serif text-[20px] leading-tight text-foreground sm:text-[22px] xl:text-[24px]">
+          <h3 className="break-words font-serif text-[20px] leading-tight text-foreground sm:text-[22px] xl:text-[24px]">
             {service.name}
           </h3>
 
