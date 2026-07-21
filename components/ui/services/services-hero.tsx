@@ -1,23 +1,10 @@
-import Image from 'next/image'
 import { CatalogScrollButton } from '@/components/ui/services/catalog-scroll-button'
 
 export function ServicesHero() {
   return (
     <header className="overflow-hidden border border-secondary/15 bg-white shadow-[0_24px_70px_rgba(30,27,21,0.06)]">
-      <div className="grid min-h-[500px] lg:min-h-[480px] lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="relative min-h-[260px] overflow-hidden lg:min-h-full">
-          <Image
-            src="/images/sarah.png"
-            alt="Coiffeuse Mlabelle Beauty"
-            fill
-            priority
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/35 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-background/20" />
-        </div>
-
-        <div className="flex flex-col justify-center bg-background px-6 py-10 sm:px-10 md:px-14 lg:py-12 xl:px-16">
+      <div className="flex min-h-[400px] items-center bg-background px-6 py-12 sm:min-h-[420px] sm:px-10 md:px-14 lg:px-16 lg:py-16">
+        <div className="flex w-full max-w-[760px] flex-col">
           <p className="font-label-caps text-[10px] uppercase tracking-[0.24em] text-secondary">
             Réservation en ligne
           </p>
