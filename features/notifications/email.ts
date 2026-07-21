@@ -10,7 +10,7 @@ import {
 } from '@/features/notifications/utils';
 import type { ClientReminderKind } from '@/types/booking';
 
-const EMAIL_FROM = 'Mlabelle Beauty <onboarding@resend.dev>';
+const EMAIL_FROM = 'Mlabelle Beauty <contact@mlabelle-beauty.fr>';
 const CONFIRMATION_SUBJECT = 'Votre réservation est confirmée — Mlabelle Beauty';
 const REQUEST_RECEIVED_SUBJECT = 'Votre demande de réservation est reçue — Mlabelle Beauty';
 const DAY_BEFORE_REMINDER_SUBJECT = 'Rappel — Votre rendez-vous demain chez Mlabelle Beauty';
