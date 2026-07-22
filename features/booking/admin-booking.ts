@@ -1,5 +1,6 @@
 import type { CreateBookingInput } from '@/types/booking'
 import { buildSalonDateTimeFromSlot } from '@/features/booking/salon-time'
+import { hasRequiredBookingPhone } from '@/features/booking/utils'
 
 type AdminBookingValidationResult =
   | { success: true }
@@ -20,6 +21,10 @@ export function validateAdminBookingInput(
 
   if (!EMAIL_REGEX.test(data.client_email)) {
     return { success: false, error: 'Adresse email invalide.' }
+  }
+
+  if (!hasRequiredBookingPhone(data.client_phone)) {
+    return { success: false, error: 'Le numéro de téléphone est requis.' }
   }
 
   if (!data.service_id) {

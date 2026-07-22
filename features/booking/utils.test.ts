@@ -20,6 +20,7 @@ import {
   getClientReminderSentColumn,
   getClientReminderWindow,
   isBookingSlotUnavailableError,
+  hasRequiredBookingPhone,
   CANCELLATION_PAST_APPOINTMENT_MESSAGE,
 } from './utils';
 import {
@@ -108,6 +109,18 @@ describe('isOverlapping', () => {
       end: new Date('2025-08-01T12:00:00'),
     };
     expect(isOverlapping(a, b)).toBe(false);
+  });
+});
+
+describe('hasRequiredBookingPhone', () => {
+  it('accepte un numéro renseigné', () => {
+    expect(hasRequiredBookingPhone('07 12 34 56 78')).toBe(true);
+  });
+
+  it('refuse un numéro vide ou composé uniquement d’espaces', () => {
+    expect(hasRequiredBookingPhone('')).toBe(false);
+    expect(hasRequiredBookingPhone('   ')).toBe(false);
+    expect(hasRequiredBookingPhone(undefined)).toBe(false);
   });
 });
 

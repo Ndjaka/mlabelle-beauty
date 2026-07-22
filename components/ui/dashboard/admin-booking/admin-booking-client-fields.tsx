@@ -29,8 +29,8 @@ export function AdminBookingClientFields({
           <input id="admin-client-email" required type="email" value={clientEmail} onChange={(event) => onClientEmailChange(event.target.value)} className={inputClassName} />
         </AdminBookingFormField>
       </div>
-      <AdminBookingFormField label="Téléphone" htmlFor="admin-client-phone">
-        <input id="admin-client-phone" type="tel" value={clientPhone} onChange={(event) => onClientPhoneChange(event.target.value)} className={inputClassName} />
+      <AdminBookingFormField label="Téléphone *" htmlFor="admin-client-phone">
+        <input id="admin-client-phone" required type="tel" autoComplete="tel" value={clientPhone} onChange={(event) => onClientPhoneChange(event.target.value)} className={inputClassName} />
       </AdminBookingFormField>
     </>
   )

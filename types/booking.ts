@@ -9,7 +9,7 @@ export interface CreateBookingInput {
   service_id: string;
   client_name: string;
   client_email: string;
-  client_phone?: string;
+  client_phone: string;
   starts_at: Date;
 }
 

@@ -44,6 +44,10 @@ describe('admin booking helpers', () => {
       success: false,
       error: 'Adresse email invalide.',
     })
+    expect(validateAdminBookingInput(buildInput({ client_phone: '   ' }), NOW)).toEqual({
+      success: false,
+      error: 'Le numéro de téléphone est requis.',
+    })
     expect(validateAdminBookingInput(buildInput({ starts_at: NOW }), NOW)).toEqual({
       success: false,
       error: 'Le créneau doit être dans le futur.',

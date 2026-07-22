@@ -54,7 +54,7 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
         service_id: service.id,
         client_name: `${formData.firstName} ${formData.lastName}`.trim(),
         client_email: formData.email,
-        client_phone: formData.phone || undefined,
+        client_phone: formData.phone.trim(),
         starts_at: startsAt,
       })
 
@@ -85,6 +85,7 @@ export function BookingFormClient({ service, date, slot }: BookingFormClientProp
     && formData.lastName.trim() !== ''
     && formData.email.trim() !== ''
     && formData.email.includes('@')
+    && formData.phone.trim() !== ''
 
   return (
     <div className="flex flex-grow flex-col bg-background selection:bg-secondary-container selection:text-on-secondary-container">

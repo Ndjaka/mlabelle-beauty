@@ -83,7 +83,7 @@ export function AdminBookingModal({ services, initialDateKey, onClose }: AdminBo
         service_id: serviceId,
         client_name: clientName,
         client_email: clientEmail,
-        client_phone: clientPhone.trim() || undefined,
+        client_phone: clientPhone.trim(),
         starts_at: startsAt,
       })
 

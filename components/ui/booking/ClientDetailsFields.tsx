@@ -54,12 +54,13 @@ export function ClientDetailsFields({
       />
       <FormInput
         autoComplete="tel"
-        hint="Utile uniquement si la coiffeuse doit vous joindre rapidement."
+        hint="Ce numéro permettra à la coiffeuse de vous joindre si nécessaire."
         id={`telephone-${idSuffix}`}
-        label="Téléphone (optionnel)"
+        label="Téléphone *"
         name="phone"
         onChange={onChange}
-        placeholder="Pour vous joindre si besoin"
+        placeholder="Votre numéro de téléphone"
+        required
         type="tel"
         value={formData.phone}
       />

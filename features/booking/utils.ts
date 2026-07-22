@@ -255,6 +255,10 @@ export function isBookingSlotUnavailableError(error: string | undefined): boolea
   return error === BOOKING_SLOT_UNAVAILABLE_ERROR;
 }
 
+export function hasRequiredBookingPhone(phone: string | null | undefined): boolean {
+  return typeof phone === 'string' && phone.trim().length > 0;
+}
+
 export function getClientCancellationState(
   booking: Pick<BookingWithService, 'status' | 'starts_at'>,
   now: Date = new Date()

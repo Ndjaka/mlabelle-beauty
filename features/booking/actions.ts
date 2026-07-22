@@ -35,6 +35,7 @@ import {
   groupSlotsByPeriod,
   formatDuration,
   formatPrice,
+  hasRequiredBookingPhone,
 } from '@/features/booking/utils';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,6 +52,10 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
 
   if (!EMAIL_REGEX.test(data.client_email)) {
     return { success: false, error: 'Adresse email invalide.' };
+  }
+
+  if (!hasRequiredBookingPhone(data.client_phone)) {
+    return { success: false, error: 'Le numéro de téléphone est requis.' };
   }
 
   if (!data.service_id) {
@@ -103,7 +108,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
       await sendBookingRequestReceived({
         clientName: data.client_name,
         clientEmail: data.client_email,
-        clientPhone: data.client_phone,
+        clientPhone: data.client_phone.trim(),
         serviceName: service.name,
         date: formattedDate,
         slot: requestedTime,
@@ -119,7 +124,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
       await sendHairdresserBookingRequestReceived({
         clientName: data.client_name,
         clientEmail: data.client_email,
-        clientPhone: data.client_phone,
+        clientPhone: data.client_phone.trim(),
         serviceName: service.name,
         date: formattedDate,
         slot: requestedTime,
@@ -284,7 +289,7 @@ export async function createBookingByAdmin(data: CreateBookingInput): Promise<Bo
       await sendAdminCreatedBookingConfirmation({
         clientName: data.client_name,
         clientEmail: data.client_email,
-        clientPhone: data.client_phone,
+        clientPhone: data.client_phone.trim(),
         serviceName: service.name,
         date: formattedDate,
         slot: requestedTime,
