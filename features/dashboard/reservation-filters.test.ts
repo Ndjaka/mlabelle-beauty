@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   buildDashboardReservationSearchFilter,
   getBookingStatusFromReservationFilter,
+  getNextDashboardReservationPage,
+  hasMoreDashboardReservations,
   isDashboardReservationStatusFilter,
   normalizeDashboardReservationSearch,
   parseDashboardReservationFilters,
@@ -54,5 +56,11 @@ describe('dashboard reservation filters', () => {
       'service_id.in.(service-id)'
     )
     expect(buildDashboardReservationSearchFilter(' , ', [])).toBe('')
+  })
+
+  it('computes mobile infinite scroll pagination state', () => {
+    expect(hasMoreDashboardReservations(10, 49)).toBe(true)
+    expect(hasMoreDashboardReservations(49, 49)).toBe(false)
+    expect(getNextDashboardReservationPage(2)).toBe(3)
   })
 })

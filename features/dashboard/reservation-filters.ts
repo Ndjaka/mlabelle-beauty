@@ -40,6 +40,14 @@ export function getBookingStatusFromReservationFilter(
   return status === 'all' ? null : bookingStatusByFilter[status]
 }
 
+export function hasMoreDashboardReservations(loadedCount: number, total: number): boolean {
+  return loadedCount < total
+}
+
+export function getNextDashboardReservationPage(currentPage: number): number {
+  return currentPage + 1
+}
+
 export function buildDashboardReservationSearchFilter(
   search: string,
   serviceIds: string[]

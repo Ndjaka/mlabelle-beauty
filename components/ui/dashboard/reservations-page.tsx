@@ -10,6 +10,7 @@ import {
 import { DashboardShell } from '@/components/ui/dashboard/dashboard-shell'
 import { ReservationFilters } from '@/components/ui/dashboard/reservations/reservation-filters'
 import { ReservationList } from '@/components/ui/dashboard/reservations/reservation-list'
+import { ReservationMobileInfiniteList } from '@/components/ui/dashboard/reservations/reservation-mobile-infinite-list'
 import { ReservationPagination } from '@/components/ui/dashboard/reservations/reservation-pagination'
 import { ReservationsPageHeader } from '@/components/ui/dashboard/reservations/reservations-page-header'
 import type { DashboardReservationStatusFilter } from '@/features/dashboard/reservation-filters'
@@ -102,18 +103,30 @@ export function ReservationsPage({
                 </h2>
               </div>
               <p className="text-sm text-foreground/55">
-                Page {currentPage} sur {totalPages}
+                <span className="hidden md:inline">Page {currentPage} sur {totalPages}</span>
+                <span className="md:hidden">{reservations.length} affichée{reservations.length > 1 ? 's' : ''}</span>
               </p>
             </div>
 
-            <ReservationList reservations={reservations} onOpen={setSelectedReservation} />
-            <ReservationPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
+            <div className="hidden md:block">
+              <ReservationList reservations={reservations} onOpen={setSelectedReservation} />
+              <ReservationPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                total={total}
+                pageSize={ITEMS_PER_PAGE}
+                isPending={isPending}
+                onPageChange={(page) => updateFilters({ page })}
+              />
+            </div>
+            <ReservationMobileInfiniteList
+              key={`${currentSearch}-${currentStatus}`}
+              initialReservations={reservations}
               total={total}
               pageSize={ITEMS_PER_PAGE}
-              isPending={isPending}
-              onPageChange={(page) => updateFilters({ page })}
+              search={currentSearch}
+              status={currentStatus}
+              onOpen={setSelectedReservation}
             />
           </div>
         </section>
