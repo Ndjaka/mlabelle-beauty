@@ -93,3 +93,11 @@ export function getServiceImageExtension(file: ServiceImageFileLike): string {
   if (file.type === 'image/webp') return 'webp'
   return 'jpg'
 }
+
+export function hasMoreServices(loadedCount: number, total: number): boolean {
+  return loadedCount < total
+}
+
+export function getNextServicesPage(currentPage: number): number {
+  return currentPage + 1
+}

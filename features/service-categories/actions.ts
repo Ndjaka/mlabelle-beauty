@@ -6,8 +6,10 @@ import {
   deleteServiceCategory,
   updateServiceCategory,
 } from '@/features/service-categories/mutations'
+import { getPaginatedServiceCategories } from '@/features/service-categories/queries'
 import { buildServiceCategoryInput } from '@/features/service-categories/utils'
 import type { ActionResult } from '@/types/action'
+import type { PaginatedServiceCategories } from '@/types/service-category'
 
 export async function createServiceCategoryAction(name: string): Promise<ActionResult> {
   const parsedInput = buildServiceCategoryInput(name)
@@ -20,6 +22,13 @@ export async function createServiceCategoryAction(name: string): Promise<ActionR
   } catch (error) {
     return { success: false, error: getCategoryActionError(error, 'créer') }
   }
+}
+
+export async function loadServiceCategoriesPage(input: {
+  page: number
+  pageSize: number
+}): Promise<PaginatedServiceCategories> {
+  return getPaginatedServiceCategories(input)
 }
 
 export async function updateServiceCategoryAction(

@@ -2,8 +2,9 @@
 'use server';
 
 import type { ActionResult } from '@/types/action';
-import type { CreateServiceInput, Service } from '@/types/service';
+import type { CreateServiceInput, PaginatedServices, Service } from '@/types/service';
 import { createService, updateService, toggleServiceActive } from '@/features/services/mutations';
+import { getAllServices } from '@/features/services/queries';
 
 type ServiceActionResult = ActionResult & {
   service?: Service
@@ -19,6 +20,22 @@ export async function createServiceAction(data: CreateServiceInput): Promise<Ser
   } catch (err) {
     return { success: false, error: getServiceActionError(err, 'créer') };
   }
+}
+
+export async function loadServicesPage(input: {
+  page: number
+  pageSize: number
+  search: string
+  status: 'all' | 'active' | 'inactive'
+  categoryId: string
+}): Promise<PaginatedServices> {
+  return getAllServices(
+    input.page,
+    input.pageSize,
+    input.search,
+    input.status,
+    input.categoryId
+  )
 }
 
 /**

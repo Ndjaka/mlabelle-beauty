@@ -10,21 +10,32 @@ import {
   getDashboardNavItems,
 } from '@/components/ui/dashboard/dashboard-navigation'
 import { ServiceCategoryList } from '@/components/ui/dashboard/service-categories/service-category-list'
+import { ServiceCategoryMobileInfiniteList } from '@/components/ui/dashboard/service-categories/service-category-mobile-infinite-list'
 import { ServiceCategoryModal } from '@/components/ui/dashboard/service-categories/service-category-modal'
+import { ServiceCategoryPagination } from '@/components/ui/dashboard/service-categories/service-category-pagination'
 import { deleteServiceCategoryAction } from '@/features/service-categories/actions'
 import { formatDashboardDateLabel } from '@/features/dashboard/utils'
 import type { ServiceCategory } from '@/types/service-category'
 
 type ServiceCategoriesPageProps = {
   categories: ServiceCategory[]
+  total: number
+  currentPage: number
 }
 
-export function ServiceCategoriesPage({ categories }: ServiceCategoriesPageProps) {
+const ITEMS_PER_PAGE = 10
+
+export function ServiceCategoriesPage({
+  categories,
+  total,
+  currentPage,
+}: ServiceCategoriesPageProps) {
   const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition()
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE))
 
   function openCreateModal() {
     setSelectedCategory(null)
@@ -80,8 +91,26 @@ export function ServiceCategoriesPage({ categories }: ServiceCategoriesPageProps
         </header>
 
         <section className="border border-outline-variant bg-surface-container-low p-4 md:p-6">
-          <ServiceCategoryList
-            categories={categories}
+          <div className="hidden md:block">
+            <ServiceCategoryList
+              categories={categories}
+              deletingId={deletingId}
+              onDelete={handleDelete}
+              onEdit={openEditModal}
+            />
+            <ServiceCategoryPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              total={total}
+              pageSize={ITEMS_PER_PAGE}
+              isPending={isPending}
+              onPageChange={(page) => router.push(page > 1 ? `/categories?page=${page}` : '/categories')}
+            />
+          </div>
+          <ServiceCategoryMobileInfiniteList
+            initialCategories={categories}
+            total={total}
+            pageSize={ITEMS_PER_PAGE}
             deletingId={deletingId}
             onDelete={handleDelete}
             onEdit={openEditModal}

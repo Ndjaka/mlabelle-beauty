@@ -22,3 +22,11 @@ export function buildServiceCategoryInput(nameValue: string): ServiceCategoryFor
 
   return { success: true, data: { name } }
 }
+
+export function hasMoreServiceCategories(loadedCount: number, total: number): boolean {
+  return loadedCount < total
+}
+
+export function getNextServiceCategoriesPage(currentPage: number): number {
+  return currentPage + 1
+}

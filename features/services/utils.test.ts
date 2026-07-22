@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   buildServiceInputFromFormValues,
   formatServiceDurationHint,
+  getNextServicesPage,
   getServiceImageExtension,
+  hasMoreServices,
   parseServiceDurationMinutes,
   parseServicePriceCents,
   validateServiceImageFile,
@@ -117,5 +119,11 @@ describe('service utils', () => {
     expect(getServiceImageExtension({ ...VALID_IMAGE_FILE, type: 'image/jpeg' })).toBe('jpg')
     expect(getServiceImageExtension({ ...VALID_IMAGE_FILE, type: 'image/png' })).toBe('png')
     expect(getServiceImageExtension(VALID_IMAGE_FILE)).toBe('webp')
+  })
+
+  it('computes mobile infinite scroll state for services', () => {
+    expect(hasMoreServices(10, 25)).toBe(true)
+    expect(hasMoreServices(25, 25)).toBe(false)
+    expect(getNextServicesPage(2)).toBe(3)
   })
 })

@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dashboard/dashboard-navigation'
 import { ServiceFilters } from '@/components/ui/dashboard/services/service-filters'
 import { ServiceList } from '@/components/ui/dashboard/services/service-list'
+import { ServiceMobileInfiniteList } from '@/components/ui/dashboard/services/service-mobile-infinite-list'
 import { ServiceModal } from '@/components/ui/dashboard/services/service-modal'
 import { ServicePagination } from '@/components/ui/dashboard/services/service-pagination'
 import { ServicesPageHeader } from '@/components/ui/dashboard/services/services-page-header'
@@ -113,18 +114,31 @@ export function ServicesPage({
             </p>
           )}
           <div className={`border border-outline-variant bg-surface-container-low p-5 transition-opacity md:p-6 ${isPending ? 'opacity-60' : 'opacity-100'}`}>
-            <ServiceList
-              services={services}
-              onEdit={openEditModal}
-              onStatusError={setPageError}
-            />
-            <ServicePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
+            <div className="hidden md:block">
+              <ServiceList
+                services={services}
+                onEdit={openEditModal}
+                onStatusError={setPageError}
+              />
+              <ServicePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                total={total}
+                pageSize={ITEMS_PER_PAGE}
+                isPending={isPending}
+                onPageChange={(page) => updateFilters({ page })}
+              />
+            </div>
+            <ServiceMobileInfiniteList
+              key={`${currentSearch}-${currentStatus}-${currentCategory}`}
+              initialServices={services}
               total={total}
               pageSize={ITEMS_PER_PAGE}
-              isPending={isPending}
-              onPageChange={(page) => updateFilters({ page })}
+              search={currentSearch}
+              status={currentStatus}
+              categoryId={currentCategory}
+              onEdit={openEditModal}
+              onStatusError={setPageError}
             />
           </div>
         </section>
