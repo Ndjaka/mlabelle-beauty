@@ -1,6 +1,6 @@
 'use client'
 
-export type ServiceFilter = 'all' | 'coupe' | 'brushing' | 'coloration' | 'coiffage'
+export type ServiceFilter = string
 export type ServiceSort = 'name' | 'price' | 'duration'
 
 type FilterOption = {

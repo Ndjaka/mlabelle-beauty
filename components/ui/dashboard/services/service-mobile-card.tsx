@@ -23,6 +23,7 @@ export function ServiceMobileCard({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="font-serif text-xl leading-tight text-foreground">{service.name}</h3>
+              <p className="mt-1 text-xs font-semibold text-secondary">{service.category.name}</p>
               <p className="mt-1 text-xs font-semibold uppercase text-foreground/50">
                 {formatDashboardDuration(service.duration_minutes)}
               </p>

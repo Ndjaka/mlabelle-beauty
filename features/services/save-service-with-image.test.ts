@@ -9,6 +9,7 @@ vi.mock('@/features/services/actions', () => ({
 }))
 
 const SERVICE_INPUT: CreateServiceInput = {
+  category_id: 'category-id',
   name: 'Brushing',
   description: 'Mise en forme',
   duration_minutes: 45,
@@ -16,6 +17,8 @@ const SERVICE_INPUT: CreateServiceInput = {
 }
 
 const SAVED_SERVICE: Service = {
+  category_id: 'category-id',
+  category: { id: 'category-id', name: 'Brushing' },
   id: 'service-id',
   name: 'Brushing',
   description: 'Mise en forme',

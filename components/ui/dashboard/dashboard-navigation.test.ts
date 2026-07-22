@@ -14,6 +14,7 @@ describe('dashboard navigation', () => {
       '/agenda',
       '/reservations',
       '/services',
+      '/categories',
       '/schedule',
     ])
   })

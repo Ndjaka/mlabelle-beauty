@@ -1,17 +1,24 @@
 import type { ChangeEvent } from 'react'
+import type { ServiceCategory } from '@/types/service-category'
 
 type ServiceFiltersProps = {
+  categories: ServiceCategory[]
+  categoryValue: string
   searchValue: string
   statusValue: 'all' | 'active' | 'inactive'
   onSearchChange: (value: string) => void
   onStatusChange: (value: 'all' | 'active' | 'inactive') => void
+  onCategoryChange: (value: string) => void
 }
 
 export function ServiceFilters({
+  categories,
+  categoryValue,
   searchValue,
   statusValue,
   onSearchChange,
   onStatusChange,
+  onCategoryChange,
 }: ServiceFiltersProps) {
   function handleStatusChange(event: ChangeEvent<HTMLSelectElement>) {
     const value = event.target.value
@@ -34,6 +41,17 @@ export function ServiceFilters({
           className="w-full border border-outline-variant bg-surface-container-low py-2 pl-10 pr-4 text-sm text-foreground focus:border-secondary focus:outline-none"
         />
       </div>
+      <select
+        value={categoryValue}
+        onChange={(event) => onCategoryChange(event.target.value)}
+        aria-label="Filtrer par catégorie"
+        className="border border-outline-variant bg-surface-container-low py-2 pl-3 pr-8 text-sm text-foreground focus:border-secondary focus:outline-none sm:w-48"
+      >
+        <option value="">Toutes les catégories</option>
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>{category.name}</option>
+        ))}
+      </select>
       <select
         value={statusValue}
         onChange={handleStatusChange}

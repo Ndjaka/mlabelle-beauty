@@ -2,7 +2,6 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
-import { Button } from '@/components/ui/button'
 import { DashboardShell } from '@/components/ui/dashboard/dashboard-shell'
 import {
   getDashboardMobileNavItems,
@@ -12,8 +11,10 @@ import { ServiceFilters } from '@/components/ui/dashboard/services/service-filte
 import { ServiceList } from '@/components/ui/dashboard/services/service-list'
 import { ServiceModal } from '@/components/ui/dashboard/services/service-modal'
 import { ServicePagination } from '@/components/ui/dashboard/services/service-pagination'
+import { ServicesPageHeader } from '@/components/ui/dashboard/services/services-page-header'
 import { formatDashboardDateLabel } from '@/features/dashboard/utils'
 import type { Service } from '@/types/service'
+import type { ServiceCategory } from '@/types/service-category'
 
 type ServicesPageProps = {
   services: Service[]
@@ -21,6 +22,8 @@ type ServicesPageProps = {
   currentPage: number
   currentSearch: string
   currentStatus: 'all' | 'active' | 'inactive'
+  currentCategory: string
+  categories: ServiceCategory[]
 }
 
 const ITEMS_PER_PAGE = 10
@@ -32,6 +35,8 @@ export function ServicesPage({
   currentPage,
   currentSearch,
   currentStatus,
+  currentCategory,
+  categories,
 }: ServicesPageProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -44,10 +49,11 @@ export function ServicesPage({
   const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE))
 
   const updateFilters = useCallback(
-    (updates: { page?: number; search?: string; status?: string }) => {
+    (updates: { page?: number; search?: string; status?: string; category?: string }) => {
       const params = new URLSearchParams(searchParams.toString())
       updateOptionalParam(params, 'search', updates.search)
       updateOptionalParam(params, 'status', updates.status === 'all' ? '' : updates.status)
+      updateOptionalParam(params, 'category', updates.category)
 
       if (updates.page !== undefined) {
         if (updates.page > 1) params.set('page', updates.page.toString())
@@ -89,30 +95,17 @@ export function ServicesPage({
       mobileNavItems={getDashboardMobileNavItems('services')}
     >
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 py-6 md:px-8 lg:px-10 lg:py-8">
-        <section className="flex flex-col gap-5 border-b border-outline-variant pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="label-caps text-secondary">Configuration</p>
-            <h1 className="mt-3 font-serif text-4xl leading-tight text-foreground md:text-5xl">
-              Prestations
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground/65 md:text-base">
-              Gérez les services proposés par le salon : tarifs, durées et statuts d&apos;activation.
-            </p>
-          </div>
-          <Button onClick={openCreateModal} className="flex w-full items-center justify-center gap-2 md:w-auto">
-            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
-              add
-            </span>
-            Nouveau service
-          </Button>
-        </section>
+        <ServicesPageHeader onCreate={openCreateModal} />
 
         <section className="space-y-4">
           <ServiceFilters
+            categories={categories}
+            categoryValue={currentCategory}
             searchValue={searchValue}
             statusValue={currentStatus}
             onSearchChange={setSearchValue}
             onStatusChange={(status) => updateFilters({ status, page: 1 })}
+            onCategoryChange={(category) => updateFilters({ category, page: 1 })}
           />
           {pageError && (
             <p className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -137,7 +130,11 @@ export function ServicesPage({
         </section>
       </div>
       {isModalOpen && (
-        <ServiceModal service={selectedService} onClose={() => setIsModalOpen(false)} />
+        <ServiceModal
+          categories={categories}
+          service={selectedService}
+          onClose={() => setIsModalOpen(false)}
+        />
       )}
     </DashboardShell>
   )

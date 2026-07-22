@@ -22,6 +22,7 @@ export function ServiceDesktopTable({
           <tr>
             <th className="px-4 py-3 font-semibold">Image</th>
             <th className="px-4 py-3 font-semibold">Prestation</th>
+            <th className="px-4 py-3 font-semibold">Catégorie</th>
             <th className="px-4 py-3 font-semibold">Durée</th>
             <th className="px-4 py-3 text-right font-semibold">Prix</th>
             <th className="px-4 py-3 text-center font-semibold">Statut</th>
@@ -33,6 +34,11 @@ export function ServiceDesktopTable({
             <tr key={service.id} className="transition-colors hover:bg-surface-container-low/50">
               <td className="w-[100px] px-4 py-4">
                 <ServiceImagePreview imageUrl={service.image_url} label={service.name} />
+              </td>
+              <td className="whitespace-nowrap px-4 py-4">
+                <span className="bg-primary px-3 py-1 text-xs font-semibold text-foreground/70">
+                  {service.category.name}
+                </span>
               </td>
               <td className="max-w-[300px] px-4 py-4">
                 <div className="font-semibold text-foreground">{service.name}</div>

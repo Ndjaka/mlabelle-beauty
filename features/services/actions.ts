@@ -17,8 +17,7 @@ export async function createServiceAction(data: CreateServiceInput): Promise<Ser
     const service = await createService(data);
     return { success: true, service };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erreur inconnue';
-    return { success: false, error: `Impossible de créer le service : ${message}` };
+    return { success: false, error: getServiceActionError(err, 'créer') };
   }
 }
 
@@ -33,9 +32,16 @@ export async function updateServiceAction(
     const service = await updateService(id, data);
     return { success: true, service };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erreur inconnue';
-    return { success: false, error: `Impossible de modifier le service : ${message}` };
+    return { success: false, error: getServiceActionError(err, 'modifier') };
   }
+}
+
+function getServiceActionError(error: unknown, operation: string): string {
+  if (error instanceof Error && error.message === 'SERVICE_CATEGORY_NOT_FOUND') {
+    return 'La catégorie sélectionnée n’existe plus. Actualisez la page et réessayez.';
+  }
+
+  return `Impossible de ${operation} la prestation.`;
 }
 
 /**

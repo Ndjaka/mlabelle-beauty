@@ -18,6 +18,7 @@ Single-provider hair salon booking application.
 - One hairdresser, no employees
 - Clients book appointments online
 - The hairdresser manages her schedule via a private dashboard
+- Services are organized into admin-managed categories displayed as public catalog filters
 
 ## Non-Negotiable Rules
 - **No `any` type** — ever. Use `unknown` and narrow if needed.

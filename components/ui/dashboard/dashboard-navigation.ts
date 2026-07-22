@@ -5,6 +5,7 @@ type DashboardNavKey =
   | 'agenda'
   | 'bookings'
   | 'services'
+  | 'categories'
   | 'schedule'
 
 const dashboardNavItems: Array<Omit<DashboardNavItem, 'active'> & { key: DashboardNavKey }> = [
@@ -12,6 +13,7 @@ const dashboardNavItems: Array<Omit<DashboardNavItem, 'active'> & { key: Dashboa
   { key: 'agenda', label: 'Agenda', href: '/agenda', icon: 'calendar_month' },
   { key: 'bookings', label: 'Réservations', href: '/reservations', icon: 'event_available' },
   { key: 'services', label: 'Prestations', href: '/services', icon: 'content_cut' },
+  { key: 'categories', label: 'Catégories', href: '/categories', icon: 'category' },
   { key: 'schedule', label: 'Horaires & jours off', href: '/schedule', icon: 'schedule' },
 ]
 

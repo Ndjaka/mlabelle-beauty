@@ -43,6 +43,11 @@ description: Use this skill when creating new files, new folders, new features, 
 │   │   ├── actions.ts
 │   │   ├── queries.ts
 │   │   └── mutations.ts
+│   ├── service-categories/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── mutations.ts
+│   │   └── utils.ts
 │   ├── schedule/
 │   │   ├── actions.ts
 │   │   ├── queries.ts

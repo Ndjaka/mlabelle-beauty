@@ -1,6 +1,8 @@
 import { createServerClient } from '@/lib/supabase/server'
 import type { PaginatedServices, Service } from '@/types/service'
 
+const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, is_active, category_id, category:service_categories(id, name)'
+
 /**
  * Fetches all services with server-side pagination and filtering.
  * Used by the dashboard to manage services.
@@ -9,7 +11,8 @@ export async function getAllServices(
   page = 1,
   pageSize = 10,
   search = '',
-  status: 'all' | 'active' | 'inactive' = 'all'
+  status: 'all' | 'active' | 'inactive' = 'all',
+  categoryId = ''
 ): Promise<PaginatedServices> {
   const supabase = await createServerClient()
 
@@ -18,7 +21,7 @@ export async function getAllServices(
 
   let query = supabase
     .from('services')
-    .select('id, name, description, image_url, duration_minutes, price_cents, is_active', {
+    .select(SERVICE_SELECT, {
       count: 'exact',
     })
 
@@ -30,6 +33,10 @@ export async function getAllServices(
     query = query.eq('is_active', true)
   } else if (status === 'inactive') {
     query = query.eq('is_active', false)
+  }
+
+  if (categoryId) {
+    query = query.eq('category_id', categoryId)
   }
 
   query = query.order('name').range(from, to)
@@ -49,7 +56,7 @@ export async function getActiveServices(): Promise<Service[]> {
 
   const { data, error } = await supabase
     .from('services')
-    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
+    .select(SERVICE_SELECT)
     .eq('is_active', true)
     .order('name')
 

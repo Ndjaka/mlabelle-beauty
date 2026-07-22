@@ -20,6 +20,14 @@ description: Use this skill when writing any code that interacts with Supabase o
 | `price_cents` | `int4` | Price in euro cents (avoid floats) |
 | `is_active` | `bool` | Soft delete |
 | `created_at` | `timestamptz` | Default `now()` |
+| `category_id` | `uuid` | Required FK → `service_categories.id` |
+
+### `service_categories`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` | Primary key |
+| `name` | `text` | Unique, case-insensitive category name |
+| `created_at` | `timestamptz` | Default `now()` |
 
 ### `schedule_rules`
 | Column | Type | Notes |
@@ -103,6 +111,7 @@ Never import the service role client into Client Components, public UI component
 
 - **`bookings`**: Public INSERT (clients can book). SELECT/UPDATE/DELETE restricted to authenticated user (hairdresser) or matching `cancel_token`.
 - **`services`**: Public SELECT. INSERT/UPDATE/DELETE restricted to authenticated user.
+- **`service_categories`**: Public SELECT. INSERT/UPDATE/DELETE restricted to an authenticated admin. Deletion is blocked while services reference the category.
 - **`schedule_rules`**: Public SELECT. INSERT/UPDATE/DELETE restricted to authenticated user.
 - **`days_off`**: Public SELECT. INSERT/UPDATE/DELETE restricted to authenticated user.
 

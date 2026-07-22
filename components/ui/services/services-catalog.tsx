@@ -21,33 +21,33 @@ interface ServicesCatalogProps {
 type FilterOption = {
   icon: string
   id: ServiceFilter
-  keywords: string[]
   label: string
 }
-
-const FILTER_OPTIONS: FilterOption[] = [
-  { id: 'all', label: 'Toutes les prestations', icon: 'grid_view', keywords: [] },
-  { id: 'coupe', label: 'Coupe', icon: 'content_cut', keywords: ['coupe'] },
-  { id: 'brushing', label: 'Brushing', icon: 'air', keywords: ['brushing'] },
-  { id: 'coloration', label: 'Coloration', icon: 'palette', keywords: ['coloration', 'couleur'] },
-  { id: 'coiffage', label: 'Coiffage', icon: 'auto_fix_high', keywords: ['coiffage', 'chignon'] },
-]
 
 export function ServicesCatalog({ services, today }: ServicesCatalogProps) {
   const [activeFilter, setActiveFilter] = useState<ServiceFilter>('all')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<ServiceSort>('name')
+  const filterOptions = useMemo<FilterOption[]>(() => {
+    const categories = new Map<string, string>()
+    for (const service of services) {
+      categories.set(service.category.id, service.category.name)
+    }
+
+    return [
+      { id: 'all', label: 'Toutes les prestations', icon: 'grid_view' },
+      ...Array.from(categories, ([id, label]) => ({ id, label, icon: 'category' }))
+        .toSorted((first, second) => first.label.localeCompare(second.label, 'fr')),
+    ]
+  }, [services])
 
   const filteredServices = useMemo(() => {
     const searchValue = normalizeValue(search)
-    const activeOption = FILTER_OPTIONS.find((option) => option.id === activeFilter)
-
     return services
       .filter((service) => {
         const searchable = normalizeValue(`${service.name} ${service.description ?? ''}`)
         const matchesSearch = searchValue === '' || searchable.includes(searchValue)
-        const matchesFilter = !activeOption || activeOption.id === 'all'
-          || activeOption.keywords.some((keyword) => searchable.includes(keyword))
+        const matchesFilter = activeFilter === 'all' || service.category_id === activeFilter
 
         return matchesSearch && matchesFilter
       })
@@ -90,7 +90,7 @@ export function ServicesCatalog({ services, today }: ServicesCatalogProps) {
 
         <ServicesCatalogControls
           activeFilter={activeFilter}
-          filterOptions={FILTER_OPTIONS}
+          filterOptions={filterOptions}
           resultCount={filteredServices.length}
           search={search}
           sort={sort}

@@ -1,6 +1,8 @@
 import { createServerClient } from '@/lib/supabase/server'
 import type { CreateServiceInput, Service } from '@/types/service'
 
+const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, is_active, category_id, category:service_categories(id, name)'
+
 /**
  * Creates a new service.
  */
@@ -11,15 +13,17 @@ export async function createService(data: CreateServiceInput): Promise<Service> 
     .from('services')
     .insert({
       name: data.name,
+      category_id: data.category_id,
       description: data.description ?? null,
       image_url: data.image_url ?? null,
       duration_minutes: data.duration_minutes,
       price_cents: data.price_cents,
       is_active: true,
     })
-    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
+    .select(SERVICE_SELECT)
     .single()
 
+  if (error?.code === '23503') throw new Error('SERVICE_CATEGORY_NOT_FOUND')
   if (error) throw new Error(error.message)
   if (!service) throw new Error('Service creation failed: no data returned')
   return service
@@ -38,9 +42,10 @@ export async function updateService(
     .from('services')
     .update(data)
     .eq('id', id)
-    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
+    .select(SERVICE_SELECT)
     .single()
 
+  if (error?.code === '23503') throw new Error('SERVICE_CATEGORY_NOT_FOUND')
   if (error) throw new Error(error.message)
   if (!service) throw new Error('Service update failed: no data returned')
   return service

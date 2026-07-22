@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { ServiceFormField } from '@/components/ui/dashboard/services/service-form-field'
 import { ServiceImageUploadField } from '@/components/ui/dashboard/services/service-image-upload-field'
+import { ServiceCategoryField } from '@/components/ui/dashboard/services/service-category-field'
 import { ServiceModalFooter } from '@/components/ui/dashboard/services/service-modal-footer'
 import { ServiceModalHeader } from '@/components/ui/dashboard/services/service-modal-header'
 import { saveServiceWithImage } from '@/features/services/save-service-with-image'
@@ -14,19 +15,22 @@ import {
 } from '@/features/services/utils'
 import { useServiceImageUpload } from '@/hooks/use-service-image-upload'
 import type { Service } from '@/types/service'
+import type { ServiceCategory } from '@/types/service-category'
 
 type ServiceModalProps = {
+  categories: ServiceCategory[]
   service: Service | null
   onClose: () => void
 }
 
 const inputClassName = 'w-full border border-outline-variant bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-secondary'
 
-export function ServiceModal({ service, onClose }: ServiceModalProps) {
+export function ServiceModal({ categories, service, onClose }: ServiceModalProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [name, setName] = useState(service?.name ?? '')
+  const [categoryId, setCategoryId] = useState(service?.category_id ?? categories[0]?.id ?? '')
   const [description, setDescription] = useState(service?.description ?? '')
   const [duration, setDuration] = useState(service?.duration_minutes?.toString() ?? '60')
   const [price, setPrice] = useState(service ? (service.price_cents / 100).toString() : '')
@@ -37,7 +41,7 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
     event.preventDefault()
     setErrorMsg(null)
 
-    const input = buildServiceInputFromFormValues({ name, description, duration, price })
+    const input = buildServiceInputFromFormValues({ categoryId, name, description, duration, price })
     if (!input.success) {
       setErrorMsg(input.error)
       return
@@ -49,23 +53,15 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
         service,
         uploadSelectedImage: serviceImage.uploadSelectedImage,
       })
-      handleActionResult(result)
+      if (!result.success) {
+        toast.error(result.error ?? 'Une erreur est survenue')
+        return
+      }
+
+      toast.success(isEditing ? 'Prestation modifiée avec succès' : 'Prestation créée avec succès')
+      router.refresh()
+      onClose()
     })
-  }
-
-  function handleActionResult(result: { success: boolean; error?: string }) {
-    if (!result.success) {
-      toast.error(result.error ?? 'Une erreur est survenue')
-      return
-    }
-
-    closeAfterSave()
-  }
-
-  function closeAfterSave() {
-    toast.success(isEditing ? 'Prestation modifiée avec succès' : 'Prestation créée avec succès')
-    router.refresh()
-    onClose()
   }
 
   return (
@@ -103,6 +99,11 @@ export function ServiceModal({ service, onClose }: ServiceModalProps) {
               className={inputClassName}
             />
           </ServiceFormField>
+          <ServiceCategoryField
+            categories={categories}
+            categoryId={categoryId}
+            onChange={setCategoryId}
+          />
           <ServiceFormField label="Description" htmlFor="description" hint="Optionnel">
             <textarea
               id="description"

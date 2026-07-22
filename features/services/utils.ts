@@ -5,6 +5,7 @@ export const SERVICE_IMAGE_MAX_SIZE_BYTES = 5 * 1024 * 1024
 export const SERVICE_IMAGE_ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
 
 type ServiceFormValues = {
+  categoryId: string
   name: string
   description: string
   duration: string
@@ -52,6 +53,10 @@ export function buildServiceInputFromFormValues(
   const name = values.name.trim()
   if (!name) return { success: false, error: 'Le nom est requis' }
 
+  if (!values.categoryId) {
+    return { success: false, error: 'La catégorie est requise' }
+  }
+
   const durationMinutes = parseServiceDurationMinutes(values.duration)
   if (!durationMinutes) {
     return { success: false, error: 'La durée minimum est de 5 minutes' }
@@ -66,6 +71,7 @@ export function buildServiceInputFromFormValues(
     success: true,
     data: {
       name,
+      category_id: values.categoryId,
       description: values.description.trim() || null,
       duration_minutes: durationMinutes,
       price_cents: priceCents,

@@ -19,6 +19,8 @@ import {
 } from '@/features/booking/salon-time';
 import { getClientReminderSentColumn } from '@/features/booking/utils';
 
+const ACTIVE_SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, is_active, category_id, category:service_categories(id, name)';
+
 /**
  * Fetches all active services, ordered by name.
  */
@@ -27,7 +29,7 @@ export async function getActiveServices(): Promise<Service[]> {
 
   const { data, error } = await supabase
     .from('services')
-    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
+    .select(ACTIVE_SERVICE_SELECT)
     .eq('is_active', true)
     .order('name');
 
@@ -43,7 +45,7 @@ export async function getActiveServiceById(id: string): Promise<Service | null> 
 
   const { data, error } = await supabase
     .from('services')
-    .select('id, name, description, image_url, duration_minutes, price_cents, is_active')
+    .select(ACTIVE_SERVICE_SELECT)
     .eq('id', id)
     .eq('is_active', true)
     .single();
