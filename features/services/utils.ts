@@ -1,4 +1,4 @@
-import type { CreateServiceInput } from '@/types/service'
+import type { CreateServiceInput, Service } from '@/types/service'
 
 export const SERVICE_IMAGE_BUCKET = 'service-images'
 export const SERVICE_IMAGE_MAX_SIZE_BYTES = 5 * 1024 * 1024
@@ -100,4 +100,16 @@ export function hasMoreServices(loadedCount: number, total: number): boolean {
 
 export function getNextServicesPage(currentPage: number): number {
   return currentPage + 1
+}
+
+export function isPublicCatalogService(
+  service: Pick<Service, 'category' | 'category_id'>
+): boolean {
+  return service.category_id.trim() !== '' && service.category.name !== UNCATEGORIZED_SERVICE_CATEGORY_NAME
+}
+
+export function getDefaultPublicCatalogCategoryId(
+  services: Array<Pick<Service, 'category' | 'category_id'>>
+): string {
+  return services.find(isPublicCatalogService)?.category_id ?? ''
 }

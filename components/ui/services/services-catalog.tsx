@@ -12,6 +12,10 @@ import { ServicesFinalCta } from '@/components/ui/services/services-final-cta'
 import { ServicesHero } from '@/components/ui/services/services-hero'
 import { ServicesProcess } from '@/components/ui/services/services-process'
 import { ServicesTrustBar } from '@/components/ui/services/services-trust-bar'
+import {
+  getDefaultPublicCatalogCategoryId,
+  isPublicCatalogService,
+} from '@/features/services/utils'
 
 interface ServicesCatalogProps {
   services: Service[]
@@ -25,29 +29,33 @@ type FilterOption = {
 }
 
 export function ServicesCatalog({ services, today }: ServicesCatalogProps) {
-  const [activeFilter, setActiveFilter] = useState<ServiceFilter>('all')
+  const defaultCategoryId = useMemo(
+    () => getDefaultPublicCatalogCategoryId(services),
+    [services]
+  )
+  const [activeFilter, setActiveFilter] = useState<ServiceFilter>(defaultCategoryId)
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<ServiceSort>('name')
   const filterOptions = useMemo<FilterOption[]>(() => {
     const categories = new Map<string, string>()
     for (const service of services) {
+      if (!isPublicCatalogService(service)) continue
       categories.set(service.category.id, service.category.name)
     }
 
-    return [
-      { id: 'all', label: 'Toutes les prestations', icon: 'grid_view' },
-      ...Array.from(categories, ([id, label]) => ({ id, label, icon: 'category' }))
-        .toSorted((first, second) => first.label.localeCompare(second.label, 'fr')),
-    ]
+    return Array.from(categories, ([id, label]) => ({ id, label, icon: 'category' }))
+      .toSorted((first, second) => first.label.localeCompare(second.label, 'fr'))
   }, [services])
 
   const filteredServices = useMemo(() => {
     const searchValue = normalizeValue(search)
     return services
       .filter((service) => {
+        if (!isPublicCatalogService(service)) return false
+
         const searchable = normalizeValue(`${service.name} ${service.description ?? ''}`)
         const matchesSearch = searchValue === '' || searchable.includes(searchValue)
-        const matchesFilter = activeFilter === 'all' || service.category_id === activeFilter
+        const matchesFilter = activeFilter !== '' && service.category_id === activeFilter
 
         return matchesSearch && matchesFilter
       })
@@ -112,7 +120,7 @@ export function ServicesCatalog({ services, today }: ServicesCatalogProps) {
             Aucune prestation ne correspond à cette recherche.
           </p>
           <p className="mt-2 font-sans text-[13px] leading-6 text-foreground/60">
-            Essayez un autre mot-clé ou revenez à toutes les prestations.
+            Essayez un autre mot-clé ou sélectionnez une autre catégorie.
           </p>
         </div>
       )}

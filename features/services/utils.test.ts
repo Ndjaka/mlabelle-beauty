@@ -2,13 +2,16 @@ import { describe, expect, it } from 'vitest'
 import {
   buildServiceInputFromFormValues,
   formatServiceDurationHint,
+  getDefaultPublicCatalogCategoryId,
   getNextServicesPage,
   getServiceImageExtension,
   hasMoreServices,
+  isPublicCatalogService,
   parseServiceDurationMinutes,
   parseServicePriceCents,
   validateServiceImageFile,
 } from '@/features/services/utils'
+import type { Service } from '@/types/service'
 
 const VALID_DURATION = '90'
 const VALID_PRICE = '45,50'
@@ -19,6 +22,31 @@ const VALID_IMAGE_FILE = {
   name: 'brushing.webp',
   size: 1_000_000,
   type: 'image/webp',
+}
+
+const PUBLIC_SERVICE: Service = {
+  id: 'service-id',
+  category_id: 'braids-category-id',
+  category: {
+    id: 'braids-category-id',
+    name: 'Braids',
+  },
+  name: 'Braids Small',
+  duration_minutes: 360,
+  price_cents: 12_500,
+  is_active: true,
+  description: null,
+  image_url: null,
+}
+
+const UNCATEGORIZED_SERVICE: Service = {
+  ...PUBLIC_SERVICE,
+  id: 'uncategorized-service-id',
+  category_id: 'uncategorized-category-id',
+  category: {
+    id: 'uncategorized-category-id',
+    name: 'Non classée',
+  },
 }
 
 describe('service utils', () => {
@@ -125,5 +153,13 @@ describe('service utils', () => {
     expect(hasMoreServices(10, 25)).toBe(true)
     expect(hasMoreServices(25, 25)).toBe(false)
     expect(getNextServicesPage(2)).toBe(3)
+  })
+
+  it('keeps uncategorized services out of the public catalog filters', () => {
+    expect(isPublicCatalogService(PUBLIC_SERVICE)).toBe(true)
+    expect(isPublicCatalogService(UNCATEGORIZED_SERVICE)).toBe(false)
+    expect(getDefaultPublicCatalogCategoryId([UNCATEGORIZED_SERVICE, PUBLIC_SERVICE])).toBe(
+      'braids-category-id'
+    )
   })
 })
