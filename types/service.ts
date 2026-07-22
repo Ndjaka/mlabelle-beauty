@@ -17,7 +17,7 @@ export interface Service {
 
 export interface CreateServiceInput {
   name: string
-  category_id: string
+  category_id?: string | null
   duration_minutes: number
   price_cents: number
   description?: string | null

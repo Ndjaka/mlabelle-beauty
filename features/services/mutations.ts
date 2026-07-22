@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { UNCATEGORIZED_SERVICE_CATEGORY_NAME } from '@/features/services/utils'
 import type { CreateServiceInput, Service } from '@/types/service'
 
 const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, is_active, category_id, category:service_categories(id, name)'
@@ -8,12 +9,13 @@ const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, pric
  */
 export async function createService(data: CreateServiceInput): Promise<Service> {
   const supabase = await createServerClient()
+  const categoryId = await resolveServiceCategoryId(data.category_id)
 
   const { data: service, error } = await supabase
     .from('services')
     .insert({
       name: data.name,
-      category_id: data.category_id,
+      category_id: categoryId,
       description: data.description ?? null,
       image_url: data.image_url ?? null,
       duration_minutes: data.duration_minutes,
@@ -37,10 +39,14 @@ export async function updateService(
   data: Partial<CreateServiceInput>
 ): Promise<Service> {
   const supabase = await createServerClient()
+  const { category_id: categoryId, ...serviceFields } = data
+  const updateData = categoryId === undefined
+    ? serviceFields
+    : { ...serviceFields, category_id: await resolveServiceCategoryId(categoryId) }
 
   const { data: service, error } = await supabase
     .from('services')
-    .update(data)
+    .update(updateData)
     .eq('id', id)
     .select(SERVICE_SELECT)
     .single()
@@ -66,4 +72,30 @@ export async function toggleServiceActive(
     .eq('id', id)
 
   if (error) throw new Error(error.message)
+}
+
+async function resolveServiceCategoryId(categoryId: string | null | undefined): Promise<string> {
+  if (categoryId) return categoryId
+
+  const supabase = await createServerClient()
+  const { data: existingCategory, error: selectError } = await supabase
+    .from('service_categories')
+    .select('id')
+    .eq('name', UNCATEGORIZED_SERVICE_CATEGORY_NAME)
+    .maybeSingle()
+
+  if (selectError) throw new Error(selectError.message)
+  if (existingCategory) return existingCategory.id
+
+  const { data: createdCategory, error: insertError } = await supabase
+    .from('service_categories')
+    .insert({ name: UNCATEGORIZED_SERVICE_CATEGORY_NAME })
+    .select('id')
+    .single()
+
+  if (insertError?.code === '23505') return resolveServiceCategoryId(null)
+  if (insertError) throw new Error(insertError.message)
+  if (!createdCategory) throw new Error('UNCATEGORIZED_CATEGORY_CREATION_FAILED')
+
+  return createdCategory.id
 }

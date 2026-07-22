@@ -59,6 +59,27 @@ describe('service utils', () => {
     })
   })
 
+  it('allows creating a service without an explicit category', () => {
+    expect(
+      buildServiceInputFromFormValues({
+        categoryId: '',
+        name: 'Vanilles',
+        description: '',
+        duration: VALID_DURATION,
+        price: VALID_PRICE,
+      })
+    ).toEqual({
+      success: true,
+      data: {
+        category_id: null,
+        name: 'Vanilles',
+        description: null,
+        duration_minutes: 90,
+        price_cents: 4550,
+      },
+    })
+  })
+
   it('rejects invalid service form values', () => {
     expect(
       buildServiceInputFromFormValues({
@@ -80,15 +101,6 @@ describe('service utils', () => {
       })
     ).toEqual({ success: false, error: 'La durée minimum est de 5 minutes' })
 
-    expect(
-      buildServiceInputFromFormValues({
-        categoryId: '',
-        name: 'Brushing',
-        description: '',
-        duration: VALID_DURATION,
-        price: VALID_PRICE,
-      })
-    ).toEqual({ success: false, error: 'La catégorie est requise' })
   })
 
   it('validates service image files', () => {

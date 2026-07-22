@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 import { confirmBookingByAdmin } from '@/features/booking/actions'
 
@@ -37,12 +38,15 @@ export function ConfirmBookingModal({
       const result = await confirmBookingByAdmin(bookingId)
 
       if (result.success) {
+        toast.success('Réservation confirmée')
         router.refresh()
         onConfirmed()
         return
       }
 
-      setError(result.error ?? 'Une erreur est survenue.')
+      const message = result.error ?? 'Une erreur est survenue.'
+      setError(message)
+      toast.error(message)
     })
   }
 

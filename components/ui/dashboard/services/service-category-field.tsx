@@ -15,14 +15,14 @@ export function ServiceCategoryField({
   onChange,
 }: ServiceCategoryFieldProps) {
   return (
-    <ServiceFormField label="Catégorie" htmlFor="category">
+    <ServiceFormField label="Catégorie" htmlFor="category" hint="Optionnel, vous pourrez la lier plus tard.">
       <select
         id="category"
         value={categoryId}
         onChange={(event) => onChange(event.target.value)}
         className={selectClassName}
       >
-        <option value="">Sélectionner une catégorie</option>
+        <option value="">Non classée</option>
         {categories.map((category) => (
           <option key={category.id} value={category.id}>{category.name}</option>
         ))}

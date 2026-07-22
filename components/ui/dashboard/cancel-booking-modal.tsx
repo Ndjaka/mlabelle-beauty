@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { cancelBookingByAdmin } from '@/features/booking/actions'
 
 interface CancelBookingModalProps {
@@ -35,11 +36,14 @@ export function CancelBookingModal({
     startTransition(async () => {
       const result = await cancelBookingByAdmin(bookingId)
       if (result.success) {
+        toast.success('Réservation annulée')
         router.refresh()
         onClose()
         onCancelled?.()
       } else {
-        setError(result.error ?? 'Une erreur est survenue.')
+        const message = result.error ?? 'Une erreur est survenue.'
+        setError(message)
+        toast.error(message)
       }
     })
   }
