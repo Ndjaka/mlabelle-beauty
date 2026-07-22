@@ -141,6 +141,7 @@ describe('generateTimeSlots', () => {
 
 describe('getAvailableSlots', () => {
   const date = parseSalonDateKey('2025-08-04') as Date; // Monday
+  const referenceNow = buildSalonDateTimeFromSlot('2025-08-03', '12:00') as Date;
   const scheduleRule: ScheduleRule = {
     id: '1',
     day_of_week: 1,
@@ -151,25 +152,25 @@ describe('getAvailableSlots', () => {
 
   it('retourne [] si jour off', () => {
     const daysOff: DayOff[] = [{ id: '1', date: '2025-08-04' }];
-    const slots = getAvailableSlots(date, scheduleRule, [], 30, daysOff);
+    const slots = getAvailableSlots(date, scheduleRule, [], 30, daysOff, referenceNow);
     expect(slots).toEqual([]);
   });
 
   it('retourne [] si scheduleRule est null', () => {
-    const slots = getAvailableSlots(date, null, [], 30, []);
+    const slots = getAvailableSlots(date, null, [], 30, [], referenceNow);
     expect(slots).toEqual([]);
   });
 
   it('retourne [] si scheduleRule inactive', () => {
     const inactiveRule = { ...scheduleRule, is_active: false };
-    const slots = getAvailableSlots(date, inactiveRule, [], 30, []);
+    const slots = getAvailableSlots(date, inactiveRule, [], 30, [], referenceNow);
     expect(slots).toEqual([]);
   });
 
   it('exclut les creneaux dont ends_at depasse close_time', () => {
     // Service de 30min, fermeture a 10:00
     // 09:00 → 09:30 OK, 09:15 → 09:45 OK, 09:30 → 10:00 OK (<=), 09:45 → 10:15 exclu
-    const slots = getAvailableSlots(date, scheduleRule, [], 30, []);
+    const slots = getAvailableSlots(date, scheduleRule, [], 30, [], referenceNow);
     expect(slots).toContain('09:00');
     expect(slots).toContain('09:15');
     expect(slots).toContain('09:30');
@@ -184,7 +185,7 @@ describe('getAvailableSlots', () => {
       },
     ];
     // Service de 15min: 09:00 et 09:15 overlappent la reservation 09:00-09:30
-    const slots = getAvailableSlots(date, scheduleRule, existingBookings, 15, []);
+    const slots = getAvailableSlots(date, scheduleRule, existingBookings, 15, [], referenceNow);
     expect(slots).not.toContain('09:00');
     expect(slots).not.toContain('09:15');
     expect(slots).toContain('09:30');
@@ -198,13 +199,13 @@ describe('getAvailableSlots', () => {
       },
     ];
     // Service de 30min, creneau 09:30 → finit a 10:00, pas d overlap avec 09:00-09:30
-    const slots = getAvailableSlots(date, scheduleRule, existingBookings, 30, []);
+    const slots = getAvailableSlots(date, scheduleRule, existingBookings, 30, [], referenceNow);
     expect(slots).toContain('09:30');
   });
 
   it('retourne les creneaux valides correctement', () => {
     // Service de 15min, pas de reservations, ouvert 09:00-10:00
-    const slots = getAvailableSlots(date, scheduleRule, [], 15, []);
+    const slots = getAvailableSlots(date, scheduleRule, [], 15, [], referenceNow);
     expect(slots).toEqual(['09:00', '09:15', '09:30', '09:45']);
   });
 
@@ -216,12 +217,33 @@ describe('getAvailableSlots', () => {
       },
     ];
 
-    const slots = getAvailableSlots(date, scheduleRule, existingBookings, 15, []);
+    const slots = getAvailableSlots(date, scheduleRule, existingBookings, 15, [], referenceNow);
 
     expect(slots).not.toContain('09:00');
     expect(slots).not.toContain('09:15');
     expect(slots).not.toContain('09:30');
     expect(slots).toContain('09:45');
+  });
+
+  it('exclut les creneaux deja passes pour la date du jour', () => {
+    const today = parseSalonDateKey('2025-08-04') as Date;
+    const now = buildSalonDateTimeFromSlot('2025-08-04', '09:30') as Date;
+
+    const slots = getAvailableSlots(today, scheduleRule, [], 15, [], now);
+
+    expect(slots).not.toContain('09:00');
+    expect(slots).not.toContain('09:15');
+    expect(slots).not.toContain('09:30');
+    expect(slots).toContain('09:45');
+  });
+
+  it('conserve les creneaux d une date future', () => {
+    const futureDate = parseSalonDateKey('2025-08-04') as Date;
+    const now = buildSalonDateTimeFromSlot('2025-08-03', '21:00') as Date;
+
+    const slots = getAvailableSlots(futureDate, scheduleRule, [], 15, [], now);
+
+    expect(slots).toEqual(['09:00', '09:15', '09:30', '09:45']);
   });
 });
 

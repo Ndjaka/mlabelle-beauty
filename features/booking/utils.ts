@@ -91,7 +91,8 @@ export function getAvailableSlots(
   scheduleRule: ScheduleRule | null,
   existingBookings: TimeRange[],
   serviceDurationMinutes: number,
-  daysOff: DayOff[]
+  daysOff: DayOff[],
+  now: Date = new Date()
 ): string[] {
   // 1. Check day off
   if (isDayOff(date, daysOff)) return [];
@@ -110,6 +111,9 @@ export function getAvailableSlots(
   return slots.filter((slot) => {
     const slotStart = parseTimeToDate(date, slot);
     const slotEnd = addMinutes(slotStart, serviceDurationMinutes);
+
+    // Clients should never be offered a slot whose start time has already passed.
+    if (slotStart <= now) return false;
 
     // Must end before or at closing time
     const closingTime = parseTimeToDate(date, scheduleRule.close_time);
