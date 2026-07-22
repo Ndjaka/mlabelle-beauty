@@ -1,7 +1,7 @@
 import type { BookingWithService } from '@/types/booking'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
 import { formatSalonDateLong, formatSalonTime } from '@/features/booking/salon-time'
-import { formatDuration, formatPrice } from '@/features/booking/utils'
+import { formatDuration, formatPriceRange } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 import { BookingConfirmationCard } from '@/components/ui/booking/BookingConfirmationCard'
 import { BookingConfirmationStickySummary } from '@/components/ui/booking/booking-confirmation-sticky-summary'
@@ -26,7 +26,7 @@ export function BookingConfirmationClient({ booking }: BookingConfirmationClient
   const dateStr = formatSalonDateLong(startsAt)
   const timeStr = formatSalonTime(startsAt)
   const durationStr = formatDuration(booking.service.duration_minutes)
-  const priceStr = formatPrice(booking.service.price_cents)
+  const priceStr = formatPriceRange(booking.service.price_cents, booking.service.price_max_cents)
   const description = isPending
     ? (
       <>

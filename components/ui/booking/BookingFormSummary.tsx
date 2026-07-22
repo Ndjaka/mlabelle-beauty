@@ -3,7 +3,7 @@ import { fr } from 'date-fns/locale'
 import type { ReactNode } from 'react'
 import type { Service } from '@/types/service'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
-import { formatDuration, formatPrice } from '@/features/booking/utils'
+import { formatDuration, formatPriceRange } from '@/features/booking/utils'
 import { ServiceImage } from '@/components/ui/service-image'
 
 interface BookingFormSummaryProps {
@@ -40,7 +40,7 @@ export function BookingFormSummary({
             </div>
           </div>
           <span className="shrink-0 font-body-lg text-[17px] font-semibold text-on-background">
-            {formatPrice(service.price_cents)}
+            {formatPriceRange(service.price_cents, service.price_max_cents)}
           </span>
         </div>
 
@@ -60,7 +60,7 @@ export function BookingFormSummary({
             Total estimé
           </span>
           <span className="font-serif text-[28px] leading-none text-on-background">
-            {formatPrice(service.price_cents)}
+            {formatPriceRange(service.price_cents, service.price_max_cents)}
           </span>
         </div>
         <p className="mt-3 font-body-md text-[13px] leading-5 text-on-surface-variant">

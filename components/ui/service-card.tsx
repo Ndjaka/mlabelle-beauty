@@ -1,4 +1,4 @@
-import { formatPrice, formatDuration } from "@/features/booking/utils";
+import { formatPriceRange, formatDuration } from "@/features/booking/utils";
 import type { Service } from "@/types/service";
 import { Button } from "@/components/ui/button";
 import { ServiceDescription } from "@/components/ui/service-description";
@@ -35,7 +35,7 @@ export function ServiceCard({ service, today }: ServiceCardProps) {
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between gap-3">
               <span className="whitespace-nowrap font-serif text-[17px] leading-none text-foreground sm:text-[19px] xl:text-[20px]">
-                {formatPrice(service.price_cents)}
+                {formatPriceRange(service.price_cents, service.price_max_cents)}
               </span>
               <span className="flex items-center gap-1.5 font-sans text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground/70 xl:text-[12px]">
                 <span className="material-symbols-outlined !text-[11px] xl:!text-[12px]" aria-hidden="true">

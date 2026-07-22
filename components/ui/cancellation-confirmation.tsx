@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ServiceImage } from '@/components/ui/service-image';
 import { formatSalonDateLong, formatSalonTime } from '@/features/booking/salon-time';
-import { formatPrice } from '@/features/booking/utils';
+import { formatPriceRange } from '@/features/booking/utils';
 import type { BookingWithService } from '@/types/booking';
 
 interface CancellationConfirmationProps {
@@ -18,7 +18,7 @@ export function CancellationConfirmation({
   const startsAt = new Date(booking.starts_at);
   const dateLabel = formatSalonDateLong(startsAt);
   const timeLabel = formatSalonTime(startsAt);
-  const priceLabel = formatPrice(booking.service.price_cents);
+  const priceLabel = formatPriceRange(booking.service.price_cents, booking.service.price_max_cents);
   const durationLabel = `${booking.service.duration_minutes}min`;
 
   return (

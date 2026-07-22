@@ -19,7 +19,7 @@ import {
 } from '@/features/booking/salon-time';
 import { getClientReminderSentColumn } from '@/features/booking/utils';
 
-const ACTIVE_SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, is_active, category_id, category:service_categories(id, name)';
+const ACTIVE_SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, price_max_cents, is_active, category_id, category:service_categories(id, name)';
 
 /**
  * Fetches all active services, ordered by name.
@@ -140,7 +140,7 @@ export async function getBookingsByDateRange(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents, price_max_cents)')
     .gte('starts_at', startDate.toISOString())
     .lte('starts_at', endDate.toISOString())
     .neq('status', 'cancelled')
@@ -174,7 +174,7 @@ export async function getBookingStats(): Promise<BookingStats> {
   // Monthly confirmed bookings
   const { data: confirmedBookings, error: confirmedError } = await supabase
     .from('bookings')
-    .select('id, service:services(price_cents)')
+    .select('id, service:services(price_cents, price_max_cents)')
     .eq('status', BOOKING_STATUS_COUNTED_AS_REVENUE)
     .gte('starts_at', monthStart.toISOString())
     .lte('starts_at', monthEnd.toISOString());
@@ -253,7 +253,7 @@ export async function getBookingById(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents, price_max_cents)')
     .eq('id', id)
     .single();
 
@@ -283,7 +283,7 @@ export async function getBookingByIdAndCancelToken(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents, price_max_cents)')
     .eq('id', id)
     .eq('cancel_token', cancelToken)
     .single();
@@ -313,7 +313,7 @@ export async function getBookingByCancelToken(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents, price_max_cents)')
     .eq('cancel_token', cancelToken)
     .single();
 
@@ -345,7 +345,7 @@ export async function getConfirmedBookingsDueForClientReminder(
 
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents)')
+    .select('id, client_name, client_email, client_phone, starts_at, ends_at, status, cancel_token, service:services(name, image_url, duration_minutes, price_cents, price_max_cents)')
     .eq('status', 'confirmed')
     .gte('starts_at', startDate.toISOString())
     .lt('starts_at', endDate.toISOString())

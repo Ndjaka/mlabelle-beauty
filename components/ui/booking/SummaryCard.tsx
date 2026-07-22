@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
-import { buildBookingFormPath, formatPrice, formatDuration } from '@/features/booking/utils'
+import { buildBookingFormPath, formatPriceRange, formatDuration } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 import { ServiceImage } from '@/components/ui/service-image'
 
@@ -44,7 +44,7 @@ export function SummaryCard({
             </span>
           </div>
           <span className="font-body-lg text-[18px] font-semibold text-on-surface">
-            {formatPrice(service.price_cents)}
+            {formatPriceRange(service.price_cents, service.price_max_cents)}
           </span>
         </div>
         <Button
@@ -84,7 +84,7 @@ export function SummaryCard({
 
       <div className="mb-10 flex items-center justify-between border-t border-secondary/15 pt-6">
         <span className="font-serif text-[26px] text-on-surface">Total</span>
-        <span className="font-serif text-[28px] text-on-surface">{formatPrice(service.price_cents)}</span>
+        <span className="font-serif text-[28px] text-on-surface">{formatPriceRange(service.price_cents, service.price_max_cents)}</span>
       </div>
 
       {confirmHref ? (

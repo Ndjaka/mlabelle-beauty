@@ -109,7 +109,10 @@ export function mapBookingsToAgendaItems(
     client: booking.client_name,
     duration: formatDashboardDuration(booking.service.duration_minutes),
     status: mapDashboardStatus(booking.status),
-    price: formatDashboardPrice(booking.service.price_cents),
+    price: formatDashboardPriceRange(
+      booking.service.price_cents,
+      booking.service.price_max_cents
+    ),
     email: booking.client_email,
     phone: booking.client_phone ?? null,
     date: formatDashboardDateLabel(new Date(booking.starts_at)),
@@ -357,7 +360,10 @@ export function mapBookingsToRecentBookings(
     date: formatRelativeBookingDate(new Date(booking.starts_at), referenceDate),
     time: formatDashboardTime(new Date(booking.starts_at)),
     duration: formatDashboardDuration(booking.service.duration_minutes),
-    price: formatDashboardPrice(booking.service.price_cents),
+    price: formatDashboardPriceRange(
+      booking.service.price_cents,
+      booking.service.price_max_cents
+    ),
     status: mapDashboardStatus(booking.status),
     email: booking.client_email,
     phone: booking.client_phone ?? null,
@@ -425,6 +431,17 @@ function formatDashboardMonthLabel(date: Date): string {
 
 export function formatDashboardPrice(priceCents: number): string {
   return CURRENCY_FORMATTER.format(priceCents / 100).replace(/[\u00A0\u202F]/g, ' ')
+}
+
+export function formatDashboardPriceRange(
+  priceCents: number,
+  priceMaxCents?: number | null
+): string {
+  if (priceMaxCents === null || priceMaxCents === undefined || priceMaxCents <= priceCents) {
+    return formatDashboardPrice(priceCents)
+  }
+
+  return `de ${formatDashboardPrice(priceCents)} à ${formatDashboardPrice(priceMaxCents)}`
 }
 
 function formatDashboardTime(date: Date): string {

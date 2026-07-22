@@ -141,6 +141,7 @@ export type Database = {
           is_active: boolean
           name: string
           price_cents: number
+          price_max_cents: number | null
         }
         Insert: {
           category_id: string
@@ -152,6 +153,7 @@ export type Database = {
           is_active?: boolean
           name: string
           price_cents: number
+          price_max_cents?: number | null
         }
         Update: {
           category_id?: string
@@ -163,6 +165,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           price_cents?: number
+          price_max_cents?: number | null
         }
         Relationships: [
           {

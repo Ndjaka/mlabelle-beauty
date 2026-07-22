@@ -38,6 +38,7 @@ export interface BookingWithService {
     name: string;
     duration_minutes: number;
     price_cents: number;
+    price_max_cents?: number | null;
   };
 }
 

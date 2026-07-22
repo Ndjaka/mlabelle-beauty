@@ -11,6 +11,7 @@ type ServiceFormValues = {
   description: string
   duration: string
   price: string
+  priceMax: string
 }
 
 type ServiceFormResult =
@@ -31,6 +32,8 @@ export function parseServiceDurationMinutes(value: string): number | null {
 }
 
 export function parseServicePriceCents(value: string): number | null {
+  if (value.trim() === '') return null
+
   const parsedPrice = Number.parseFloat(value.replace(',', '.'))
   if (Number.isNaN(parsedPrice) || parsedPrice < 0) return null
 
@@ -61,7 +64,16 @@ export function buildServiceInputFromFormValues(
 
   const priceCents = parseServicePriceCents(values.price)
   if (priceCents === null) {
-    return { success: false, error: 'Le prix doit être un nombre valide (ex: 45 ou 45.50)' }
+    return { success: false, error: 'Le prix minimum doit être un nombre valide (ex: 45 ou 45.50)' }
+  }
+
+  const priceMaxCents = parseServicePriceCents(values.priceMax)
+  if (values.priceMax.trim() !== '' && priceMaxCents === null) {
+    return { success: false, error: 'Le prix maximum doit être un nombre valide (ex: 80 ou 80.50)' }
+  }
+
+  if (priceMaxCents !== null && priceMaxCents < priceCents) {
+    return { success: false, error: 'Le prix maximum ne peut pas être inférieur au prix minimum' }
   }
 
   return {
@@ -72,6 +84,7 @@ export function buildServiceInputFromFormValues(
       description: values.description.trim() || null,
       duration_minutes: durationMinutes,
       price_cents: priceCents,
+      price_max_cents: priceMaxCents !== null && priceMaxCents > priceCents ? priceMaxCents : null,
     },
   }
 }

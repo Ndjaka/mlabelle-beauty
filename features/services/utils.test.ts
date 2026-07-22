@@ -59,6 +59,7 @@ describe('service utils', () => {
   it('parses euro prices into cents', () => {
     expect(parseServicePriceCents(VALID_PRICE)).toBe(4550)
     expect(parseServicePriceCents('45.50')).toBe(4550)
+    expect(parseServicePriceCents('')).toBeNull()
     expect(parseServicePriceCents(NEGATIVE_PRICE)).toBeNull()
   })
 
@@ -76,6 +77,7 @@ describe('service utils', () => {
         description: ' Mise en forme ',
         duration: VALID_DURATION,
         price: VALID_PRICE,
+        priceMax: '',
       })
     ).toEqual({
       success: true,
@@ -85,6 +87,30 @@ describe('service utils', () => {
         description: 'Mise en forme',
         duration_minutes: 90,
         price_cents: 4550,
+        price_max_cents: null,
+      },
+    })
+  })
+
+  it('builds a service input with a price range', () => {
+    expect(
+      buildServiceInputFromFormValues({
+        categoryId: 'category-id',
+        name: ' Braids Medium ',
+        description: '',
+        duration: '240',
+        price: '60',
+        priceMax: '80',
+      })
+    ).toEqual({
+      success: true,
+      data: {
+        category_id: 'category-id',
+        name: 'Braids Medium',
+        description: null,
+        duration_minutes: 240,
+        price_cents: 6000,
+        price_max_cents: 8000,
       },
     })
   })
@@ -97,6 +123,7 @@ describe('service utils', () => {
         description: '',
         duration: VALID_DURATION,
         price: VALID_PRICE,
+        priceMax: '',
       })
     ).toEqual({
       success: true,
@@ -106,6 +133,7 @@ describe('service utils', () => {
         description: null,
         duration_minutes: 90,
         price_cents: 4550,
+        price_max_cents: null,
       },
     })
   })
@@ -118,6 +146,7 @@ describe('service utils', () => {
         description: '',
         duration: VALID_DURATION,
         price: VALID_PRICE,
+        priceMax: '',
       })
     ).toEqual({ success: false, error: 'Le nom est requis' })
 
@@ -128,8 +157,23 @@ describe('service utils', () => {
         description: '',
         duration: INVALID_DURATION,
         price: VALID_PRICE,
+        priceMax: '',
       })
     ).toEqual({ success: false, error: 'La durée minimum est de 5 minutes' })
+
+    expect(
+      buildServiceInputFromFormValues({
+        categoryId: 'category-id',
+        name: 'Brushing',
+        description: '',
+        duration: VALID_DURATION,
+        price: '80',
+        priceMax: '60',
+      })
+    ).toEqual({
+      success: false,
+      error: 'Le prix maximum ne peut pas être inférieur au prix minimum',
+    })
 
   })
 

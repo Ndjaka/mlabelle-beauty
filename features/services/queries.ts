@@ -1,7 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import type { PaginatedServices, Service } from '@/types/service'
 
-const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, is_active, category_id, category:service_categories(id, name)'
+const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, price_max_cents, is_active, category_id, category:service_categories(id, name)'
 
 /**
  * Fetches all services with server-side pagination and filtering.

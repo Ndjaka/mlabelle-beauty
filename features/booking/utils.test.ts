@@ -8,6 +8,7 @@ import {
   generateTimeSlots,
   getAvailableSlots,
   formatPrice,
+  formatPriceRange,
   formatDuration,
   groupBookingsByDay,
   getWeekDays,
@@ -273,6 +274,12 @@ describe('formatPrice', () => {
 
   it('0 -> "0,00 €"', () => {
     expect(formatPrice(0)).toBe('0,00 €');
+  });
+
+  it('formats price ranges only when a higher maximum price exists', () => {
+    expect(formatPriceRange(6000, 8000)).toBe('de 60,00 € à 80,00 €');
+    expect(formatPriceRange(6000, null)).toBe('60,00 €');
+    expect(formatPriceRange(6000, 6000)).toBe('60,00 €');
   });
 });
 

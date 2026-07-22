@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ServiceImagePreview } from '@/components/ui/dashboard/services/service-image-preview'
 import { ServiceStatusToggle } from '@/components/ui/dashboard/services/service-status-toggle'
-import { formatDashboardDuration, formatDashboardPrice } from '@/features/dashboard/utils'
+import { formatDashboardDuration, formatDashboardPriceRange } from '@/features/dashboard/utils'
 import type { Service } from '@/types/service'
 
 type ServiceDesktopTableProps = {
@@ -52,7 +52,7 @@ export function ServiceDesktopTable({
                 {formatDashboardDuration(service.duration_minutes)}
               </td>
               <td className="whitespace-nowrap px-4 py-4 text-right font-semibold">
-                {formatDashboardPrice(service.price_cents)}
+                {formatDashboardPriceRange(service.price_cents, service.price_max_cents)}
               </td>
               <td className="px-4 py-4 text-center">
                 <ServiceStatusToggle

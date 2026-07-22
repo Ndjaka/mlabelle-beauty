@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
 import { BOOKING_DEPOSIT_LABEL } from '@/features/booking/deposit'
-import { formatPrice } from '@/features/booking/utils'
+import { formatPriceRange } from '@/features/booking/utils'
 import { BookingSubmitButton } from '@/components/ui/booking/BookingSubmitButton'
 import { ServiceImage } from '@/components/ui/service-image'
 
@@ -40,7 +40,7 @@ export function BookingFormStickySummary({
               Récapitulatif
             </p>
             <span className="shrink-0 font-body-lg text-[16px] font-semibold text-on-background">
-              {formatPrice(service.price_cents)}
+              {formatPriceRange(service.price_cents, service.price_max_cents)}
             </span>
           </div>
           <h3 className="mt-1 truncate font-serif text-[21px] leading-none text-on-background">

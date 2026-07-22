@@ -2,7 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { UNCATEGORIZED_SERVICE_CATEGORY_NAME } from '@/features/services/utils'
 import type { CreateServiceInput, Service } from '@/types/service'
 
-const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, is_active, category_id, category:service_categories(id, name)'
+const SERVICE_SELECT = 'id, name, description, image_url, duration_minutes, price_cents, price_max_cents, is_active, category_id, category:service_categories(id, name)'
 
 /**
  * Creates a new service.
@@ -20,6 +20,7 @@ export async function createService(data: CreateServiceInput): Promise<Service> 
       image_url: data.image_url ?? null,
       duration_minutes: data.duration_minutes,
       price_cents: data.price_cents,
+      price_max_cents: data.price_max_cents ?? null,
       is_active: true,
     })
     .select(SERVICE_SELECT)

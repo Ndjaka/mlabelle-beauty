@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ServiceImagePreview } from '@/components/ui/dashboard/services/service-image-preview'
 import { ServiceStatusToggle } from '@/components/ui/dashboard/services/service-status-toggle'
-import { formatDashboardDuration, formatDashboardPrice } from '@/features/dashboard/utils'
+import { formatDashboardDuration, formatDashboardPriceRange } from '@/features/dashboard/utils'
 import type { Service } from '@/types/service'
 
 type ServiceMobileCardProps = {
@@ -29,7 +29,7 @@ export function ServiceMobileCard({
               </p>
             </div>
             <p className="shrink-0 text-sm font-semibold text-foreground">
-              {formatDashboardPrice(service.price_cents)}
+              {formatDashboardPriceRange(service.price_cents, service.price_max_cents)}
             </p>
           </div>
           {service.description && (

@@ -4,15 +4,14 @@ import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { ServiceFormField } from '@/components/ui/dashboard/services/service-form-field'
+import { ServiceDurationField } from '@/components/ui/dashboard/services/service-duration-field'
 import { ServiceImageUploadField } from '@/components/ui/dashboard/services/service-image-upload-field'
 import { ServiceCategoryField } from '@/components/ui/dashboard/services/service-category-field'
 import { ServiceModalFooter } from '@/components/ui/dashboard/services/service-modal-footer'
 import { ServiceModalHeader } from '@/components/ui/dashboard/services/service-modal-header'
+import { ServicePriceFields } from '@/components/ui/dashboard/services/service-price-fields'
 import { saveServiceWithImage } from '@/features/services/save-service-with-image'
-import {
-  buildServiceInputFromFormValues,
-  formatServiceDurationHint,
-} from '@/features/services/utils'
+import { buildServiceInputFromFormValues } from '@/features/services/utils'
 import { useServiceImageUpload } from '@/hooks/use-service-image-upload'
 import type { Service } from '@/types/service'
 import type { ServiceCategory } from '@/types/service-category'
@@ -34,6 +33,9 @@ export function ServiceModal({ categories, service, onClose }: ServiceModalProps
   const [description, setDescription] = useState(service?.description ?? '')
   const [duration, setDuration] = useState(service?.duration_minutes?.toString() ?? '60')
   const [price, setPrice] = useState(service ? (service.price_cents / 100).toString() : '')
+  const [priceMax, setPriceMax] = useState(
+    service?.price_max_cents ? (service.price_max_cents / 100).toString() : ''
+  )
   const serviceImage = useServiceImageUpload(service?.image_url)
   const isEditing = Boolean(service)
 
@@ -41,7 +43,14 @@ export function ServiceModal({ categories, service, onClose }: ServiceModalProps
     event.preventDefault()
     setErrorMsg(null)
 
-    const input = buildServiceInputFromFormValues({ categoryId, name, description, duration, price })
+    const input = buildServiceInputFromFormValues({
+      categoryId,
+      name,
+      description,
+      duration,
+      price,
+      priceMax,
+    })
     if (!input.success) {
       setErrorMsg(input.error)
       return
@@ -114,30 +123,18 @@ export function ServiceModal({ categories, service, onClose }: ServiceModalProps
             />
           </ServiceFormField>
           <div className="grid gap-4 sm:grid-cols-2">
-            <ServiceFormField
-              label="Durée (minutes)"
-              htmlFor="duration"
-              hint={formatServiceDurationHint(duration)}
-            >
-              <input
-                id="duration"
-                type="text"
-                placeholder="ex: 90"
-                value={duration}
-                onChange={(event) => setDuration(event.target.value)}
-                className={inputClassName}
-              />
-            </ServiceFormField>
-            <ServiceFormField label="Prix (€)" htmlFor="price">
-              <input
-                id="price"
-                type="text"
-                placeholder="ex: 45 ou 45.50"
-                value={price}
-                onChange={(event) => setPrice(event.target.value)}
-                className={inputClassName}
-              />
-            </ServiceFormField>
+            <ServiceDurationField
+              inputClassName={inputClassName}
+              duration={duration}
+              onDurationChange={setDuration}
+            />
+            <ServicePriceFields
+              inputClassName={inputClassName}
+              price={price}
+              priceMax={priceMax}
+              onPriceChange={setPrice}
+              onPriceMaxChange={setPriceMax}
+            />
           </div>
           <ServiceModalFooter isPending={isPending} onClose={onClose} />
         </form>

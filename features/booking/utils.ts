@@ -138,6 +138,14 @@ export function formatPrice(cents: number): string {
   return `${euros} €`;
 }
 
+export function formatPriceRange(priceCents: number, priceMaxCents?: number | null): string {
+  if (priceMaxCents === null || priceMaxCents === undefined || priceMaxCents <= priceCents) {
+    return formatPrice(priceCents);
+  }
+
+  return `de ${formatPrice(priceCents)} à ${formatPrice(priceMaxCents)}`;
+}
+
 /**
  * Formats a duration in minutes to a human-readable string.
  * 30 → "30min", 60 → "1h", 90 → "1h30"

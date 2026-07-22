@@ -34,7 +34,7 @@ import {
   getAvailableSlots,
   groupSlotsByPeriod,
   formatDuration,
-  formatPrice,
+  formatPriceRange,
   hasRequiredBookingPhone,
 } from '@/features/booking/utils';
 
@@ -102,7 +102,7 @@ export async function bookAppointment(data: CreateBookingInput): Promise<Booking
     const result = await createBooking(data, service.duration_minutes);
     const formattedDate = formatSalonDateLong(data.starts_at);
     const duration = formatDuration(service.duration_minutes);
-    const price = formatPrice(service.price_cents);
+    const price = formatPriceRange(service.price_cents, service.price_max_cents);
 
     try {
       await sendBookingRequestReceived({
@@ -182,7 +182,7 @@ export async function confirmBookingByAdmin(bookingId: string): Promise<ActionRe
         date: formatSalonDateLong(startsAt),
         slot: formatSalonTime(startsAt),
         duration: formatDuration(booking.service.duration_minutes),
-        price: formatPrice(booking.service.price_cents),
+        price: formatPriceRange(booking.service.price_cents, booking.service.price_max_cents),
         cancelToken: booking.cancel_token,
       });
     } catch (emailError) {
@@ -225,7 +225,7 @@ export async function cancelBookingByAdmin(bookingId: string): Promise<ActionRes
         date: formatSalonDateLong(startsAt),
         slot: formatSalonTime(startsAt),
         duration: formatDuration(booking.service.duration_minutes),
-        price: formatPrice(booking.service.price_cents),
+        price: formatPriceRange(booking.service.price_cents, booking.service.price_max_cents),
         cancelToken: booking.cancel_token,
       });
     } catch (emailError) {
@@ -283,7 +283,7 @@ export async function createBookingByAdmin(data: CreateBookingInput): Promise<Bo
     const result = await createAdminBooking(data, service.duration_minutes);
     const formattedDate = formatSalonDateLong(data.starts_at);
     const duration = formatDuration(service.duration_minutes);
-    const price = formatPrice(service.price_cents);
+    const price = formatPriceRange(service.price_cents, service.price_max_cents);
 
     try {
       await sendAdminCreatedBookingConfirmation({
@@ -378,7 +378,7 @@ export async function cancelBookingByToken(
         date: formatSalonDateLong(startsAt),
         slot: formatSalonTime(startsAt),
         duration: formatDuration(booking.service.duration_minutes),
-        price: formatPrice(booking.service.price_cents),
+        price: formatPriceRange(booking.service.price_cents, booking.service.price_max_cents),
         cancelToken: booking.cancel_token,
       });
     } catch (emailError) {

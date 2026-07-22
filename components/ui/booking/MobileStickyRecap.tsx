@@ -3,7 +3,7 @@
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { Service } from '@/types/service'
-import { buildBookingFormPath, formatDuration, formatPrice } from '@/features/booking/utils'
+import { buildBookingFormPath, formatDuration, formatPriceRange } from '@/features/booking/utils'
 import { Button } from '@/components/ui/button'
 import { ServiceImage } from '@/components/ui/service-image'
 
@@ -41,7 +41,7 @@ export function MobileStickyRecap({
               {service.name}
             </h3>
             <span className="shrink-0 font-body-lg text-[16px] font-semibold text-on-background">
-              {formatPrice(service.price_cents)}
+              {formatPriceRange(service.price_cents, service.price_max_cents)}
             </span>
           </div>
           <p className="mt-2 flex items-center gap-1.5 font-body-md text-[12px] text-on-surface-variant">

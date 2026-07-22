@@ -3,7 +3,7 @@ import { getConfirmedBookingsDueForClientReminder } from '@/features/booking/que
 import { formatSalonDateLong, formatSalonTime } from '@/features/booking/salon-time';
 import {
   formatDuration,
-  formatPrice,
+  formatPriceRange,
   getClientReminderWindow,
 } from '@/features/booking/utils';
 import { sendBookingReminder, type BookingEmailData } from '@/features/notifications/email';
@@ -76,7 +76,7 @@ function buildBookingEmailData(booking: BookingWithService): BookingEmailData {
     date: formatSalonDateLong(startsAt),
     slot: formatSalonTime(startsAt),
     duration: formatDuration(booking.service.duration_minutes),
-    price: formatPrice(booking.service.price_cents),
+    price: formatPriceRange(booking.service.price_cents, booking.service.price_max_cents),
     cancelToken: booking.cancel_token,
   };
 }
